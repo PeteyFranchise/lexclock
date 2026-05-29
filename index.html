@@ -580,6 +580,201 @@
         display: none;
       }
 
+      .settings-full-span {
+        grid-column: 1 / -1;
+      }
+
+      .settings-section-heading {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--navy);
+        margin-top: 4px;
+      }
+
+      .settings-subsection {
+        border: 1px solid #e1e6ef;
+        border-radius: var(--radius);
+        padding: 16px;
+        background: #fbfcfe;
+      }
+
+      .settings-subsection h4 {
+        margin-bottom: 12px;
+        font-size: 0.98rem;
+      }
+
+      .label-row {
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .help-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--navy);
+        color: var(--gold);
+        font-size: 11px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        margin-left: 6px;
+        vertical-align: middle;
+        line-height: 1;
+      }
+
+      .help-btn:hover {
+        background: var(--gold);
+        color: var(--navy);
+      }
+
+      .phase-note {
+        color: var(--grey-text);
+        margin-top: 8px;
+      }
+
+      .btn-connect {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--navy);
+        color: var(--white);
+        border: none;
+        border-radius: 6px;
+        padding: 9px 18px;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+      .btn-connect:hover {
+        background: #162d54;
+      }
+
+      .btn-connect.is-disabled {
+        background: #cbd5e1;
+        color: #94a3b8;
+        cursor: not-allowed;
+      }
+
+      .btn-connect.connected {
+        background: var(--green);
+        color: var(--white);
+        cursor: default;
+        pointer-events: none;
+      }
+
+      .connect-status {
+        display: block;
+        font-size: 12px;
+        color: var(--grey-text);
+        margin-top: 5px;
+      }
+
+      .connect-status.connected {
+        color: var(--green);
+        font-weight: 500;
+      }
+
+      .disconnect-link {
+        font-size: 12px;
+        color: var(--red);
+        text-decoration: underline;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0;
+        margin-top: 4px;
+        display: block;
+      }
+
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .modal-overlay.active {
+        display: flex;
+      }
+
+      .modal-box {
+        background: var(--white);
+        border-radius: 10px;
+        padding: 28px 32px;
+        max-width: 480px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        position: relative;
+      }
+
+      .modal-title {
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--navy);
+        margin-bottom: 16px;
+        padding-right: 24px;
+      }
+
+      .modal-body {
+        font-size: 14px;
+        color: #333;
+        line-height: 1.65;
+      }
+
+      .modal-body ol {
+        padding-left: 20px;
+        margin: 10px 0;
+      }
+
+      .modal-body li {
+        margin-bottom: 6px;
+      }
+
+      .modal-body code {
+        background: var(--grey-light);
+        padding: 1px 5px;
+        border-radius: 3px;
+        font-size: 12px;
+        font-family: monospace;
+      }
+
+      .modal-caution {
+        margin-top: 14px;
+        padding: 10px 14px;
+        background: #fef9ec;
+        border-left: 3px solid var(--gold);
+        border-radius: 4px;
+        font-size: 13px;
+        color: #555;
+      }
+
+      .modal-close {
+        position: absolute;
+        top: 14px;
+        right: 16px;
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--grey-text);
+        line-height: 1;
+      }
+
+      .modal-close:hover {
+        color: var(--navy);
+      }
+
       .desktop-only {
         display: initial;
       }
@@ -767,6 +962,14 @@
 
     <div class="toast-container" id="toast-container"></div>
     <div class="modal-root" id="modal-root"></div>
+    <div id="help-modal-overlay" class="modal-overlay" aria-hidden="true">
+      <div class="modal-box">
+        <button class="modal-close" id="help-modal-close" type="button" aria-label="Close help modal">×</button>
+        <div class="modal-title" id="help-modal-title"></div>
+        <div class="modal-body" id="help-modal-body"></div>
+        <div class="modal-caution" id="help-modal-caution"></div>
+      </div>
+    </div>
 
     <script>
       const STORAGE_KEYS = {
@@ -777,6 +980,8 @@
         timers: 'lexclock_timers',
       };
 
+      const IS_HOSTED = window.location.protocol === 'https:';
+
       const DEFAULT_SETTINGS = {
         lawyerName: '',
         firmName: '',
@@ -784,6 +989,7 @@
         increment: 0.1,
         anthropicApiKey: '',
         googleClientId: '',
+        microsoftClientId: '',
         gmailConnected: false,
         outlookConnected: false,
         onboardingDismissed: false,
@@ -810,6 +1016,69 @@
         longReply: 'Long / Researched Email',
         attachmentReview: 'Email + Attachment Review',
         draftedFromScratch: 'Drafted from Scratch',
+      };
+
+      const HELP_CONTENT = {
+        anthropicApiKey: {
+          title: 'Anthropic API Key',
+          body: `
+            <p>This key connects LexClock to Claude, the AI that analyzes your emails and writes billing narratives.</p>
+            <p>It starts with: <code>sk-ant-</code></p>
+            <p>How to get it:</p>
+            <ol>
+              <li>Go to console.anthropic.com</li>
+              <li>Sign in or create a free account</li>
+              <li>Click "API Keys" in the left sidebar</li>
+              <li>Click "Create Key" and name it "LexClock"</li>
+              <li>Copy the key immediately — Anthropic only shows it once</li>
+            </ol>
+          `,
+          caution:
+            'Your key is stored only in this browser. It never leaves your device. Keep it private — do not share your screen while this field is visible. Usage is billed to your Anthropic account at approximately $0.01–$0.03 per email analysis session.',
+        },
+        googleClientId: {
+          title: 'Google Client ID (Gmail Sync)',
+          body: `
+            <p>This ID connects LexClock to your Gmail inbox so emails can be fetched and analyzed automatically.</p>
+            <p>It ends with: <code>.apps.googleusercontent.com</code></p>
+            <p>How to get it:</p>
+            <ol>
+              <li>Go to console.cloud.google.com</li>
+              <li>Create a new project (or select an existing one)</li>
+              <li>Go to "APIs & Services" → "Enabled APIs" → enable "Gmail API"</li>
+              <li>Go to "APIs & Services" → "Credentials"</li>
+              <li>Click "Create Credentials" → "OAuth 2.0 Client ID"</li>
+              <li>Application type: "Web application"</li>
+              <li>Under "Authorized JavaScript origins" add:<br /><code>https://peteyfranchise.github.io</code></li>
+              <li>Under "Authorized redirect URIs" add:<br /><code>https://peteyfranchise.github.io/lexclock/</code></li>
+              <li>Click Create and copy the Client ID</li>
+            </ol>
+          `,
+          caution:
+            'LexClock requests read-only access. It cannot send, delete, or modify any emails. Setup takes approximately 10–15 minutes the first time. Gmail sync activates in a future update.',
+        },
+        microsoftClientId: {
+          title: 'Microsoft Client ID (Outlook Sync)',
+          body: `
+            <p>This ID connects LexClock to your Outlook inbox so emails can be fetched and analyzed automatically.</p>
+            <p>It is a UUID formatted as:<br /><code>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</code></p>
+            <p>How to get it:</p>
+            <ol>
+              <li>Go to portal.azure.com</li>
+              <li>Search for "App registrations" and click it</li>
+              <li>Click "New registration"</li>
+              <li>Name: "LexClock"</li>
+              <li>Account type: "Personal Microsoft accounts only"</li>
+              <li>Redirect URI: Select "Single-page application (SPA)" and enter:<br /><code>https://peteyfranchise.github.io/lexclock/</code></li>
+              <li>Click Register</li>
+              <li>Copy the "Application (client) ID" from the Overview page</li>
+              <li>Go to "API permissions" → "Add a permission" → "Microsoft Graph" → "Delegated" → search for and add "Mail.Read"</li>
+              <li>Click "Grant admin consent" if prompted</li>
+            </ol>
+          `,
+          caution:
+            'LexClock requests read-only access. It cannot send, delete, or modify any emails. Setup takes approximately 10–15 minutes the first time. Gmail and Outlook cannot be connected simultaneously — connecting one will disconnect the other. Outlook sync activates in a future update.',
+        },
       };
 
       const state = {
@@ -873,6 +1142,10 @@
         setJson(STORAGE_KEYS.settings, settings);
       }
 
+      function saveSettings(settings) {
+        setSettings(settings);
+      }
+
       function getClients() {
         return getJson(STORAGE_KEYS.clients, [cloneDefault(DEFAULT_CLIENT)]);
       }
@@ -890,7 +1163,12 @@
       }
 
       function getEntries() {
-        return getJson(STORAGE_KEYS.entries, []);
+        const entries = getJson(STORAGE_KEYS.entries, []);
+        const normalized = entries.map((entry) => ('syncedTo' in entry ? entry : { ...entry, syncedTo: null }));
+        if (normalized.some((entry, index) => entry !== entries[index])) {
+          setJson(STORAGE_KEYS.entries, normalized);
+        }
+        return normalized;
       }
 
       function setEntries(entries) {
@@ -927,6 +1205,23 @@
       function calcDollars(billedHours, matterId) {
         const rate = getMatterRate(matterId);
         return Number((billedHours * rate).toFixed(2));
+      }
+
+      function createEntry({ matterId, date, rawSeconds, description, type, billable }) {
+        const billedHours = calcBilledHours(rawSeconds, getSettings().increment);
+        return {
+          id: generateId('entry'),
+          matterId,
+          date,
+          rawSeconds,
+          billedHours,
+          description,
+          type,
+          billable,
+          dollars: billable ? calcDollars(billedHours, matterId) : 0,
+          createdAt: Date.now(),
+          syncedTo: null,
+        };
       }
 
       function formatHours(hours) {
@@ -1067,24 +1362,19 @@
         const timer = timers.find((item) => item.id === timerId);
         if (!timer) return;
         const rawSeconds = Math.round(getTimerTotalSeconds(timer, now));
-        const billedHours = calcBilledHours(rawSeconds, getSettings().increment);
         const description = timer.description.trim() || 'Legal work session.';
-        const entry = {
-          id: generateId('entry'),
+        const entry = createEntry({
           matterId: timer.matterId,
           date: todayKey(),
           rawSeconds,
-          billedHours,
           description,
           type: 'timer',
           billable: timer.billable,
-          dollars: timer.billable ? calcDollars(billedHours, timer.matterId) : 0,
-          createdAt: Date.now(),
-        };
+        });
         setEntries([entry, ...getEntries()]);
         setTimers(timers.filter((item) => item.id !== timerId));
         renderAll();
-        showToast(`Logged ${formatRawDuration(rawSeconds)} raw as ${formatHours(billedHours)}.`, 'success');
+        showToast(`Logged ${formatRawDuration(rawSeconds)} raw as ${formatHours(entry.billedHours)}.`, 'success');
       }
 
       function discardTimer(timerId) {
@@ -1097,20 +1387,15 @@
         const settings = getSettings();
         const suggestedHours = Number(settings.emailDefaults[formData.emailType] || 0.1);
         const rawSeconds = Math.round(suggestedHours * 3600);
-        const billedHours = calcBilledHours(rawSeconds, settings.increment);
         const description = formData.description.trim() || `${EMAIL_TIER_LABELS[formData.emailType]}.`;
-        const entry = {
-          id: generateId('entry'),
+        const entry = createEntry({
           matterId: formData.matterId,
           date: formData.date,
           rawSeconds,
-          billedHours,
           description,
           type: 'email',
           billable: formData.billable,
-          dollars: formData.billable ? calcDollars(billedHours, formData.matterId) : 0,
-          createdAt: Date.now(),
-        };
+        });
         setEntries([entry, ...getEntries()]);
         state.currentView = 'view-log';
         showView('view-log');
@@ -1129,6 +1414,7 @@
             billable: updates.billable,
             billedHours,
             dollars: updates.billable ? calcDollars(billedHours, updates.matterId) : 0,
+            syncedTo: entry.syncedTo,
           };
         });
         setEntries(entries);
@@ -1194,6 +1480,7 @@
           increment: Number(form.querySelector('[name="increment"]').value || existing.increment),
           anthropicApiKey: form.querySelector('[name="anthropicApiKey"]').value.trim(),
           googleClientId: form.querySelector('[name="googleClientId"]').value.trim(),
+          microsoftClientId: form.querySelector('[name="microsoftClientId"]').value.trim(),
           emailDefaults: {
             quickReply: Number(form.querySelector('[name="quickReply"]').value || 0.1),
             standardReply: Number(form.querySelector('[name="standardReply"]').value || 0.2),
@@ -1389,6 +1676,103 @@
       function closeModal() {
         state.modal = null;
         renderModal();
+      }
+
+      function openHelpModal(key) {
+        const content = HELP_CONTENT[key];
+        if (!content) return;
+        document.getElementById('help-modal-title').textContent = content.title;
+        document.getElementById('help-modal-body').innerHTML = content.body;
+        document.getElementById('help-modal-caution').textContent = content.caution;
+        document.getElementById('help-modal-overlay').classList.add('active');
+        document.getElementById('help-modal-overlay').setAttribute('aria-hidden', 'false');
+      }
+
+      function closeHelpModal() {
+        document.getElementById('help-modal-overlay').classList.remove('active');
+        document.getElementById('help-modal-overlay').setAttribute('aria-hidden', 'true');
+      }
+
+      function renderConnectButton(provider) {
+        const settings = getSettings();
+        const isGmail = provider === 'gmail';
+        const clientId = isGmail ? settings.googleClientId : settings.microsoftClientId;
+        const isConnected = isGmail ? settings.gmailConnected : settings.outlookConnected;
+        const helpKey = isGmail ? 'googleClientId' : 'microsoftClientId';
+        const label = isGmail ? 'Gmail' : 'Outlook';
+        const buttonId = `btn-connect-${provider}`;
+        const statusId = `status-connect-${provider}`;
+        const canConnect = IS_HOSTED && clientId.trim().length > 0;
+
+        let buttonClass = 'btn-connect';
+        let buttonText = `Connect ${label}`;
+        let statusText = '';
+        let statusClass = 'connect-status';
+        let disconnectLink = '';
+        let action = 'oauth';
+
+        if (isConnected) {
+          buttonClass += ' connected';
+          buttonText = `✓ ${label} Connected`;
+          statusText = settings[`${provider}Email`] || 'Connected';
+          statusClass += ' connected';
+          disconnectLink = `<button class="disconnect-link" data-disconnect-provider="${provider}" type="button">Disconnect</button>`;
+          action = 'connected';
+        } else if (!IS_HOSTED) {
+          buttonClass += ' is-disabled';
+          statusText = 'Available once hosted on GitHub Pages';
+          action = 'help';
+        } else if (!clientId.trim()) {
+          buttonClass += ' is-disabled';
+          statusText = `Enter your ${label === 'Gmail' ? 'Google Client ID' : 'Microsoft Client ID'} above first`;
+          action = 'help';
+        }
+
+        return `
+          <button
+            id="${buttonId}"
+            class="${buttonClass}"
+            data-connect-provider="${provider}"
+            data-connect-help-key="${helpKey}"
+            data-connect-action="${action}"
+            type="button">
+            ${buttonText}
+          </button>
+          <span id="${statusId}" class="${statusClass}">${escapeHtml(statusText)}</span>
+          ${disconnectLink}
+        `;
+      }
+
+      function initiateOAuth(provider) {
+        // MUTUAL EXCLUSIVITY GUARD (enforce in Phase 2):
+        // If provider === 'gmail' and settings.outlookConnected === true,
+        //   disconnect Outlook before proceeding.
+        // If provider === 'outlook' and settings.gmailConnected === true,
+        //   disconnect Gmail before proceeding.
+        // Show a confirmation: "This will disconnect [other provider]. Continue?"
+        // Phase 2 implementation below:
+        console.log(`OAuth flow for ${provider} — implemented in Phase 2`);
+      }
+
+      function disconnectProvider(provider) {
+        const confirmed = confirm(`Disconnect ${provider === 'gmail' ? 'Gmail' : 'Outlook'}? Your logged billing entries will not be affected.`);
+        if (!confirmed) return;
+
+        const settings = getSettings();
+        if (provider === 'gmail') {
+          settings.gmailConnected = false;
+          localStorage.removeItem('lexclock_gmail_token');
+          localStorage.removeItem('lexclock_gmail_expiry');
+          localStorage.removeItem('lexclock_gmail_synced_ids');
+        } else {
+          settings.outlookConnected = false;
+          localStorage.removeItem('lexclock_outlook_token');
+          localStorage.removeItem('lexclock_outlook_expiry');
+        }
+
+        saveSettings(settings);
+        renderSettingsView();
+        showToast(`${provider === 'gmail' ? 'Gmail' : 'Outlook'} disconnected`, 'success');
       }
 
       function renderModal() {
@@ -1810,6 +2194,7 @@
                         <th>Entry</th>
                         <th>Raw / Billed</th>
                         <th>Amount</th>
+                        <!-- PHASE 4: Add "Sync Status" column here -->
                         <th>Actions</th>
                       </tr>
                     </thead>
@@ -1925,13 +2310,36 @@
                 <label for="increment">Billing Increment (hours)</label>
                 <input id="increment" name="increment" type="number" min="0.1" step="0.1" value="${settings.increment}" />
               </div>
-              <div class="field-row">
-                <label for="anthropic-api-key">Anthropic API Key</label>
-                <input id="anthropic-api-key" name="anthropicApiKey" type="password" value="${escapeHtml(settings.anthropicApiKey)}" />
+              <div class="field-row settings-full-span">
+                <div class="settings-section-heading">AI Analysis</div>
               </div>
               <div class="field-row">
-                <label for="google-client-id">Google Client ID</label>
-                <input id="google-client-id" name="googleClientId" type="text" value="${escapeHtml(settings.googleClientId)}" />
+                <label class="label-row" for="anthropic-api-key">Anthropic API Key<button class="help-btn" data-help-key="anthropicApiKey" type="button" aria-label="Learn how to find the Anthropic API Key">?</button></label>
+                <input id="anthropic-api-key" name="anthropicApiKey" type="password" value="${escapeHtml(settings.anthropicApiKey)}" />
+              </div>
+              <div class="field-row settings-full-span">
+                <div class="settings-section-heading">Email Sync</div>
+              </div>
+              <div class="field-row settings-full-span">
+                <div class="settings-subsection">
+                  <h4>Gmail Sync</h4>
+                  <div class="field-row">
+                    <label class="label-row" for="google-client-id">Google Client ID<button class="help-btn" data-help-key="googleClientId" type="button" aria-label="Learn how to find the Google Client ID">?</button></label>
+                    <input id="google-client-id" name="googleClientId" type="text" value="${escapeHtml(settings.googleClientId)}" />
+                    ${renderConnectButton('gmail')}
+                  </div>
+                </div>
+              </div>
+              <div class="field-row settings-full-span">
+                <div class="settings-subsection">
+                  <h4>Outlook Sync</h4>
+                  <div class="field-row">
+                    <label class="label-row" for="microsoft-client-id">Microsoft Client ID<button class="help-btn" data-help-key="microsoftClientId" type="button" aria-label="Learn how to find the Microsoft Client ID">?</button></label>
+                    <input id="microsoft-client-id" name="microsoftClientId" type="password" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" value="${escapeHtml(settings.microsoftClientId)}" />
+                    ${renderConnectButton('outlook')}
+                    <small class="phase-note">Outlook sync available in a future update</small>
+                  </div>
+                </div>
               </div>
               <div class="field-row">
                 <label for="quick-reply">Quick Reply Hours</label>
@@ -2038,6 +2446,31 @@
 
         if (ctaButton) {
           showView(ctaButton.dataset.ctaView);
+          return;
+        }
+
+        const helpButton = event.target.closest('[data-help-key]');
+        if (helpButton) {
+          openHelpModal(helpButton.dataset.helpKey);
+          return;
+        }
+
+        const connectButton = event.target.closest('[data-connect-provider]');
+        if (connectButton) {
+          const provider = connectButton.dataset.connectProvider;
+          const action = connectButton.dataset.connectAction;
+          const helpKey = connectButton.dataset.connectHelpKey;
+          if (action === 'help') {
+            openHelpModal(helpKey);
+          } else if (action === 'oauth') {
+            initiateOAuth(provider);
+          }
+          return;
+        }
+
+        const disconnectButton = event.target.closest('[data-disconnect-provider]');
+        if (disconnectButton) {
+          disconnectProvider(disconnectButton.dataset.disconnectProvider);
           return;
         }
 
@@ -2251,6 +2684,13 @@
         renderAll();
         showView(state.currentView);
         startTicker();
+        document.getElementById('help-modal-overlay').addEventListener('click', function (event) {
+          if (event.target === this) closeHelpModal();
+        });
+        document.getElementById('help-modal-close').addEventListener('click', closeHelpModal);
+        document.addEventListener('keydown', function (event) {
+          if (event.key === 'Escape') closeHelpModal();
+        });
         document.addEventListener('click', handleGlobalClick);
         document.addEventListener('submit', handleGlobalSubmit);
         document.querySelector('.sidebar-nav').addEventListener('click', handleNav);
