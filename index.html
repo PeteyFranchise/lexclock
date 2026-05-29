@@ -2224,11 +2224,18 @@
         }
       }
 
+      function hasRunningTimers() {
+        return getTimers().some((timer) => timer.running);
+      }
+
       function startTicker() {
         if (state.tickHandle) {
           window.clearInterval(state.tickHandle);
         }
         state.tickHandle = window.setInterval(() => {
+          if (!hasRunningTimers()) {
+            return;
+          }
           persistRunningTimerHeartbeat();
           renderShell();
           if (state.currentView === 'view-timers') {
