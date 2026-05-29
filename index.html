@@ -1,0 +1,2256 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LexClock</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --navy: #0f1f3d;
+        --navy-dark: #070f1e;
+        --gold: #c9a84c;
+        --white: #ffffff;
+        --grey-light: #f4f6f9;
+        --grey-text: #6b7280;
+        --grey-mid: #d5dbe6;
+        --green: #2d7d46;
+        --red: #e05c5c;
+        --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        --radius: 8px;
+      }
+
+      body {
+        font-family: 'Inter', sans-serif;
+        background: var(--grey-light);
+        color: var(--navy);
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .app-shell {
+        min-height: 100vh;
+        display: flex;
+      }
+
+      .sidebar {
+        width: 240px;
+        background: linear-gradient(180deg, var(--navy-dark), #0b1730 65%, #102346);
+        color: var(--white);
+        padding: 24px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+      }
+
+      .brand {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .brand-mark {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--gold), #f1dd9f);
+        color: var(--navy-dark);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+      }
+
+      .brand h1 {
+        font-size: 1.4rem;
+      }
+
+      .brand p,
+      .nav-footer p,
+      .meta-text,
+      .helper-text {
+        color: rgba(255, 255, 255, 0.72);
+      }
+
+      .sidebar-nav,
+      .mobile-nav {
+        display: flex;
+        gap: 8px;
+      }
+
+      .sidebar-nav {
+        flex-direction: column;
+      }
+
+      .nav-item {
+        min-height: 44px;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        padding: 12px 14px;
+        background: transparent;
+        color: inherit;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-align: left;
+      }
+
+      .nav-item.active {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(201, 168, 76, 0.25);
+      }
+
+      .nav-icon {
+        width: 20px;
+        height: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .nav-icon svg {
+        width: 20px;
+        height: 20px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .nav-footer {
+        margin-top: auto;
+        padding: 16px;
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .nav-footer strong {
+        display: block;
+        margin-top: 6px;
+        font-size: 1.05rem;
+        color: var(--gold);
+      }
+
+      .main-content {
+        flex: 1;
+        padding: 32px 24px 96px;
+      }
+
+      .content-wrap {
+        max-width: 960px;
+        margin: 0 auto;
+      }
+
+      .view {
+        display: none;
+      }
+
+      .view.active {
+        display: block;
+      }
+
+      .view-header {
+        margin-bottom: 22px;
+      }
+
+      .view-header h2 {
+        font-size: 2rem;
+        margin-bottom: 8px;
+      }
+
+      .view-grid,
+      .card-grid,
+      .form-grid,
+      .stats-grid,
+      .settings-grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .settings-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .card {
+        background: var(--white);
+        border-radius: var(--radius);
+        padding: 20px 24px;
+        box-shadow: var(--shadow);
+      }
+
+      .card + .card {
+        margin-top: 16px;
+      }
+
+      .card-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+
+      .card-title h3 {
+        font-size: 1.05rem;
+      }
+
+      .stat-card {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .stat-value {
+        font-size: 1.9rem;
+        font-weight: 700;
+      }
+
+      .money {
+        color: var(--green);
+      }
+
+      .meta-text,
+      .helper-text,
+      .empty-state p,
+      .field-row small,
+      .table-subtext,
+      .row-stack small {
+        color: var(--grey-text);
+      }
+
+      .hero-banner {
+        background: linear-gradient(135deg, #101f3b, #183055 60%, #305480);
+        color: var(--white);
+        overflow: hidden;
+        position: relative;
+      }
+
+      .hero-banner::after {
+        content: '';
+        position: absolute;
+        inset: auto -50px -50px auto;
+        width: 180px;
+        height: 180px;
+        border-radius: 999px;
+        background: rgba(201, 168, 76, 0.18);
+      }
+
+      .hero-banner h3 {
+        font-size: 1.45rem;
+        margin-bottom: 10px;
+      }
+
+      .hero-banner p {
+        color: rgba(255, 255, 255, 0.82);
+        max-width: 60ch;
+      }
+
+      .button-row,
+      .inline-actions,
+      .filter-row,
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .button-row {
+        margin-top: 18px;
+      }
+
+      .btn-primary,
+      .btn-secondary,
+      .btn-gold,
+      .btn-danger {
+        min-height: 44px;
+        border-radius: 6px;
+        padding: 10px 16px;
+        border: 1px solid transparent;
+      }
+
+      .btn-primary {
+        background: var(--navy);
+        color: var(--white);
+        font-weight: 600;
+      }
+
+      .btn-primary:hover {
+        background: #162d54;
+      }
+
+      .btn-secondary {
+        background: var(--white);
+        color: var(--navy);
+        border-color: var(--grey-mid);
+      }
+
+      .btn-gold {
+        background: var(--gold);
+        color: var(--navy);
+        font-weight: 700;
+      }
+
+      .btn-danger {
+        background: transparent;
+        color: var(--red);
+        border-color: var(--red);
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        background: var(--grey-light);
+      }
+
+      .pill.billable {
+        color: var(--green);
+        background: rgba(45, 125, 70, 0.1);
+      }
+
+      .pill.non-billable {
+        color: var(--grey-text);
+        background: #ebeef3;
+      }
+
+      .timer-total {
+        font-size: 2rem;
+        font-weight: 700;
+      }
+
+      .timer-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+
+      .list-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .list-table th,
+      .list-table td {
+        text-align: left;
+        padding: 14px 12px;
+        border-bottom: 1px solid #e7ebf2;
+        vertical-align: top;
+      }
+
+      .list-table th {
+        font-size: 0.88rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--grey-text);
+      }
+
+      .list-table tr.non-billable {
+        color: var(--grey-text);
+        background: #fafbfd;
+      }
+
+      .row-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .empty-state {
+        border: 1px dashed var(--grey-mid);
+        background: linear-gradient(180deg, #fbfcfe, #f4f6f9);
+        text-align: center;
+        padding: 28px 20px;
+        border-radius: var(--radius);
+      }
+
+      .empty-state h3 {
+        margin-bottom: 8px;
+      }
+
+      .field-row {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .field-row label {
+        font-weight: 600;
+      }
+
+      .field-row input,
+      .field-row select,
+      .field-row textarea {
+        min-height: 44px;
+        border-radius: 6px;
+        border: 1px solid #ccd4e2;
+        background: var(--white);
+        padding: 10px 12px;
+      }
+
+      .field-row textarea {
+        min-height: 110px;
+        resize: vertical;
+      }
+
+      .form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .form-grid .full-span {
+        grid-column: 1 / -1;
+      }
+
+      .split-card {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: 1.2fr 0.8fr;
+      }
+
+      .tier-grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .tier-card {
+        border: 1px solid #d9e0eb;
+        border-radius: var(--radius);
+        padding: 16px;
+        background: #fbfcfe;
+      }
+
+      .tier-card h4 {
+        margin-bottom: 6px;
+      }
+
+      .entry-group {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .entry-group + .entry-group {
+        margin-top: 20px;
+      }
+
+      .group-heading {
+        padding-bottom: 8px;
+        border-bottom: 1px solid #dce3ee;
+      }
+
+      .export-box {
+        width: 100%;
+        min-height: 240px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.94rem;
+        white-space: pre-wrap;
+      }
+
+      .manager-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .manager-row {
+        border: 1px solid #e1e6ef;
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .manager-row strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .toast-container {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 40;
+      }
+
+      .toast {
+        min-width: 260px;
+        max-width: 360px;
+        background: var(--navy);
+        color: var(--white);
+        padding: 14px 16px;
+        border-radius: 10px;
+        box-shadow: 0 14px 28px rgba(7, 15, 30, 0.22);
+        animation: toast-in 0.2s ease;
+      }
+
+      .toast.success {
+        background: var(--green);
+      }
+
+      .toast.error {
+        background: #9f2f2f;
+      }
+
+      @keyframes toast-in {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .modal-root {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(7, 15, 30, 0.5);
+        padding: 20px;
+        z-index: 50;
+      }
+
+      .modal-root.active {
+        display: flex;
+      }
+
+      .modal-card {
+        width: min(560px, 100%);
+        background: var(--white);
+        border-radius: 12px;
+        box-shadow: 0 24px 48px rgba(7, 15, 30, 0.22);
+        padding: 24px;
+      }
+
+      .modal-card h3 {
+        margin-bottom: 8px;
+      }
+
+      .modal-card p {
+        color: var(--grey-text);
+        margin-bottom: 18px;
+      }
+
+      .mobile-nav {
+        display: none;
+      }
+
+      .desktop-only {
+        display: initial;
+      }
+
+      .mobile-only {
+        display: none;
+      }
+
+      @media (max-width: 1023px) {
+        .sidebar {
+          display: none;
+        }
+
+        .main-content {
+          padding: 20px 16px 92px;
+        }
+
+        .mobile-nav {
+          display: grid;
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+          background: var(--navy-dark);
+          color: var(--white);
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          z-index: 30;
+        }
+
+        .mobile-nav .nav-item {
+          flex-direction: column;
+          justify-content: center;
+          gap: 4px;
+          padding: 8px 6px;
+          font-size: 0.76rem;
+        }
+
+        .stats-grid,
+        .settings-grid,
+        .split-card,
+        .form-grid,
+        .tier-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 767px) {
+        .view-header h2 {
+          font-size: 1.6rem;
+        }
+
+        .card {
+          padding: 18px 16px;
+        }
+
+        .list-table,
+        .list-table thead,
+        .list-table tbody,
+        .list-table tr,
+        .list-table th,
+        .list-table td {
+          display: block;
+          width: 100%;
+        }
+
+        .list-table thead {
+          display: none;
+        }
+
+        .list-table tr {
+          padding: 10px 0;
+          border-bottom: 1px solid #e7ebf2;
+        }
+
+        .list-table td {
+          padding: 6px 0;
+          border-bottom: none;
+        }
+
+        .desktop-only {
+          display: none;
+        }
+
+        .mobile-only {
+          display: initial;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">LC</div>
+          <div>
+            <h1>LexClock</h1>
+            <p>Single-file legal billing tracker</p>
+          </div>
+        </div>
+
+        <nav class="sidebar-nav">
+          <button class="nav-item active" data-view="view-dashboard" type="button">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 13h6V5H4zM14 19h6v-8h-6zM14 11h6V5h-6zM4 19h6v-4H4z"></path></svg>
+            </span>
+            Dashboard
+          </button>
+          <button class="nav-item" data-view="view-timers" type="button">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l2.5 2.5M9 3h6"></path></svg>
+            </span>
+            Timers
+          </button>
+          <button class="nav-item" data-view="view-email" type="button">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"></path><path d="m5 7 7 6 7-6"></path></svg>
+            </span>
+            Emails
+          </button>
+          <button class="nav-item" data-view="view-log" type="button">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M7 4h10l3 3v13H7z"></path><path d="M9 10h6M9 14h6M9 18h4"></path></svg>
+            </span>
+            Log
+          </button>
+          <button class="nav-item" data-view="view-settings" type="button">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 8.5A3.5 3.5 0 1 0 12 15.5A3.5 3.5 0 1 0 12 8.5z"></path><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.58 1.7 1.7 0 0 0-1.8.37l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.67 8.9a1.7 1.7 0 0 0-.37-1.8l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.55 1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.55 1.03H21a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15z"></path></svg>
+            </span>
+            Settings
+          </button>
+        </nav>
+
+        <div class="nav-footer">
+          <p>Today</p>
+          <strong id="sidebar-today-stats">0.0 hrs / $0.00</strong>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="content-wrap">
+          <section class="view active" id="view-dashboard"></section>
+          <section class="view" id="view-timers"></section>
+          <section class="view" id="view-email"></section>
+          <section class="view" id="view-log"></section>
+          <section class="view" id="view-settings"></section>
+        </div>
+      </main>
+    </div>
+
+    <nav class="mobile-nav">
+      <button class="nav-item active" data-view="view-dashboard" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 13h6V5H4zM14 19h6v-8h-6zM14 11h6V5h-6zM4 19h6v-4H4z"></path></svg>
+        </span>
+        Dashboard
+      </button>
+      <button class="nav-item" data-view="view-timers" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l2.5 2.5M9 3h6"></path></svg>
+        </span>
+        Timers
+      </button>
+      <button class="nav-item" data-view="view-email" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"></path><path d="m5 7 7 6 7-6"></path></svg>
+        </span>
+        Emails
+      </button>
+      <button class="nav-item" data-view="view-log" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M7 4h10l3 3v13H7z"></path><path d="M9 10h6M9 14h6M9 18h4"></path></svg>
+        </span>
+        Log
+      </button>
+      <button class="nav-item" data-view="view-settings" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 8.5A3.5 3.5 0 1 0 12 15.5A3.5 3.5 0 1 0 12 8.5z"></path><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.58 1.7 1.7 0 0 0-1.8.37l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.67 8.9a1.7 1.7 0 0 0-.37-1.8l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.55 1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.55 1.03H21a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15z"></path></svg>
+        </span>
+        Settings
+      </button>
+    </nav>
+
+    <div class="toast-container" id="toast-container"></div>
+    <div class="modal-root" id="modal-root"></div>
+
+    <script>
+      const STORAGE_KEYS = {
+        settings: 'lexclock_settings',
+        clients: 'lexclock_clients',
+        matters: 'lexclock_matters',
+        entries: 'lexclock_entries',
+        timers: 'lexclock_timers',
+      };
+
+      const DEFAULT_SETTINGS = {
+        lawyerName: '',
+        firmName: '',
+        defaultRate: 350,
+        increment: 0.1,
+        anthropicApiKey: '',
+        googleClientId: '',
+        gmailConnected: false,
+        outlookConnected: false,
+        onboardingDismissed: false,
+        emailDefaults: {
+          quickReply: 0.1,
+          standardReply: 0.2,
+          longReply: 0.3,
+          attachmentReview: 0.2,
+          draftedFromScratch: 0.4,
+        },
+      };
+
+      const DEFAULT_CLIENT = { id: 'client_001', name: 'General' };
+      const DEFAULT_MATTER = {
+        id: 'matter_001',
+        clientId: 'client_001',
+        name: 'General Matters',
+        rateOverride: null,
+      };
+
+      const EMAIL_TIER_LABELS = {
+        quickReply: 'Quick Reply (<= 3 sentences)',
+        standardReply: 'Standard Reply (substantive)',
+        longReply: 'Long / Researched Email',
+        attachmentReview: 'Email + Attachment Review',
+        draftedFromScratch: 'Drafted from Scratch',
+      };
+
+      const state = {
+        currentView: 'view-dashboard',
+        exportText: '',
+        logFilters: {
+          startDate: '',
+          endDate: '',
+          matterId: 'all',
+          billable: 'all',
+        },
+        modal: null,
+        tickHandle: null,
+      };
+
+      function generateId(prefix) {
+        return `${prefix}_${Date.now()}`;
+      }
+
+      function getJson(key, fallback) {
+        const raw = localStorage.getItem(key);
+        if (!raw) return fallback;
+        try {
+          return JSON.parse(raw);
+        } catch (error) {
+          return fallback;
+        }
+      }
+
+      function setJson(key, value) {
+        localStorage.setItem(key, JSON.stringify(value));
+      }
+
+      function cloneDefault(value) {
+        return JSON.parse(JSON.stringify(value));
+      }
+
+      function seedDataIfNeeded() {
+        if (!localStorage.getItem(STORAGE_KEYS.settings)) {
+          setJson(STORAGE_KEYS.settings, cloneDefault(DEFAULT_SETTINGS));
+        }
+        if (!localStorage.getItem(STORAGE_KEYS.clients)) {
+          setJson(STORAGE_KEYS.clients, [cloneDefault(DEFAULT_CLIENT)]);
+        }
+        if (!localStorage.getItem(STORAGE_KEYS.matters)) {
+          setJson(STORAGE_KEYS.matters, [cloneDefault(DEFAULT_MATTER)]);
+        }
+        if (!localStorage.getItem(STORAGE_KEYS.entries)) {
+          setJson(STORAGE_KEYS.entries, []);
+        }
+        if (!localStorage.getItem(STORAGE_KEYS.timers)) {
+          setJson(STORAGE_KEYS.timers, []);
+        }
+      }
+
+      function getSettings() {
+        return { ...cloneDefault(DEFAULT_SETTINGS), ...getJson(STORAGE_KEYS.settings, cloneDefault(DEFAULT_SETTINGS)) };
+      }
+
+      function setSettings(settings) {
+        setJson(STORAGE_KEYS.settings, settings);
+      }
+
+      function getClients() {
+        return getJson(STORAGE_KEYS.clients, [cloneDefault(DEFAULT_CLIENT)]);
+      }
+
+      function setClients(clients) {
+        setJson(STORAGE_KEYS.clients, clients);
+      }
+
+      function getMatters() {
+        return getJson(STORAGE_KEYS.matters, [cloneDefault(DEFAULT_MATTER)]);
+      }
+
+      function setMatters(matters) {
+        setJson(STORAGE_KEYS.matters, matters);
+      }
+
+      function getEntries() {
+        return getJson(STORAGE_KEYS.entries, []);
+      }
+
+      function setEntries(entries) {
+        setJson(STORAGE_KEYS.entries, entries);
+      }
+
+      function getTimers() {
+        return getJson(STORAGE_KEYS.timers, []);
+      }
+
+      function setTimers(timers) {
+        setJson(STORAGE_KEYS.timers, timers);
+      }
+
+      function calcBilledHours(rawSeconds, increment = 0.1) {
+        if (rawSeconds <= 0) return 0;
+        const rawHours = rawSeconds / 3600;
+        return Number((Math.ceil(rawHours / increment) * increment).toFixed(4));
+      }
+
+      function getMatterById(matterId) {
+        return getMatters().find((matter) => matter.id === matterId) || null;
+      }
+
+      function getClientById(clientId) {
+        return getClients().find((client) => client.id === clientId) || null;
+      }
+
+      function getMatterRate(matterId) {
+        const matter = getMatterById(matterId);
+        return matter && matter.rateOverride != null ? Number(matter.rateOverride) : Number(getSettings().defaultRate);
+      }
+
+      function calcDollars(billedHours, matterId) {
+        const rate = getMatterRate(matterId);
+        return Number((billedHours * rate).toFixed(2));
+      }
+
+      function formatHours(hours) {
+        return `${Number(hours || 0).toFixed(1)} hrs`;
+      }
+
+      function formatDollars(amount) {
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(Number(amount || 0));
+      }
+
+      function formatRawDuration(totalSeconds) {
+        const seconds = Math.max(0, Math.floor(totalSeconds || 0));
+        const hours = String(Math.floor(seconds / 3600)).padStart(2, '0');
+        const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+        const secs = String(seconds % 60).padStart(2, '0');
+        return `${hours}:${minutes}:${secs}`;
+      }
+
+      function formatDateLabel(dateString) {
+        if (!dateString) return '';
+        const date = new Date(`${dateString}T12:00:00`);
+        return date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        });
+      }
+
+      function todayKey() {
+        return new Date().toISOString().slice(0, 10);
+      }
+
+      function startOfWeekKey() {
+        const now = new Date();
+        const day = now.getDay();
+        const offset = day === 0 ? 6 : day - 1;
+        now.setDate(now.getDate() - offset);
+        return now.toISOString().slice(0, 10);
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function getTimerTotalSeconds(timer, now = Date.now()) {
+        if (!timer.running) return timer.accumulatedSeconds;
+        return timer.accumulatedSeconds + Math.max(0, (now - timer.startEpoch) / 1000);
+      }
+
+      function pauseAllTimers(exceptId = null) {
+        const now = Date.now();
+        const timers = getTimers().map((timer) => {
+          if (!timer.running || timer.id === exceptId) return timer;
+          return {
+            ...timer,
+            running: false,
+            accumulatedSeconds: getTimerTotalSeconds(timer, now),
+          };
+        });
+        setTimers(timers);
+        return timers;
+      }
+
+      function toggleTimerBillable(timerId, billable) {
+        const timers = getTimers().map((timer) => (timer.id === timerId ? { ...timer, billable } : timer));
+        setTimers(timers);
+        renderAll();
+        showToast(`Timer marked ${billable ? 'billable' : 'non-billable'}.`, 'success');
+      }
+
+      function createTimer({ matterId, description, billable }) {
+        pauseAllTimers();
+        const now = Date.now();
+        const timers = getTimers();
+        timers.unshift({
+          id: generateId('timer'),
+          matterId,
+          description,
+          startEpoch: now,
+          accumulatedSeconds: 0,
+          running: true,
+          billable,
+        });
+        setTimers(timers);
+        const settings = getSettings();
+        if (!settings.onboardingDismissed) {
+          settings.onboardingDismissed = true;
+          setSettings(settings);
+        }
+        renderAll();
+        showToast('Timer started. Any other running timer was auto-paused.', 'success');
+      }
+
+      function pauseTimer(timerId) {
+        const now = Date.now();
+        const timers = getTimers().map((timer) => {
+          if (timer.id !== timerId || !timer.running) return timer;
+          return {
+            ...timer,
+            running: false,
+            accumulatedSeconds: getTimerTotalSeconds(timer, now),
+          };
+        });
+        setTimers(timers);
+        renderAll();
+        showToast('Timer paused.', 'success');
+      }
+
+      function resumeTimer(timerId) {
+        pauseAllTimers(timerId);
+        const now = Date.now();
+        const timers = getTimers().map((timer) => {
+          if (timer.id !== timerId) return timer;
+          return {
+            ...timer,
+            running: true,
+            startEpoch: now,
+          };
+        });
+        setTimers(timers);
+        renderAll();
+        showToast('Timer resumed.', 'success');
+      }
+
+      function stopTimer(timerId) {
+        const now = Date.now();
+        const timers = getTimers();
+        const timer = timers.find((item) => item.id === timerId);
+        if (!timer) return;
+        const rawSeconds = Math.round(getTimerTotalSeconds(timer, now));
+        const billedHours = calcBilledHours(rawSeconds, getSettings().increment);
+        const description = timer.description.trim() || 'Legal work session.';
+        const entry = {
+          id: generateId('entry'),
+          matterId: timer.matterId,
+          date: todayKey(),
+          rawSeconds,
+          billedHours,
+          description,
+          type: 'timer',
+          billable: timer.billable,
+          dollars: timer.billable ? calcDollars(billedHours, timer.matterId) : 0,
+          createdAt: Date.now(),
+        };
+        setEntries([entry, ...getEntries()]);
+        setTimers(timers.filter((item) => item.id !== timerId));
+        renderAll();
+        showToast(`Logged ${formatRawDuration(rawSeconds)} raw as ${formatHours(billedHours)}.`, 'success');
+      }
+
+      function discardTimer(timerId) {
+        setTimers(getTimers().filter((timer) => timer.id !== timerId));
+        renderAll();
+        showToast('Timer discarded.', 'success');
+      }
+
+      function addManualEmailEntry(formData) {
+        const settings = getSettings();
+        const suggestedHours = Number(settings.emailDefaults[formData.emailType] || 0.1);
+        const rawSeconds = Math.round(suggestedHours * 3600);
+        const billedHours = calcBilledHours(rawSeconds, settings.increment);
+        const description = formData.description.trim() || `${EMAIL_TIER_LABELS[formData.emailType]}.`;
+        const entry = {
+          id: generateId('entry'),
+          matterId: formData.matterId,
+          date: formData.date,
+          rawSeconds,
+          billedHours,
+          description,
+          type: 'email',
+          billable: formData.billable,
+          dollars: formData.billable ? calcDollars(billedHours, formData.matterId) : 0,
+          createdAt: Date.now(),
+        };
+        setEntries([entry, ...getEntries()]);
+        state.currentView = 'view-log';
+        showView('view-log');
+        showToast('Email entry logged.', 'success');
+      }
+
+      function saveEntryEdits(entryId, updates) {
+        const entries = getEntries().map((entry) => {
+          if (entry.id !== entryId) return entry;
+          const billedHours = calcBilledHours(entry.rawSeconds, getSettings().increment);
+          return {
+            ...entry,
+            date: updates.date,
+            matterId: updates.matterId,
+            description: updates.description.trim(),
+            billable: updates.billable,
+            billedHours,
+            dollars: updates.billable ? calcDollars(billedHours, updates.matterId) : 0,
+          };
+        });
+        setEntries(entries);
+        closeModal();
+        renderAll();
+        showToast('Entry updated.', 'success');
+      }
+
+      function addClient(name) {
+        const trimmed = name.trim();
+        if (!trimmed) return;
+        const clients = getClients();
+        clients.push({ id: generateId('client'), name: trimmed });
+        setClients(clients);
+        renderAll();
+        showToast('Client added.', 'success');
+      }
+
+      function addMatter(clientId, name, rateOverride) {
+        const trimmed = name.trim();
+        if (!trimmed || !clientId) return;
+        const matters = getMatters();
+        matters.push({
+          id: generateId('matter'),
+          clientId,
+          name: trimmed,
+          rateOverride: rateOverride === '' ? null : Number(rateOverride),
+        });
+        setMatters(matters);
+        renderAll();
+        showToast('Matter added.', 'success');
+      }
+
+      function deleteClient(clientId) {
+        if (clientId === DEFAULT_CLIENT.id) {
+          showToast('The default General client cannot be deleted.', 'error');
+          return;
+        }
+        setClients(getClients().filter((client) => client.id !== clientId));
+        setMatters(getMatters().filter((matter) => matter.clientId !== clientId));
+        renderAll();
+        showToast('Client deleted. Existing entries will show Unknown Matter.', 'success');
+      }
+
+      function deleteMatter(matterId) {
+        if (matterId === DEFAULT_MATTER.id) {
+          showToast('The default General matter cannot be deleted.', 'error');
+          return;
+        }
+        setMatters(getMatters().filter((matter) => matter.id !== matterId));
+        setTimers(getTimers().filter((timer) => timer.matterId !== matterId));
+        renderAll();
+        showToast('Matter deleted. Existing entries will show Unknown Matter.', 'success');
+      }
+
+      function saveSettingsFromForm(form) {
+        const existing = getSettings();
+        const next = {
+          ...existing,
+          lawyerName: form.querySelector('[name="lawyerName"]').value.trim(),
+          firmName: form.querySelector('[name="firmName"]').value.trim(),
+          defaultRate: Number(form.querySelector('[name="defaultRate"]').value || existing.defaultRate),
+          increment: Number(form.querySelector('[name="increment"]').value || existing.increment),
+          anthropicApiKey: form.querySelector('[name="anthropicApiKey"]').value.trim(),
+          googleClientId: form.querySelector('[name="googleClientId"]').value.trim(),
+          emailDefaults: {
+            quickReply: Number(form.querySelector('[name="quickReply"]').value || 0.1),
+            standardReply: Number(form.querySelector('[name="standardReply"]').value || 0.2),
+            longReply: Number(form.querySelector('[name="longReply"]').value || 0.3),
+            attachmentReview: Number(form.querySelector('[name="attachmentReview"]').value || 0.2),
+            draftedFromScratch: Number(form.querySelector('[name="draftedFromScratch"]').value || 0.4),
+          },
+        };
+        setSettings(next);
+        renderAll();
+        showToast('Settings saved.', 'success');
+      }
+
+      function clearAllData() {
+        Object.values(STORAGE_KEYS).forEach((key) => localStorage.removeItem(key));
+        seedDataIfNeeded();
+        state.exportText = '';
+        state.logFilters = {
+          startDate: '',
+          endDate: '',
+          matterId: 'all',
+          billable: 'all',
+        };
+        closeModal();
+        renderAll();
+        showToast('All LexClock data cleared and defaults re-seeded.', 'success');
+      }
+
+      function getDisplayMatter(matterId) {
+        const matter = getMatterById(matterId);
+        if (!matter) {
+          return {
+            matterName: 'Unknown Matter',
+            clientName: 'Unknown Client',
+          };
+        }
+        const client = getClientById(matter.clientId);
+        return {
+          matterName: matter.name,
+          clientName: client ? client.name : 'Unknown Client',
+        };
+      }
+
+      function collectTotals(entries) {
+        return entries.reduce(
+          (accumulator, entry) => {
+            if (!entry.billable) return accumulator;
+            accumulator.hours += Number(entry.billedHours || 0);
+            accumulator.dollars += Number(entry.dollars || 0);
+            return accumulator;
+          },
+          { hours: 0, dollars: 0 }
+        );
+      }
+
+      function getTodayStats() {
+        const today = todayKey();
+        const entries = getEntries().filter((entry) => entry.date === today && entry.billable);
+        const totals = collectTotals(entries);
+        const timers = getTimers();
+        timers.forEach((timer) => {
+          if (!timer.billable) return;
+          const seconds = getTimerTotalSeconds(timer);
+          const billedHours = calcBilledHours(seconds, getSettings().increment);
+          totals.hours += billedHours;
+          totals.dollars += calcDollars(billedHours, timer.matterId);
+        });
+        return totals;
+      }
+
+      function getWeekStats() {
+        const start = startOfWeekKey();
+        const entries = getEntries().filter((entry) => entry.date >= start && entry.billable);
+        return collectTotals(entries);
+      }
+
+      function buildExportText(entries, startDate, endDate) {
+        const settings = getSettings();
+        const lawyerName = settings.lawyerName || 'UNNAMED LAWYER';
+        const rangeLabel = startDate && endDate ? `${startDate} to ${endDate}` : 'All Dates';
+        const grouped = new Map();
+
+        entries
+          .filter((entry) => entry.billable)
+          .sort((a, b) => a.date.localeCompare(b.date) || a.createdAt - b.createdAt)
+          .forEach((entry) => {
+            const display = getDisplayMatter(entry.matterId);
+            const groupKey = `${display.clientName}|||${display.matterName}`;
+            if (!grouped.has(groupKey)) grouped.set(groupKey, []);
+            grouped.get(groupKey).push({ entry, display });
+          });
+
+        const lines = [];
+        lines.push('================================================');
+        lines.push(`BILLING EXPORT - ${lawyerName.toUpperCase()} - ${rangeLabel}`);
+        lines.push('================================================');
+        lines.push('');
+
+        grouped.forEach((items, key) => {
+          const [clientName, matterName] = key.split('|||');
+          lines.push(`${clientName} - ${matterName}`);
+          lines.push('');
+          items.forEach(({ entry }) => {
+            const rate = formatDollars(getMatterRate(entry.matterId));
+            lines.push(`Date:      ${entry.date}`);
+            lines.push(`Time:      ${Number(entry.billedHours).toFixed(1)} hrs`);
+            lines.push(`Rate:      ${rate}/hr`);
+            lines.push(`Amount:    ${formatDollars(entry.dollars)}`);
+            lines.push(`Narrative: ${entry.description}`);
+            lines.push('------------------------------------------------');
+          });
+          lines.push('');
+        });
+
+        const totals = collectTotals(entries);
+        lines.push(`TOTAL BILLABLE:  ${Number(totals.hours).toFixed(1)} hrs  |  ${formatDollars(totals.dollars)}`);
+        lines.push('================================================');
+        return lines.join('\n');
+      }
+
+      function filteredEntries() {
+        const { startDate, endDate, matterId, billable } = state.logFilters;
+        return getEntries()
+          .filter((entry) => !startDate || entry.date >= startDate)
+          .filter((entry) => !endDate || entry.date <= endDate)
+          .filter((entry) => matterId === 'all' || entry.matterId === matterId)
+          .filter((entry) => billable === 'all' || String(entry.billable) === billable)
+          .sort((a, b) => b.createdAt - a.createdAt);
+      }
+
+      function showToast(message, tone = '') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${tone}`.trim();
+        toast.textContent = message;
+        container.appendChild(toast);
+        window.setTimeout(() => {
+          toast.remove();
+        }, 3000);
+      }
+
+      function openConfirmModal({ title, message, confirmLabel, confirmClass = 'btn-primary', onConfirm }) {
+        state.modal = { type: 'confirm', title, message, confirmLabel, confirmClass, onConfirm };
+        renderModal();
+      }
+
+      function openEditEntryModal(entryId) {
+        const entry = getEntries().find((item) => item.id === entryId);
+        if (!entry) return;
+        const matters = getMatters();
+        const options = matters
+          .map((matter) => {
+            const display = getDisplayMatter(matter.id);
+            return `<option value="${matter.id}" ${matter.id === entry.matterId ? 'selected' : ''}>${escapeHtml(display.clientName)} - ${escapeHtml(matter.name)}</option>`;
+          })
+          .join('');
+        state.modal = {
+          type: 'edit-entry',
+          title: 'Edit billing entry',
+          content: `
+            <form id="edit-entry-form" data-entry-id="${entry.id}">
+              <div class="form-grid">
+                <div class="field-row">
+                  <label for="edit-entry-date">Date</label>
+                  <input id="edit-entry-date" name="date" type="date" value="${entry.date}" required />
+                </div>
+                <div class="field-row">
+                  <label for="edit-entry-matter">Matter</label>
+                  <select id="edit-entry-matter" name="matterId">${options}</select>
+                </div>
+                <div class="field-row full-span">
+                  <label for="edit-entry-description">Description</label>
+                  <textarea id="edit-entry-description" name="description" required>${escapeHtml(entry.description)}</textarea>
+                  <small>Raw time remains ${formatRawDuration(entry.rawSeconds)}. Billed time will be recalculated using the current rounding increment.</small>
+                </div>
+                <div class="field-row">
+                  <label>
+                    <input name="billable" type="checkbox" ${entry.billable ? 'checked' : ''} />
+                    Billable
+                  </label>
+                </div>
+              </div>
+              <div class="button-row">
+                <button class="btn-primary" type="submit">Save Changes</button>
+                <button class="btn-secondary" data-modal-close type="button">Cancel</button>
+              </div>
+            </form>
+          `,
+        };
+        renderModal();
+      }
+
+      function closeModal() {
+        state.modal = null;
+        renderModal();
+      }
+
+      function renderModal() {
+        const root = document.getElementById('modal-root');
+        if (!state.modal) {
+          root.classList.remove('active');
+          root.innerHTML = '';
+          return;
+        }
+
+        if (state.modal.type === 'confirm') {
+          root.innerHTML = `
+            <div class="modal-card">
+              <h3>${escapeHtml(state.modal.title)}</h3>
+              <p>${escapeHtml(state.modal.message)}</p>
+              <div class="button-row">
+                <button class="${state.modal.confirmClass}" id="modal-confirm-action" type="button">${escapeHtml(state.modal.confirmLabel)}</button>
+                <button class="btn-secondary" data-modal-close type="button">Cancel</button>
+              </div>
+            </div>
+          `;
+        } else if (state.modal.type === 'edit-entry') {
+          root.innerHTML = `
+            <div class="modal-card">
+              <h3>${escapeHtml(state.modal.title)}</h3>
+              ${state.modal.content}
+            </div>
+          `;
+        }
+
+        root.classList.add('active');
+      }
+
+      function renderShell() {
+        const today = getTodayStats();
+        document.getElementById('sidebar-today-stats').textContent = `${formatHours(today.hours)} / ${formatDollars(today.dollars)}`;
+        document.querySelectorAll('.nav-item').forEach((button) => {
+          button.classList.toggle('active', button.dataset.view === state.currentView);
+        });
+      }
+
+      function renderDashboardView() {
+        const root = document.getElementById('view-dashboard');
+        const settings = getSettings();
+        const entries = getEntries().slice().sort((a, b) => b.createdAt - a.createdAt);
+        const recentEntries = entries.slice(0, 5);
+        const today = getTodayStats();
+        const week = getWeekStats();
+        const timerCount = getTimers().length;
+
+        root.innerHTML = `
+          <div class="view-header">
+            <h2>Dashboard</h2>
+            <p class="helper-text">Track today, review recent work, and jump straight into billing tasks.</p>
+          </div>
+          ${
+            !settings.onboardingDismissed
+              ? `
+                <div class="card hero-banner">
+                  <h3>Start the clock before billing amnesia starts.</h3>
+                  <p>LexClock is ready with your default General client and matter. Start a timer, log a manual email, or open Settings to tune your rate and increments.</p>
+                  <div class="button-row">
+                    <button class="btn-gold" data-cta-view="view-timers" type="button">Start a Timer</button>
+                    <button class="btn-secondary" data-cta-view="view-settings" type="button">Review Settings</button>
+                  </div>
+                </div>
+              `
+              : ''
+          }
+          <div class="stats-grid">
+            <div class="card stat-card">
+              <span class="meta-text">Today</span>
+              <span class="stat-value">${formatHours(today.hours)}</span>
+              <span class="money">${formatDollars(today.dollars)}</span>
+            </div>
+            <div class="card stat-card">
+              <span class="meta-text">This Week</span>
+              <span class="stat-value">${formatHours(week.hours)}</span>
+              <span class="money">${formatDollars(week.dollars)}</span>
+            </div>
+            <div class="card stat-card">
+              <span class="meta-text">Active + Paused Timers</span>
+              <span class="stat-value">${timerCount}</span>
+              <span class="helper-text">${timerCount === 1 ? '1 timer in progress queue' : 'Timers preserved across refreshes'}</span>
+            </div>
+          </div>
+          <div class="split-card" style="margin-top:16px;">
+            <div class="card">
+              <div class="card-title">
+                <h3>Quick Start</h3>
+              </div>
+              <div class="button-row">
+                <button class="btn-primary" data-cta-view="view-timers" type="button">Open Timers</button>
+                <button class="btn-secondary" data-cta-view="view-email" type="button">Log an Email</button>
+                <button class="btn-secondary" data-cta-view="view-log" type="button">Review Log</button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">
+                <h3>Profile</h3>
+              </div>
+              <p><strong>${escapeHtml(settings.lawyerName || 'Lawyer name not set')}</strong></p>
+              <p class="helper-text">${escapeHtml(settings.firmName || 'Firm name not set')}</p>
+              <p class="helper-text" style="margin-top:10px;">Default rate: ${formatDollars(settings.defaultRate)}/hr</p>
+              <p class="helper-text">Increment: ${settings.increment.toFixed(1)} hr</p>
+            </div>
+          </div>
+          <div class="card" style="margin-top:16px;">
+            <div class="card-title">
+              <h3>Recent Entries</h3>
+              <button class="btn-secondary" data-cta-view="view-log" type="button">View Full Log</button>
+            </div>
+            ${
+              recentEntries.length
+                ? `
+                  <table class="list-table">
+                    <thead>
+                      <tr>
+                        <th>Entry</th>
+                        <th>Time</th>
+                        <th>Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${recentEntries
+                        .map((entry) => {
+                          const display = getDisplayMatter(entry.matterId);
+                          return `
+                            <tr class="${entry.billable ? '' : 'non-billable'}">
+                              <td>
+                                <div class="row-stack">
+                                  <strong>${escapeHtml(entry.description)}</strong>
+                                  <small>${escapeHtml(display.clientName)} - ${escapeHtml(display.matterName)} | ${formatDateLabel(entry.date)}</small>
+                                </div>
+                              </td>
+                              <td>
+                                <div class="row-stack">
+                                  <strong>${formatHours(entry.billedHours)}</strong>
+                                  <small>Raw ${formatRawDuration(entry.rawSeconds)}</small>
+                                </div>
+                              </td>
+                              <td>${entry.billable ? `<span class="money">${formatDollars(entry.dollars)}</span>` : 'Non-billable'}</td>
+                            </tr>
+                          `;
+                        })
+                        .join('')}
+                    </tbody>
+                  </table>
+                `
+                : `
+                  <div class="empty-state">
+                    <h3>No entries yet</h3>
+                    <p>Your time log will show up here after you stop a timer or log an email.</p>
+                  </div>
+                `
+            }
+          </div>
+        `;
+      }
+
+      function renderTimersView() {
+        const root = document.getElementById('view-timers');
+        const matters = getMatters();
+        const matterOptions = matters
+          .map((matter) => {
+            const display = getDisplayMatter(matter.id);
+            return `<option value="${matter.id}">${escapeHtml(display.clientName)} - ${escapeHtml(matter.name)}</option>`;
+          })
+          .join('');
+        const timers = getTimers().slice().sort((a, b) => Number(b.running) - Number(a.running) || b.startEpoch - a.startEpoch);
+
+        root.innerHTML = `
+          <div class="view-header">
+            <h2>Timers</h2>
+            <p class="helper-text">Start one timer at a time. Starting a new timer automatically pauses every other timer.</p>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <h3>Start New Timer</h3>
+            </div>
+            <form id="new-timer-form" class="form-grid">
+              <div class="field-row">
+                <label for="timer-matter">Matter</label>
+                <select id="timer-matter" name="matterId">${matterOptions}</select>
+              </div>
+              <div class="field-row">
+                <label for="timer-description">Description</label>
+                <input id="timer-description" name="description" type="text" placeholder="Call with client, review motion, draft email..." />
+              </div>
+              <div class="field-row">
+                <label>
+                  <input name="billable" type="checkbox" checked />
+                  Billable
+                </label>
+              </div>
+              <div class="field-row">
+                <label>&nbsp;</label>
+                <button class="btn-primary" type="submit">Start Timer</button>
+              </div>
+            </form>
+          </div>
+          <div class="card" style="margin-top:16px;">
+            <div class="timer-toolbar">
+              <div>
+                <h3>Active and Paused Timers</h3>
+                <p class="helper-text">Timers survive refreshes and keep live totals.</p>
+              </div>
+              <div class="pill">${timers.filter((timer) => timer.running).length} running</div>
+            </div>
+            ${
+              timers.length
+                ? timers
+                    .map((timer) => {
+                      const display = getDisplayMatter(timer.matterId);
+                      const totalSeconds = getTimerTotalSeconds(timer);
+                      const billedHours = calcBilledHours(totalSeconds, getSettings().increment);
+                      const dollars = timer.billable ? calcDollars(billedHours, timer.matterId) : 0;
+                      return `
+                        <div class="card" style="box-shadow:none; border:1px solid #e1e6ef; padding:18px; margin-top:12px;">
+                          <div class="card-title">
+                            <div>
+                              <h3>${escapeHtml(timer.description || 'Untitled timer')}</h3>
+                              <p class="helper-text">${escapeHtml(display.clientName)} - ${escapeHtml(display.matterName)}</p>
+                            </div>
+                            <span class="pill ${timer.billable ? 'billable' : 'non-billable'}">${timer.running ? 'Running' : 'Paused'}</span>
+                          </div>
+                          <div class="stats-grid">
+                            <div class="stat-card">
+                              <span class="meta-text">Raw</span>
+                              <span class="timer-total">${formatRawDuration(totalSeconds)}</span>
+                            </div>
+                            <div class="stat-card">
+                              <span class="meta-text">Billed</span>
+                              <span class="timer-total">${formatHours(billedHours)}</span>
+                            </div>
+                            <div class="stat-card">
+                              <span class="meta-text">Dollar Tracker</span>
+                              <span class="timer-total money">${formatDollars(dollars)}</span>
+                            </div>
+                          </div>
+                          <div class="button-row">
+                            ${
+                              timer.running
+                                ? `<button class="btn-secondary" data-action="pause-timer" data-timer-id="${timer.id}" type="button">Pause</button>`
+                                : `<button class="btn-primary" data-action="resume-timer" data-timer-id="${timer.id}" type="button">Resume</button>`
+                            }
+                            <button class="btn-gold" data-action="stop-timer" data-timer-id="${timer.id}" type="button">Stop and Log</button>
+                            <button class="btn-danger" data-action="discard-timer" data-timer-id="${timer.id}" type="button">Discard</button>
+                            <label class="pill ${timer.billable ? 'billable' : 'non-billable'}">
+                              <input data-action="toggle-timer-billable" data-timer-id="${timer.id}" type="checkbox" ${timer.billable ? 'checked' : ''} />
+                              Billable
+                            </label>
+                          </div>
+                        </div>
+                      `;
+                    })
+                    .join('')
+                : `
+                  <div class="empty-state">
+                    <h3>No timers yet</h3>
+                    <p>Start a timer to begin capturing billable work in real time.</p>
+                  </div>
+                `
+            }
+          </div>
+        `;
+      }
+
+      function renderEmailView() {
+        const root = document.getElementById('view-email');
+        const settings = getSettings();
+        const matters = getMatters();
+        const matterOptions = matters
+          .map((matter) => {
+            const display = getDisplayMatter(matter.id);
+            return `<option value="${matter.id}">${escapeHtml(display.clientName)} - ${escapeHtml(matter.name)}</option>`;
+          })
+          .join('');
+        const tierCards = Object.entries(EMAIL_TIER_LABELS)
+          .map(([key, label]) => {
+            const hours = Number(settings.emailDefaults[key] || 0);
+            return `
+              <div class="tier-card">
+                <h4>${escapeHtml(label)}</h4>
+                <p class="helper-text">${formatHours(hours)} default</p>
+                <button class="btn-secondary" data-action="prefill-email-tier" data-tier="${key}" type="button" style="margin-top:10px;">Use Tier</button>
+              </div>
+            `;
+          })
+          .join('');
+
+        root.innerHTML = `
+          <div class="view-header">
+            <h2>Emails</h2>
+            <p class="helper-text">Phase 1 includes manual email tallying. AI email analysis hooks are reserved for Phase 2.</p>
+          </div>
+          <div class="split-card">
+            <div class="card">
+              <div class="card-title">
+                <h3>Log Email Work</h3>
+              </div>
+              <form id="manual-email-form" class="form-grid">
+                <div class="field-row">
+                  <label for="email-date">Date</label>
+                  <input id="email-date" name="date" type="date" value="${todayKey()}" required />
+                </div>
+                <div class="field-row">
+                  <label for="email-matter">Matter</label>
+                  <select id="email-matter" name="matterId">${matterOptions}</select>
+                </div>
+                <div class="field-row">
+                  <label for="email-type">Email Tier</label>
+                  <select id="email-type" name="emailType">
+                    ${Object.entries(EMAIL_TIER_LABELS)
+                      .map(([key, label]) => `<option value="${key}">${escapeHtml(label)}</option>`)
+                      .join('')}
+                  </select>
+                </div>
+                <div class="field-row">
+                  <label>
+                    <input name="billable" type="checkbox" checked />
+                    Billable
+                  </label>
+                </div>
+                <div class="field-row full-span">
+                  <label for="email-description">Billing Narrative</label>
+                  <textarea id="email-description" name="description" placeholder="Review and respond to client email regarding scheduling and discovery issues."></textarea>
+                </div>
+                <div class="field-row full-span">
+                  <small>Suggested time will use the editable default for the selected tier, then round up using your billing increment.</small>
+                </div>
+                <div class="field-row">
+                  <button class="btn-primary" type="submit">Log Email Entry</button>
+                </div>
+              </form>
+            </div>
+            <div class="card">
+              <div class="card-title">
+                <h3>Email Billing Tiers</h3>
+              </div>
+              <div class="tier-grid">
+                ${tierCards}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderLogView() {
+        const root = document.getElementById('view-log');
+        const entries = filteredEntries();
+        const matters = getMatters();
+        const totals = collectTotals(entries);
+        const matterOptions = matters
+          .map((matter) => {
+            const display = getDisplayMatter(matter.id);
+            return `<option value="${matter.id}" ${state.logFilters.matterId === matter.id ? 'selected' : ''}>${escapeHtml(display.clientName)} - ${escapeHtml(matter.name)}</option>`;
+          })
+          .join('');
+
+        root.innerHTML = `
+          <div class="view-header">
+            <h2>Log</h2>
+            <p class="helper-text">Review your billing history, filter the results, edit entries, and prepare an export.</p>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <h3>Filters</h3>
+            </div>
+            <form id="log-filter-form" class="form-grid">
+              <div class="field-row">
+                <label for="filter-start-date">Start Date</label>
+                <input id="filter-start-date" name="startDate" type="date" value="${state.logFilters.startDate}" />
+              </div>
+              <div class="field-row">
+                <label for="filter-end-date">End Date</label>
+                <input id="filter-end-date" name="endDate" type="date" value="${state.logFilters.endDate}" />
+              </div>
+              <div class="field-row">
+                <label for="filter-matter">Matter</label>
+                <select id="filter-matter" name="matterId">
+                  <option value="all">All Matters</option>
+                  ${matterOptions}
+                </select>
+              </div>
+              <div class="field-row">
+                <label for="filter-billable">Billable Status</label>
+                <select id="filter-billable" name="billable">
+                  <option value="all" ${state.logFilters.billable === 'all' ? 'selected' : ''}>All Entries</option>
+                  <option value="true" ${state.logFilters.billable === 'true' ? 'selected' : ''}>Billable</option>
+                  <option value="false" ${state.logFilters.billable === 'false' ? 'selected' : ''}>Non-billable</option>
+                </select>
+              </div>
+              <div class="field-row">
+                <button class="btn-primary" type="submit">Apply Filters</button>
+              </div>
+              <div class="field-row">
+                <button class="btn-secondary" id="reset-log-filters" type="button">Reset Filters</button>
+              </div>
+            </form>
+          </div>
+          <div class="card" style="margin-top:16px;">
+            <div class="timer-toolbar">
+              <div>
+                <h3>Billing History</h3>
+                <p class="helper-text">${entries.length} entries shown</p>
+              </div>
+              <div class="inline-actions">
+                <span class="pill billable">${formatHours(totals.hours)}</span>
+                <span class="pill billable">${formatDollars(totals.dollars)}</span>
+              </div>
+            </div>
+            ${
+              entries.length
+                ? `
+                  <table class="list-table">
+                    <thead>
+                      <tr>
+                        <th>Entry</th>
+                        <th>Raw / Billed</th>
+                        <th>Amount</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${entries
+                        .map((entry) => {
+                          const display = getDisplayMatter(entry.matterId);
+                          return `
+                            <tr class="${entry.billable ? '' : 'non-billable'}">
+                              <td>
+                                <div class="row-stack">
+                                  <strong>${escapeHtml(entry.description)}</strong>
+                                  <small>${escapeHtml(display.clientName)} - ${escapeHtml(display.matterName)}</small>
+                                  <small>${formatDateLabel(entry.date)} | ${escapeHtml(entry.type)}</small>
+                                </div>
+                              </td>
+                              <td>
+                                <div class="row-stack">
+                                  <strong>${formatHours(entry.billedHours)}</strong>
+                                  <small>Raw ${formatRawDuration(entry.rawSeconds)}</small>
+                                </div>
+                              </td>
+                              <td>${entry.billable ? `<span class="money">${formatDollars(entry.dollars)}</span>` : 'Non-billable'}</td>
+                              <td>
+                                <div class="inline-actions">
+                                  <button class="btn-secondary" data-action="edit-entry" data-entry-id="${entry.id}" type="button">Edit</button>
+                                </div>
+                              </td>
+                            </tr>
+                          `;
+                        })
+                        .join('')}
+                    </tbody>
+                  </table>
+                `
+                : `
+                  <div class="empty-state">
+                    <h3>No entries match these filters</h3>
+                    <p>Try widening the date range, or start by logging a timer or email entry.</p>
+                  </div>
+                `
+            }
+          </div>
+          <div class="card" style="margin-top:16px;">
+            <div class="card-title">
+              <h3>Export</h3>
+              <div class="inline-actions">
+                <button class="btn-primary" id="generate-export" type="button">Generate Export</button>
+                <button class="btn-secondary" id="copy-export" type="button">Copy Export</button>
+              </div>
+            </div>
+            <textarea class="export-box" id="export-text" placeholder="Generate a billing export to paste into Clio, TimeSolv, or Aderant.">${escapeHtml(state.exportText)}</textarea>
+          </div>
+        `;
+      }
+
+      function renderSettingsView() {
+        const root = document.getElementById('view-settings');
+        const settings = getSettings();
+        const clients = getClients();
+        const matters = getMatters();
+        const clientRows = clients
+          .map(
+            (client) => `
+              <div class="manager-row">
+                <div>
+                  <strong>${escapeHtml(client.name)}</strong>
+                  <p class="helper-text">${client.id}</p>
+                </div>
+                <button class="btn-danger" data-action="delete-client" data-client-id="${client.id}" type="button">Delete</button>
+              </div>
+            `
+          )
+          .join('');
+        const matterRows = matters
+          .map((matter) => {
+            const client = getClientById(matter.clientId);
+            return `
+              <div class="manager-row">
+                <div>
+                  <strong>${escapeHtml(matter.name)}</strong>
+                  <p class="helper-text">${escapeHtml(client ? client.name : 'Unknown Client')} | ${matter.rateOverride == null ? `Default ${formatDollars(settings.defaultRate)}/hr` : `${formatDollars(matter.rateOverride)}/hr override`}</p>
+                </div>
+                <button class="btn-danger" data-action="delete-matter" data-matter-id="${matter.id}" type="button">Delete</button>
+              </div>
+            `;
+          })
+          .join('');
+
+        root.innerHTML = `
+          <div class="view-header">
+            <h2>Settings</h2>
+            <p class="helper-text">Configure firm details, billing defaults, email tier values, clients, matters, and stored API placeholders.</p>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <h3>Core Settings</h3>
+            </div>
+            <form id="settings-form" class="settings-grid">
+              <div class="field-row">
+                <label for="lawyer-name">Lawyer Name</label>
+                <input id="lawyer-name" name="lawyerName" type="text" value="${escapeHtml(settings.lawyerName)}" />
+              </div>
+              <div class="field-row">
+                <label for="firm-name">Firm Name</label>
+                <input id="firm-name" name="firmName" type="text" value="${escapeHtml(settings.firmName)}" />
+              </div>
+              <div class="field-row">
+                <label for="default-rate">Default Hourly Rate</label>
+                <input id="default-rate" name="defaultRate" type="number" min="0" step="0.01" value="${settings.defaultRate}" />
+              </div>
+              <div class="field-row">
+                <label for="increment">Billing Increment (hours)</label>
+                <input id="increment" name="increment" type="number" min="0.1" step="0.1" value="${settings.increment}" />
+              </div>
+              <div class="field-row">
+                <label for="anthropic-api-key">Anthropic API Key</label>
+                <input id="anthropic-api-key" name="anthropicApiKey" type="password" value="${escapeHtml(settings.anthropicApiKey)}" />
+              </div>
+              <div class="field-row">
+                <label for="google-client-id">Google Client ID</label>
+                <input id="google-client-id" name="googleClientId" type="text" value="${escapeHtml(settings.googleClientId)}" />
+              </div>
+              <div class="field-row">
+                <label for="quick-reply">Quick Reply Hours</label>
+                <input id="quick-reply" name="quickReply" type="number" min="0.1" step="0.1" value="${settings.emailDefaults.quickReply}" />
+              </div>
+              <div class="field-row">
+                <label for="standard-reply">Standard Reply Hours</label>
+                <input id="standard-reply" name="standardReply" type="number" min="0.1" step="0.1" value="${settings.emailDefaults.standardReply}" />
+              </div>
+              <div class="field-row">
+                <label for="long-reply">Long / Researched Email Hours</label>
+                <input id="long-reply" name="longReply" type="number" min="0.1" step="0.1" value="${settings.emailDefaults.longReply}" />
+              </div>
+              <div class="field-row">
+                <label for="attachment-review">Attachment Review Hours</label>
+                <input id="attachment-review" name="attachmentReview" type="number" min="0.1" step="0.1" value="${settings.emailDefaults.attachmentReview}" />
+              </div>
+              <div class="field-row">
+                <label for="drafted-from-scratch">Drafted from Scratch Hours</label>
+                <input id="drafted-from-scratch" name="draftedFromScratch" type="number" min="0.1" step="0.1" value="${settings.emailDefaults.draftedFromScratch}" />
+              </div>
+              <div class="field-row">
+                <label>&nbsp;</label>
+                <button class="btn-primary" type="submit">Save Settings</button>
+              </div>
+            </form>
+          </div>
+          <div class="split-card" style="margin-top:16px;">
+            <div class="card">
+              <div class="card-title">
+                <h3>Clients</h3>
+              </div>
+              <form id="add-client-form" class="button-row" style="margin-bottom:16px;">
+                <input name="clientName" type="text" placeholder="New client name" style="flex:1; min-width:220px; min-height:44px; border-radius:6px; border:1px solid #ccd4e2; padding:10px 12px;" />
+                <button class="btn-primary" type="submit">Add Client</button>
+              </form>
+              <div class="manager-list">${clientRows}</div>
+            </div>
+            <div class="card">
+              <div class="card-title">
+                <h3>Matters</h3>
+              </div>
+              <form id="add-matter-form" class="form-grid" style="margin-bottom:16px;">
+                <div class="field-row">
+                  <label for="matter-client-id">Client</label>
+                  <select id="matter-client-id" name="clientId">
+                    ${clients.map((client) => `<option value="${client.id}">${escapeHtml(client.name)}</option>`).join('')}
+                  </select>
+                </div>
+                <div class="field-row">
+                  <label for="matter-name">Matter Name</label>
+                  <input id="matter-name" name="matterName" type="text" placeholder="Matter name" />
+                </div>
+                <div class="field-row">
+                  <label for="matter-rate-override">Rate Override</label>
+                  <input id="matter-rate-override" name="rateOverride" type="number" min="0" step="0.01" placeholder="Optional" />
+                </div>
+                <div class="field-row">
+                  <label>&nbsp;</label>
+                  <button class="btn-primary" type="submit">Add Matter</button>
+                </div>
+              </form>
+              <div class="manager-list">${matterRows}</div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:16px;">
+            <div class="card-title">
+              <h3>Danger Zone</h3>
+            </div>
+            <p class="helper-text">Clears every LexClock key and re-seeds the default General client and matter.</p>
+            <div class="button-row">
+              <button class="btn-danger" id="clear-all-data" type="button">Clear All Data</button>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderAll() {
+        renderShell();
+        renderDashboardView();
+        renderTimersView();
+        renderEmailView();
+        renderLogView();
+        renderSettingsView();
+        renderModal();
+      }
+
+      function showView(viewId) {
+        state.currentView = viewId;
+        document.querySelectorAll('.view').forEach((view) => view.classList.remove('active'));
+        document.getElementById(viewId).classList.add('active');
+        renderShell();
+      }
+
+      function handleNav(event) {
+        const button = event.target.closest('[data-view]');
+        if (!button) return;
+        showView(button.dataset.view);
+      }
+
+      function handleGlobalClick(event) {
+        const actionButton = event.target.closest('[data-action]');
+        const ctaButton = event.target.closest('[data-cta-view]');
+
+        if (ctaButton) {
+          showView(ctaButton.dataset.ctaView);
+          return;
+        }
+
+        if (event.target.matches('[data-modal-close]') || event.target === document.getElementById('modal-root')) {
+          closeModal();
+          return;
+        }
+
+        if (event.target.id === 'modal-confirm-action' && state.modal && state.modal.type === 'confirm') {
+          const action = state.modal.onConfirm;
+          if (typeof action === 'function') action();
+          return;
+        }
+
+        if (event.target.id === 'reset-log-filters') {
+          state.logFilters = {
+            startDate: '',
+            endDate: '',
+            matterId: 'all',
+            billable: 'all',
+          };
+          renderLogView();
+          showToast('Filters reset.', 'success');
+          return;
+        }
+
+        if (event.target.id === 'generate-export') {
+          const entries = filteredEntries();
+          state.exportText = buildExportText(entries, state.logFilters.startDate, state.logFilters.endDate);
+          renderLogView();
+          showToast('Billing export generated.', 'success');
+          return;
+        }
+
+        if (event.target.id === 'copy-export') {
+          const exportField = document.getElementById('export-text');
+          const text = exportField ? exportField.value : state.exportText;
+          if (!text.trim()) {
+            showToast('Generate an export before copying.', 'error');
+            return;
+          }
+          navigator.clipboard.writeText(text).then(
+            () => showToast('Export copied to clipboard.', 'success'),
+            () => showToast('Clipboard copy failed in this browser.', 'error')
+          );
+          return;
+        }
+
+        if (event.target.id === 'clear-all-data') {
+          openConfirmModal({
+            title: 'Clear all LexClock data?',
+            message: 'This wipes settings, clients, matters, entries, and timers, then re-seeds the default General client and matter.',
+            confirmLabel: 'Clear All Data',
+            confirmClass: 'btn-danger',
+            onConfirm: clearAllData,
+          });
+          return;
+        }
+
+        if (!actionButton) return;
+
+        const { action } = actionButton.dataset;
+        if (action === 'pause-timer') {
+          pauseTimer(actionButton.dataset.timerId);
+        } else if (action === 'resume-timer') {
+          resumeTimer(actionButton.dataset.timerId);
+        } else if (action === 'stop-timer') {
+          const timer = getTimers().find((item) => item.id === actionButton.dataset.timerId);
+          if (!timer) return;
+          const rawSeconds = Math.round(getTimerTotalSeconds(timer));
+          const billedHours = calcBilledHours(rawSeconds, getSettings().increment);
+          openConfirmModal({
+            title: 'Stop and log this timer?',
+            message: `Raw time ${formatRawDuration(rawSeconds)} will bill as ${formatHours(billedHours)}.`,
+            confirmLabel: 'Stop and Log',
+            confirmClass: 'btn-gold',
+            onConfirm: () => {
+              closeModal();
+              stopTimer(actionButton.dataset.timerId);
+            },
+          });
+        } else if (action === 'discard-timer') {
+          openConfirmModal({
+            title: 'Discard this timer?',
+            message: 'This removes the timer without creating a billing entry.',
+            confirmLabel: 'Discard Timer',
+            confirmClass: 'btn-danger',
+            onConfirm: () => {
+              closeModal();
+              discardTimer(actionButton.dataset.timerId);
+            },
+          });
+        } else if (action === 'toggle-timer-billable') {
+          toggleTimerBillable(actionButton.dataset.timerId, actionButton.checked);
+        } else if (action === 'prefill-email-tier') {
+          const select = document.getElementById('email-type');
+          if (select) select.value = actionButton.dataset.tier;
+          showToast('Email tier selected.', 'success');
+        } else if (action === 'edit-entry') {
+          openEditEntryModal(actionButton.dataset.entryId);
+        } else if (action === 'delete-client') {
+          const client = getClientById(actionButton.dataset.clientId);
+          openConfirmModal({
+            title: 'Delete this client?',
+            message: `Delete ${client ? client.name : 'this client'} and all of its matters. Existing entries will be preserved and shown as Unknown Matter.`,
+            confirmLabel: 'Delete Client',
+            confirmClass: 'btn-danger',
+            onConfirm: () => {
+              closeModal();
+              deleteClient(actionButton.dataset.clientId);
+            },
+          });
+        } else if (action === 'delete-matter') {
+          const matter = getMatterById(actionButton.dataset.matterId);
+          openConfirmModal({
+            title: 'Delete this matter?',
+            message: `Delete ${matter ? matter.name : 'this matter'}. Existing entries will be preserved and shown as Unknown Matter.`,
+            confirmLabel: 'Delete Matter',
+            confirmClass: 'btn-danger',
+            onConfirm: () => {
+              closeModal();
+              deleteMatter(actionButton.dataset.matterId);
+            },
+          });
+        }
+      }
+
+      function handleGlobalSubmit(event) {
+        if (event.target.id === 'new-timer-form') {
+          event.preventDefault();
+          createTimer({
+            matterId: event.target.matterId.value,
+            description: event.target.description.value,
+            billable: event.target.billable.checked,
+          });
+          event.target.reset();
+          event.target.billable.checked = true;
+        } else if (event.target.id === 'manual-email-form') {
+          event.preventDefault();
+          addManualEmailEntry({
+            date: event.target.date.value,
+            matterId: event.target.matterId.value,
+            emailType: event.target.emailType.value,
+            description: event.target.description.value,
+            billable: event.target.billable.checked,
+          });
+          renderAll();
+        } else if (event.target.id === 'log-filter-form') {
+          event.preventDefault();
+          state.logFilters = {
+            startDate: event.target.startDate.value,
+            endDate: event.target.endDate.value,
+            matterId: event.target.matterId.value,
+            billable: event.target.billable.value,
+          };
+          renderLogView();
+          showToast('Filters applied.', 'success');
+        } else if (event.target.id === 'settings-form') {
+          event.preventDefault();
+          saveSettingsFromForm(event.target);
+        } else if (event.target.id === 'add-client-form') {
+          event.preventDefault();
+          addClient(event.target.clientName.value);
+          event.target.reset();
+        } else if (event.target.id === 'add-matter-form') {
+          event.preventDefault();
+          addMatter(event.target.clientId.value, event.target.matterName.value, event.target.rateOverride.value);
+          event.target.reset();
+        } else if (event.target.id === 'edit-entry-form') {
+          event.preventDefault();
+          saveEntryEdits(event.target.dataset.entryId, {
+            date: event.target.date.value,
+            matterId: event.target.matterId.value,
+            description: event.target.description.value,
+            billable: event.target.billable.checked,
+          });
+        }
+      }
+
+      function persistRunningTimerHeartbeat() {
+        const timers = getTimers();
+        if (timers.some((timer) => timer.running)) {
+          setTimers(timers);
+        }
+      }
+
+      function startTicker() {
+        if (state.tickHandle) {
+          window.clearInterval(state.tickHandle);
+        }
+        state.tickHandle = window.setInterval(() => {
+          persistRunningTimerHeartbeat();
+          renderShell();
+          if (state.currentView === 'view-timers') {
+            renderTimersView();
+          } else if (state.currentView === 'view-dashboard') {
+            renderDashboardView();
+          }
+        }, 1000);
+      }
+
+      function initializeApp() {
+        seedDataIfNeeded();
+        renderAll();
+        showView(state.currentView);
+        startTicker();
+        document.addEventListener('click', handleGlobalClick);
+        document.addEventListener('submit', handleGlobalSubmit);
+        document.querySelector('.sidebar-nav').addEventListener('click', handleNav);
+        document.querySelector('.mobile-nav').addEventListener('click', handleNav);
+      }
+
+      document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+  </body>
+</html>
