@@ -14,23 +14,52 @@
       }
 
       :root {
-        --navy: #0f1f3d;
-        --navy-dark: #070f1e;
-        --gold: #c9a84c;
+        /* Brand — Clio ocean navy + signature orange */
+        --ink: #0b2545;
+        --ink-2: #123a63;
+        --navy: #0b2545;
+        --navy-dark: #071a30;
+        --brand: #1aa3d6;
+        --brand-strong: #1487b3;
+        --brand-soft: #e8f7fc;
+        --brand-ring: rgba(26, 163, 214, 0.34);
+        --accent: #ff9410;
+        --accent-strong: #f57f05;
+        --accent-soft: #fff4e6;
+        --gold: #ff9410;
+        /* Neutrals */
         --white: #ffffff;
-        --grey-light: #f4f6f9;
-        --grey-text: #6b7280;
-        --grey-mid: #d5dbe6;
-        --green: #2d7d46;
-        --red: #e05c5c;
-        --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-        --radius: 8px;
+        --surface: #ffffff;
+        --surface-2: #f7f9fc;
+        --bg: #f4f7fb;
+        --grey-light: #eef2f7;
+        --grey-text: #5a6678;
+        --grey-mid: #cdd6e2;
+        --muted: #5a6678;
+        --border: #e6ebf2;
+        --border-strong: #d5dce7;
+        /* Status */
+        --green: #12c27c;
+        --green-soft: rgba(18, 194, 124, 0.14);
+        --red: #dc4b4b;
+        --red-soft: rgba(220, 75, 75, 0.1);
+        /* Effects — flatter, crisper */
+        --shadow-sm: 0 1px 2px rgba(11, 37, 69, 0.05);
+        --shadow: 0 1px 3px rgba(11, 37, 69, 0.06);
+        --shadow-md: 0 4px 14px rgba(11, 37, 69, 0.07);
+        --shadow-lg: 0 20px 44px rgba(11, 37, 69, 0.18);
+        --radius: 10px;
+        --radius-sm: 8px;
+        --radius-lg: 14px;
       }
 
       body {
         font-family: 'Inter', sans-serif;
-        background: var(--grey-light);
-        color: var(--navy);
+        background: var(--bg);
+        color: var(--ink);
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
 
       button,
@@ -48,22 +77,45 @@
         color: inherit;
       }
 
+      button,
+      .nav-item,
+      .btn-connect,
+      .help-btn,
+      .field-row input,
+      .field-row select,
+      .field-row textarea {
+        transition: background-color 0.16s ease, border-color 0.16s ease,
+          color 0.16s ease, box-shadow 0.16s ease, transform 0.06s ease;
+      }
+
+      :focus-visible {
+        outline: 2px solid var(--brand);
+        outline-offset: 2px;
+      }
+
+      h1,
+      h2,
+      h3 {
+        letter-spacing: -0.01em;
+      }
+
       .app-shell {
         min-height: 100vh;
         display: flex;
       }
 
       .sidebar {
-        width: 240px;
-        background: linear-gradient(180deg, var(--navy-dark), #0b1730 65%, #102346);
+        width: 248px;
+        background: linear-gradient(180deg, #0f587b, #12688f 55%, #1aa3d6);
         color: var(--white);
-        padding: 24px 16px;
+        padding: 26px 16px;
         display: flex;
         flex-direction: column;
         gap: 24px;
         position: sticky;
         top: 0;
         height: 100vh;
+        border-right: 1px solid rgba(255, 255, 255, 0.06);
       }
 
       .brand {
@@ -76,12 +128,13 @@
         width: 44px;
         height: 44px;
         border-radius: 12px;
-        background: linear-gradient(135deg, var(--gold), #f1dd9f);
-        color: var(--navy-dark);
+        background: linear-gradient(135deg, #ffa451, #f6821f 58%, #e06f0c);
+        color: var(--white);
         display: inline-flex;
         align-items: center;
         justify-content: center;
         font-weight: 700;
+        box-shadow: 0 6px 16px rgba(246, 130, 31, 0.38);
       }
 
       .brand h1 {
@@ -111,16 +164,53 @@
         border-radius: 10px;
         padding: 12px 14px;
         background: transparent;
-        color: inherit;
+        color: rgba(255, 255, 255, 0.78);
         display: flex;
         align-items: center;
         gap: 12px;
         text-align: left;
+        position: relative;
+        font-weight: 500;
+      }
+
+      .sidebar-nav .nav-item:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--white);
       }
 
       .nav-item.active {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(201, 168, 76, 0.25);
+        background: rgba(28, 111, 212, 0.18);
+        border-color: rgba(86, 150, 230, 0.3);
+        color: var(--white);
+        font-weight: 600;
+      }
+
+      .sidebar-nav .nav-item.active::before {
+        content: '';
+        position: absolute;
+        left: -16px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 22px;
+        border-radius: 0 3px 3px 0;
+        background: var(--accent);
+      }
+
+      .nav-badge {
+        margin-left: auto;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 6px;
+        border-radius: 999px;
+        background: var(--accent);
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
       }
 
       .nav-icon {
@@ -154,7 +244,7 @@
         display: block;
         margin-top: 6px;
         font-size: 1.05rem;
-        color: var(--gold);
+        color: #7fb2ff;
       }
 
       .main-content {
@@ -181,6 +271,8 @@
 
       .view-header h2 {
         font-size: 2rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
         margin-bottom: 8px;
       }
 
@@ -202,10 +294,11 @@
       }
 
       .card {
-        background: var(--white);
+        background: var(--surface);
         border-radius: var(--radius);
-        padding: 20px 24px;
-        box-shadow: var(--shadow);
+        padding: 22px 24px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border);
       }
 
       .card + .card {
@@ -222,6 +315,7 @@
 
       .card-title h3 {
         font-size: 1.05rem;
+        font-weight: 600;
       }
 
       .stat-card {
@@ -249,20 +343,26 @@
       }
 
       .hero-banner {
-        background: linear-gradient(135deg, #101f3b, #183055 60%, #305480);
+        background: linear-gradient(135deg, #0d5274, #1487b3 55%, #1aa3d6);
         color: var(--white);
         overflow: hidden;
         position: relative;
+        border: none;
       }
 
       .hero-banner::after {
         content: '';
         position: absolute;
-        inset: auto -50px -50px auto;
-        width: 180px;
-        height: 180px;
+        inset: auto -60px -70px auto;
+        width: 240px;
+        height: 240px;
         border-radius: 999px;
-        background: rgba(201, 168, 76, 0.18);
+        background: radial-gradient(circle, rgba(255, 148, 16, 0.45), rgba(255, 148, 16, 0));
+      }
+
+      .hero-banner > * {
+        position: relative;
+        z-index: 1;
       }
 
       .hero-banner h3 {
@@ -293,37 +393,61 @@
       .btn-gold,
       .btn-danger {
         min-height: 44px;
-        border-radius: 6px;
-        padding: 10px 16px;
+        border-radius: 999px;
+        padding: 10px 22px;
         border: 1px solid transparent;
-      }
-
-      .btn-primary {
-        background: var(--navy);
-        color: var(--white);
         font-weight: 600;
       }
 
+      .btn-primary:active,
+      .btn-secondary:active,
+      .btn-gold:active,
+      .btn-danger:active {
+        transform: translateY(1px);
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        color: var(--white);
+        box-shadow: 0 1px 2px rgba(246, 130, 31, 0.26);
+      }
+
       .btn-primary:hover {
-        background: #162d54;
+        background: var(--accent-strong);
+        box-shadow: 0 3px 10px rgba(246, 130, 31, 0.3);
       }
 
       .btn-secondary {
         background: var(--white);
-        color: var(--navy);
-        border-color: var(--grey-mid);
+        color: var(--ink);
+        border-color: var(--border-strong);
+      }
+
+      .btn-secondary:hover {
+        background: var(--surface-2);
+        border-color: var(--brand);
+        color: var(--brand-strong);
       }
 
       .btn-gold {
-        background: var(--gold);
-        color: var(--navy);
-        font-weight: 700;
+        background: var(--green);
+        color: var(--white);
+        box-shadow: 0 1px 2px rgba(14, 138, 95, 0.24);
+      }
+
+      .btn-gold:hover {
+        background: #0b7350;
+        box-shadow: 0 3px 10px rgba(14, 138, 95, 0.28);
       }
 
       .btn-danger {
         background: transparent;
         color: var(--red);
         border-color: var(--red);
+      }
+
+      .btn-danger:hover {
+        background: var(--red-soft);
       }
 
       .pill {
@@ -344,6 +468,206 @@
       .pill.non-billable {
         color: var(--grey-text);
         background: #ebeef3;
+      }
+
+      .pill-warn {
+        color: var(--accent-strong);
+        background: var(--accent-soft);
+        font-weight: 600;
+      }
+
+      .pill-soft {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        padding: 3px 9px;
+        color: var(--brand-strong);
+        background: var(--brand-soft);
+      }
+
+      /* Phase 4 — Notion source card */
+      .source-card {
+        border-left: 4px solid var(--brand);
+      }
+
+      .source-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        padding: 12px 0 4px;
+      }
+
+      .source-name {
+        display: block;
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      .source-sub {
+        display: block;
+        font-size: 0.84rem;
+        color: var(--muted);
+      }
+
+      .source-foot {
+        margin-top: 12px;
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+
+      .notion-status {
+        margin-top: 12px;
+        border-radius: var(--radius-sm);
+        padding: 10px 14px;
+        font-size: 0.88rem;
+      }
+
+      .notion-status-loading {
+        background: var(--brand-soft);
+        color: var(--brand-strong);
+      }
+
+      .notion-status-ok {
+        background: var(--green-soft);
+        color: var(--green);
+      }
+
+      .notion-status-error {
+        background: var(--accent-soft);
+        color: var(--accent-strong);
+      }
+
+      .reconcile-card {
+        border-left: 4px solid var(--accent);
+      }
+
+      .reconcile-bar {
+        position: relative;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--surface-2);
+        overflow: hidden;
+        margin-top: 12px;
+      }
+
+      .reconcile-bar > span {
+        display: block;
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #ffa451, var(--accent));
+      }
+
+      .capture-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .capture-row input {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .capture-row .btn-primary {
+        flex-shrink: 0;
+      }
+
+      @media (max-width: 560px) {
+        .capture-row {
+          flex-direction: column;
+        }
+      }
+
+      .bill-nudge {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 12px;
+        margin-top: 10px;
+        padding: 9px 12px;
+        border-radius: var(--radius-sm);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        font-size: 0.85rem;
+        color: var(--grey-text);
+      }
+
+      .bill-nudge strong {
+        color: var(--ink);
+      }
+
+      .bill-nudge-warn {
+        background: var(--accent-soft);
+        border-color: var(--accent-soft);
+        color: var(--accent-strong);
+      }
+
+      .bill-nudge-msg {
+        flex-basis: 100%;
+      }
+
+      .link-btn {
+        background: none;
+        border: none;
+        padding: 0;
+        font: inherit;
+        font-weight: 600;
+        color: var(--accent-strong);
+        text-decoration: underline;
+        cursor: pointer;
+      }
+
+      .wip-aging {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .wip-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 14px;
+        border-radius: 999px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        font-size: 0.86rem;
+        color: var(--grey-text);
+      }
+
+      .wip-chip strong {
+        color: var(--ink);
+      }
+
+      .wip-chip-old {
+        background: var(--accent-soft);
+        border-color: var(--accent-soft);
+        color: var(--accent-strong);
+      }
+
+      .wip-chip-old strong {
+        color: var(--accent-strong);
+      }
+
+      .wip-stale td {
+        background: var(--accent-soft);
+      }
+
+      .wip-flag {
+        display: inline-block;
+        margin-left: 6px;
+        padding: 1px 8px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: #fff;
+        background: var(--accent);
       }
 
       .timer-total {
@@ -369,7 +693,7 @@
       .list-table td {
         text-align: left;
         padding: 14px 12px;
-        border-bottom: 1px solid #e7ebf2;
+        border-bottom: 1px solid var(--border);
         vertical-align: top;
       }
 
@@ -417,10 +741,24 @@
       .field-row select,
       .field-row textarea {
         min-height: 44px;
-        border-radius: 6px;
-        border: 1px solid #ccd4e2;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-strong);
         background: var(--white);
         padding: 10px 12px;
+        color: var(--ink);
+      }
+
+      .field-row input::placeholder,
+      .field-row textarea::placeholder {
+        color: #9aa6b8;
+      }
+
+      .field-row input:focus,
+      .field-row select:focus,
+      .field-row textarea:focus {
+        outline: none;
+        border-color: var(--brand);
+        box-shadow: 0 0 0 3px var(--brand-ring);
       }
 
       .field-row textarea {
@@ -449,14 +787,190 @@
       }
 
       .tier-card {
-        border: 1px solid #d9e0eb;
-        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
         padding: 16px;
-        background: #fbfcfe;
+        background: var(--surface-2);
       }
 
       .tier-card h4 {
         margin-bottom: 6px;
+      }
+
+      .draft-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .draft-card {
+        border-left: 3px solid var(--accent);
+      }
+
+      .draft-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .draft-source {
+        font-weight: 700;
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--accent-strong);
+      }
+
+      .draft-confidence {
+        font-size: 0.78rem;
+        color: var(--grey-text);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 2px 10px;
+      }
+
+      .draft-evidence {
+        margin-top: 10px;
+        padding: 10px 12px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-size: 0.86rem;
+        color: var(--grey-text);
+      }
+
+      .draft-lint:empty {
+        display: none;
+      }
+
+      .draft-lint-body {
+        margin-top: 12px;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--surface-2);
+        font-size: 0.88rem;
+      }
+
+      .draft-lint-body.loading {
+        color: var(--grey-text);
+      }
+
+      .draft-lint-body.error {
+        color: var(--accent-strong);
+        background: var(--accent-soft);
+        border-color: var(--accent-soft);
+      }
+
+      .lint-head {
+        margin-bottom: 8px;
+      }
+
+      .lint-score {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 3px 12px;
+        font-weight: 600;
+        font-size: 0.82rem;
+      }
+
+      .lint-good {
+        color: var(--green);
+        background: rgba(45, 125, 70, 0.12);
+      }
+
+      .lint-warn {
+        color: var(--accent-strong);
+        background: var(--accent-soft);
+      }
+
+      .lint-bad {
+        color: #b42318;
+        background: rgba(180, 35, 24, 0.1);
+      }
+
+      .lint-issues {
+        margin: 4px 0 0;
+        padding-left: 18px;
+        color: var(--grey-text);
+      }
+
+      .lint-issues li {
+        margin-bottom: 3px;
+      }
+
+      .lint-suggestion {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+      }
+
+      .lint-suggestion p {
+        margin: 4px 0 10px;
+        color: var(--ink);
+      }
+
+      .ai-result {
+        margin-top: 16px;
+        padding: 18px;
+        border: 1px solid var(--brand-soft);
+        border-left: 3px solid var(--brand);
+        border-radius: var(--radius-sm);
+        background: var(--brand-soft);
+      }
+
+      .ai-result h4 {
+        margin-bottom: 8px;
+      }
+
+      .ai-result p {
+        margin: 4px 0;
+      }
+
+      .ai-result.ai-error {
+        background: #fdf2f2;
+        border-color: #f3c2c2;
+        color: #9b1c1c;
+      }
+
+      .ai-narrative {
+        padding: 10px 12px;
+        background: var(--white);
+        border: 1px solid #d9e0eb;
+        border-radius: 6px;
+        font-style: italic;
+      }
+
+      .inbox-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid #e5eaf2;
+      }
+
+      .inbox-item:last-child {
+        border-bottom: none;
+      }
+
+      .inbox-item-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+      }
+
+      .inbox-snippet {
+        color: #6b7686;
+        font-size: 0.85rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
       }
 
       .entry-group {
@@ -489,13 +1003,14 @@
       }
 
       .manager-row {
-        border: 1px solid #e1e6ef;
-        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
         padding: 14px 16px;
         display: flex;
         justify-content: space-between;
         gap: 12px;
         align-items: flex-start;
+        background: var(--surface-2);
       }
 
       .manager-row strong {
@@ -516,12 +1031,13 @@
       .toast {
         min-width: 260px;
         max-width: 360px;
-        background: var(--navy);
+        background: var(--ink);
         color: var(--white);
         padding: 14px 16px;
-        border-radius: 10px;
-        box-shadow: 0 14px 28px rgba(7, 15, 30, 0.22);
+        border-radius: var(--radius-sm);
+        box-shadow: var(--shadow-lg);
         animation: toast-in 0.2s ease;
+        font-weight: 500;
       }
 
       .toast.success {
@@ -562,9 +1078,9 @@
       .modal-card {
         width: min(560px, 100%);
         background: var(--white);
-        border-radius: 12px;
-        box-shadow: 0 24px 48px rgba(7, 15, 30, 0.22);
-        padding: 24px;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-lg);
+        padding: 26px;
       }
 
       .modal-card h3 {
@@ -574,6 +1090,198 @@
       .modal-card p {
         color: var(--grey-text);
         margin-bottom: 18px;
+      }
+
+      /* Phase 6 — billing-ready writing guide */
+      .btn-sm {
+        min-height: 34px;
+        padding: 6px 16px;
+        font-size: 0.82rem;
+        white-space: nowrap;
+      }
+
+      .view-header-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .modal-card-guide {
+        width: min(620px, 100%);
+        max-height: min(86vh, 760px);
+        display: flex;
+        flex-direction: column;
+        padding: 22px 24px;
+      }
+
+      .modal-guide-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .modal-guide-head h3 {
+        margin: 0;
+      }
+
+      .modal-guide-body {
+        overflow-y: auto;
+        margin: 14px 0 4px;
+        padding-right: 6px;
+      }
+
+      .guide-intro {
+        color: var(--grey-text);
+        margin-bottom: 16px;
+      }
+
+      .guide-section {
+        margin-bottom: 18px;
+      }
+
+      .guide-section h4 {
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--brand-strong);
+        margin-bottom: 8px;
+      }
+
+      .guide-formula {
+        font-size: 1rem;
+        margin-bottom: 4px !important;
+        color: var(--ink) !important;
+      }
+
+      .guide-formula strong {
+        color: var(--brand-strong);
+      }
+
+      .guide-formula-eg {
+        margin-bottom: 0 !important;
+        font-size: 0.9rem;
+      }
+
+      .guide-verbs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .guide-verb {
+        background: var(--brand-soft);
+        color: var(--brand-strong);
+        border-radius: 999px;
+        padding: 4px 12px;
+        font-size: 0.82rem;
+        font-weight: 600;
+      }
+
+      .guide-examples {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .guide-example {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 12px 14px;
+        background: var(--surface-2);
+      }
+
+      .guide-ba {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 4px;
+      }
+
+      .guide-tag {
+        flex: 0 0 auto;
+        font-size: 0.66rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        border-radius: 4px;
+        padding: 2px 6px;
+        min-width: 88px;
+        text-align: center;
+      }
+
+      .guide-tag-bad {
+        background: var(--red-soft);
+        color: var(--red);
+      }
+
+      .guide-tag-good {
+        background: var(--green-soft);
+        color: var(--green);
+      }
+
+      .guide-vague {
+        color: var(--grey-text);
+        text-decoration: line-through;
+      }
+
+      .guide-strong {
+        color: var(--ink);
+        font-weight: 600;
+      }
+
+      .guide-why {
+        margin: 6px 0 0 !important;
+        font-size: 0.82rem;
+        color: var(--grey-text);
+      }
+
+      .guide-risks {
+        margin: 0;
+        padding-left: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .guide-risks li {
+        font-size: 0.9rem;
+        color: var(--grey-text);
+      }
+
+      .guide-risks strong {
+        color: var(--ink);
+      }
+
+      .guide-templates {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .guide-template {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 8px 12px;
+      }
+
+      .guide-template-label {
+        display: block;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+        margin-bottom: 2px;
+      }
+
+      .guide-template code {
+        font-size: 0.86rem;
+        color: var(--ink);
       }
 
       .mobile-nav {
@@ -592,10 +1300,10 @@
       }
 
       .settings-subsection {
-        border: 1px solid #e1e6ef;
-        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
         padding: 16px;
-        background: #fbfcfe;
+        background: var(--surface-2);
       }
 
       .settings-subsection h4 {
@@ -615,8 +1323,8 @@
         width: 18px;
         height: 18px;
         border-radius: 50%;
-        background: var(--navy);
-        color: var(--gold);
+        background: var(--brand-soft);
+        color: var(--brand-strong);
         font-size: 11px;
         font-weight: 700;
         border: none;
@@ -627,8 +1335,8 @@
       }
 
       .help-btn:hover {
-        background: var(--gold);
-        color: var(--navy);
+        background: var(--brand);
+        color: var(--white);
       }
 
       .phase-note {
@@ -640,20 +1348,21 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: var(--navy);
+        background: var(--brand);
         color: var(--white);
         border: none;
-        border-radius: 6px;
-        padding: 9px 18px;
+        border-radius: var(--radius-sm);
+        padding: 10px 18px;
         font-family: 'Inter', sans-serif;
         font-size: 14px;
         font-weight: 600;
         cursor: pointer;
         margin-top: 10px;
+        box-shadow: 0 1px 2px rgba(28, 111, 212, 0.24);
       }
 
       .btn-connect:hover {
-        background: #162d54;
+        background: var(--brand-strong);
       }
 
       .btn-connect.is-disabled {
@@ -800,10 +1509,20 @@
           left: 0;
           right: 0;
           padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
-          background: var(--navy-dark);
+          background: linear-gradient(180deg, #12688f, #0f587b);
           color: var(--white);
-          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          border-top: 1px solid rgba(255, 255, 255, 0.10);
           z-index: 30;
+        }
+
+        .mobile-nav .nav-item {
+          color: rgba(255, 255, 255, 0.7);
+        }
+
+        .mobile-nav .nav-item.active {
+          background: rgba(26, 163, 214, 0.40);
+          color: var(--white);
+          box-shadow: inset 0 -2px 0 var(--accent);
         }
 
         .mobile-nav .nav-item {
@@ -812,6 +1531,17 @@
           gap: 4px;
           padding: 8px 6px;
           font-size: 0.76rem;
+          position: relative;
+        }
+
+        .mobile-nav .nav-badge {
+          position: absolute;
+          top: 2px;
+          right: calc(50% - 22px);
+          margin: 0;
+          min-width: 16px;
+          height: 16px;
+          font-size: 0.62rem;
         }
 
         .stats-grid,
@@ -864,16 +1594,180 @@
           display: initial;
         }
       }
+
+      /* ---- Auth gate (login layer) ---- */
+      .auth-gate {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: linear-gradient(135deg, #0d5274, #1487b3 55%, #1aa3d6);
+        overflow-y: auto;
+      }
+      .auth-gate[hidden] {
+        display: none;
+      }
+      .auth-card {
+        width: 100%;
+        max-width: 400px;
+        background: #fff;
+        border-radius: 18px;
+        padding: 32px 28px;
+        box-shadow: 0 24px 60px rgba(8, 47, 73, 0.32);
+      }
+      .auth-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        color: var(--brand-strong);
+        margin-bottom: 18px;
+      }
+      .auth-card h1 {
+        font-size: 1.4rem;
+        margin: 0 0 6px;
+        color: #0f2740;
+      }
+      .auth-sub {
+        margin: 0 0 18px;
+        color: #4b5b6b;
+        font-size: 0.92rem;
+      }
+      .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .auth-form input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #d6e1ea;
+        border-radius: 10px;
+        font-size: 0.95rem;
+      }
+      .auth-form input:focus {
+        outline: none;
+        border-color: var(--brand);
+        box-shadow: 0 0 0 3px var(--brand-ring);
+      }
+      .auth-submit {
+        margin-top: 4px;
+      }
+      .auth-alt {
+        width: 100%;
+        margin-top: 10px;
+      }
+      .auth-divider {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 16px 0;
+        color: #9aa8b4;
+        font-size: 0.8rem;
+      }
+      .auth-divider::before,
+      .auth-divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #e2eaf0;
+      }
+      .btn-google {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 11px 14px;
+        border: 1px solid #d6e1ea;
+        border-radius: 999px;
+        background: #fff;
+        font-weight: 600;
+        color: #2b3a47;
+        cursor: pointer;
+      }
+      .btn-google:hover {
+        background: #f6fafd;
+      }
+      .btn-google .g-mark {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--brand);
+        color: #fff;
+        font-weight: 800;
+        font-size: 0.78rem;
+      }
+      .auth-switch {
+        margin: 18px 0 4px;
+        font-size: 0.88rem;
+        color: #4b5b6b;
+        text-align: center;
+      }
+      .auth-forgot {
+        display: block;
+        margin: 0 auto;
+        font-size: 0.82rem;
+      }
+      .auth-message {
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-size: 0.86rem;
+        margin-bottom: 12px;
+        background: #eef4f8;
+        color: #2b3a47;
+      }
+      .auth-message[hidden] {
+        display: none;
+      }
+      .auth-message-error {
+        background: #fdecea;
+        color: #b3261e;
+      }
+      .auth-message-ok {
+        background: var(--green-soft);
+        color: #0a7a4d;
+      }
+      .account-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
     </style>
   </head>
   <body>
+    <div id="auth-gate" class="auth-gate" hidden>
+      <div class="auth-card">
+        <div class="auth-brand"><div class="brand-mark">LC</div><span>LexClock</span></div>
+        <h1 id="auth-title">Sign in</h1>
+        <p class="auth-sub" id="auth-sub">Welcome back. Sign in to your LexClock account.</p>
+        <div id="auth-message" class="auth-message" hidden></div>
+        <form id="auth-form" class="auth-form" autocomplete="on">
+          <input id="auth-email" name="email" type="email" placeholder="you@firm.com" autocomplete="email" required />
+          <input id="auth-password" name="password" type="password" placeholder="Password" autocomplete="current-password" />
+          <button class="btn-primary auth-submit" type="submit" id="auth-submit">Sign in</button>
+        </form>
+        <button class="btn-secondary auth-alt" type="button" data-auth-action="magic">Email me a magic link instead</button>
+        <div class="auth-divider"><span>or</span></div>
+        <button class="btn-google" type="button" data-auth-action="google"><span class="g-mark">G</span> Continue with Google</button>
+        <p class="auth-switch"><span id="auth-switch-text">New to LexClock?</span> <button type="button" class="link-btn" data-auth-action="toggle-mode" id="auth-switch-btn">Create an account</button></p>
+        <button type="button" class="link-btn auth-forgot" data-auth-action="forgot">Forgot password?</button>
+      </div>
+    </div>
     <div class="app-shell">
       <aside class="sidebar">
         <div class="brand">
           <div class="brand-mark">LC</div>
           <div>
             <h1>LexClock</h1>
-            <p>Single-file legal billing tracker</p>
+            <p>Billable Hours Tracker</p>
           </div>
         </div>
 
@@ -895,6 +1789,13 @@
               <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"></path><path d="m5 7 7 6 7-6"></path></svg>
             </span>
             Emails
+          </button>
+          <button class="nav-item" data-view="view-review" type="button">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"></path><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"></path></svg>
+            </span>
+            Review
+            <span class="nav-badge" id="sidebar-review-badge" hidden></span>
           </button>
           <button class="nav-item" data-view="view-log" type="button">
             <span class="nav-icon" aria-hidden="true">
@@ -921,6 +1822,7 @@
           <section class="view active" id="view-dashboard"></section>
           <section class="view" id="view-timers"></section>
           <section class="view" id="view-email"></section>
+          <section class="view" id="view-review"></section>
           <section class="view" id="view-log"></section>
           <section class="view" id="view-settings"></section>
         </div>
@@ -945,6 +1847,13 @@
           <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"></path><path d="m5 7 7 6 7-6"></path></svg>
         </span>
         Emails
+      </button>
+      <button class="nav-item" data-view="view-review" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"></path><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"></path></svg>
+        </span>
+        Review
+        <span class="nav-badge" id="mobile-review-badge" hidden></span>
       </button>
       <button class="nav-item" data-view="view-log" type="button">
         <span class="nav-icon" aria-hidden="true">
@@ -978,18 +1887,44 @@
         matters: 'lexclock_matters',
         entries: 'lexclock_entries',
         timers: 'lexclock_timers',
+        drafts: 'lexclock_drafts',
+      };
+
+      const DRAFT_SOURCE_LABELS = {
+        manual: 'Manual draft',
+        email: 'Email analysis',
+        notion: 'Notion task',
+        workspace: 'Google Workspace',
+        phone: 'Phone call',
+        research: 'Research session',
       };
 
       const IS_HOSTED = window.location.protocol === 'https:';
+
+      const AI_MODEL = 'claude-haiku-4-5-20251001';
+
+      // ---- Auth (Supabase) — login layer, AUTH_PLAN.md Phase B ----
+      // Set both to your project's public values to turn login ON. While blank,
+      // the app runs exactly as today (no login gate, localStorage only).
+      const SUPABASE_URL = 'https://lztnevdhwpzmlwkzdeqw.supabase.co';
+      const SUPABASE_ANON_KEY = 'sb_publishable_aSGCUOaZm11DHN84EfpwVQ_G-rx1Xq2'; // publishable key — safe in the browser
+      const AUTH_ENABLED = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 
       const DEFAULT_SETTINGS = {
         lawyerName: '',
         firmName: '',
         defaultRate: 350,
         increment: 0.1,
+        workdayTargetHours: 8,
+        logStartDefault: 'today',
         anthropicApiKey: '',
         googleClientId: '',
         microsoftClientId: '',
+        notionToken: '',
+        notionDatabaseId: '',
+        notionMatterProperty: '',
+        apiBaseUrl: 'https://lexclock-backend.vercel.app',
+        apiKey: '',
         gmailConnected: false,
         outlookConnected: false,
         onboardingDismissed: false,
@@ -1055,7 +1990,7 @@
             </ol>
           `,
           caution:
-            'LexClock requests read-only access. It cannot send, delete, or modify any emails. Setup takes approximately 10–15 minutes the first time. Gmail sync activates in a future update.',
+            'LexClock requests read-only access. It cannot send, delete, or modify any emails. Setup takes approximately 10–15 minutes the first time. Gmail sync requires LexClock to be served over HTTPS (e.g. GitHub Pages) — the Connect button stays disabled when running locally.',
         },
         microsoftClientId: {
           title: 'Microsoft Client ID (Outlook Sync)',
@@ -1079,23 +2014,102 @@
           caution:
             'LexClock requests read-only access. It cannot send, delete, or modify any emails. Setup takes approximately 10–15 minutes the first time. Gmail and Outlook cannot be connected simultaneously — connecting one will disconnect the other. Outlook sync activates in a future update.',
         },
+        notionToken: {
+          title: 'Notion Integration Token (Tasks Sync)',
+          body: `
+            <p>This token lets LexClock read tasks you completed today from a Notion database and turn them into billing drafts.</p>
+            <p>It starts with: <code>ntn_</code> (older tokens start with <code>secret_</code>)</p>
+            <p>How to set it up:</p>
+            <ol>
+              <li>Go to notion.so/my-integrations</li>
+              <li>Click "New integration", name it "LexClock", pick your workspace</li>
+              <li>Capabilities: "Read content" is enough — leave the rest off</li>
+              <li>Click Submit, then copy the "Internal Integration Secret"</li>
+              <li>Open the Notion database that holds your tasks</li>
+              <li>Click the <code>•••</code> menu → "Connections" → "Connect to" → "LexClock" (this shares the DB with the integration)</li>
+              <li>Copy the Database ID from its URL: the 32-character string after your workspace name and before the <code>?v=</code></li>
+              <li>Paste the token and Database ID into the fields below</li>
+            </ol>
+          `,
+          caution:
+            'This is a client-side prototype. Notion’s API blocks direct browser calls (CORS), so a live sync needs the LexClock backend (Phase 4). Use "Try sample tasks" to see the Notion → draft pipeline now. When the backend ships, this same token moves server-side and never lives in the browser. Read-only: LexClock cannot edit or delete anything in Notion.',
+        },
+      };
+
+      // Phase 6 — task-description coaching (guidance/templates half).
+      // Teaches the lawyer to title work so it reads as billing-ready automatically,
+      // complementing the inline "Polish description" linter on draft cards.
+      const WRITING_GUIDE = {
+        verbs: [
+          'Drafted', 'Revised', 'Reviewed', 'Analyzed', 'Researched',
+          'Prepared', 'Negotiated', 'Conferred with', 'Telephone conference with',
+          'Corresponded with', 'Attended', 'Advised', 'Summarized', 'Evaluated',
+        ],
+        examples: [
+          {
+            vague: 'call w/ client',
+            strong: 'Telephone conference with client re: settlement strategy and next steps',
+            why: 'Names who, the medium, and the subject — a reviewer can see the value.',
+          },
+          {
+            vague: 'research',
+            strong: 'Researched case law on personal jurisdiction for motion to dismiss',
+            why: 'A bare "research" is the #1 write-down trigger. Say the issue and what it feeds.',
+          },
+          {
+            vague: 'email',
+            strong: 'Reviewed and responded to client email re: lease amendment terms',
+            why: 'Past-tense verbs + the topic. "Email" alone reads as clerical.',
+          },
+          {
+            vague: 'work on motion',
+            strong: 'Drafted argument section of motion to dismiss; incorporated jurisdiction research',
+            why: 'Specifies the deliverable and the part worked on — not open-ended "work on."',
+          },
+          {
+            vague: 'review docs',
+            strong: 'Reviewed and analyzed discovery responses; flagged gaps for follow-up',
+            why: 'Two verbs show the analysis, not just passive reading.',
+          },
+        ],
+        risks: [
+          { flag: 'Vague nouns', detail: '"research", "review", "work", "stuff" with no subject. Add the issue and the deliverable.' },
+          { flag: 'Present / gerund tense', detail: '"drafting", "reviewing". Bill in the past tense: "Drafted", "Reviewed".' },
+          { flag: 'Clerical phrasing', detail: '"printed", "filed", "scanned", "scheduled". Reads as non-billable admin — reframe to the legal work.' },
+          { flag: 'Block billing', detail: 'Five tasks crammed in one line. Split distinct tasks so each justifies its own time.' },
+          { flag: 'No client/matter cue', detail: 'Add "re: [subject]" so the narrative stands alone on an invoice.' },
+        ],
+        templates: [
+          { label: 'Phone call', text: 'Telephone conference with [name] re: [subject]' },
+          { label: 'Legal research', text: 'Researched [legal issue] for [deliverable]' },
+          { label: 'Drafting', text: 'Drafted [document] re: [subject]' },
+          { label: 'Revising', text: 'Revised [document] to address [issue/comments]' },
+          { label: 'Client email', text: 'Reviewed and responded to client email re: [subject]' },
+          { label: 'Document review', text: 'Reviewed and analyzed [documents] re: [subject]' },
+          { label: 'Meeting', text: 'Attended [meeting] with [parties] re: [subject]' },
+          { label: 'Court / filing', text: 'Prepared and filed [document] with [court] re: [subject]' },
+        ],
       };
 
       const state = {
         currentView: 'view-dashboard',
         exportText: '',
         logFilters: {
-          startDate: '',
-          endDate: '',
+          startDate: resolveLogStartDate(),
+          endDate: todayKey(),
           matterId: 'all',
           billable: 'all',
         },
         modal: null,
         tickHandle: null,
+        emailAnalysis: null,
+        gmailInbox: null,
+        draftLint: {},
+        notionSync: null,
       };
 
       function generateId(prefix) {
-        return `${prefix}_${Date.now()}`;
+        return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
       }
 
       function getJson(key, fallback) {
@@ -1131,6 +2145,9 @@
         }
         if (!localStorage.getItem(STORAGE_KEYS.timers)) {
           setJson(STORAGE_KEYS.timers, []);
+        }
+        if (!localStorage.getItem(STORAGE_KEYS.drafts)) {
+          setJson(STORAGE_KEYS.drafts, []);
         }
       }
 
@@ -1181,6 +2198,70 @@
 
       function setTimers(timers) {
         setJson(STORAGE_KEYS.timers, timers);
+      }
+
+      function getDrafts() {
+        return getJson(STORAGE_KEYS.drafts, []);
+      }
+
+      function setDrafts(drafts) {
+        setJson(STORAGE_KEYS.drafts, drafts);
+      }
+
+      function getPendingDrafts() {
+        return getDrafts().filter((draft) => draft.status !== 'approved');
+      }
+
+      function createDraft({ source, matterId, date, estimatedSeconds, description, billable = true, confidence = null, evidence = '', externalId = null, backendId = null }) {
+        const matters = getMatters();
+        const safeMatter = matters.some((matter) => matter.id === matterId) ? matterId : (matters[0] && matters[0].id) || DEFAULT_MATTER.id;
+        return {
+          id: generateId('draft'),
+          source: source in DRAFT_SOURCE_LABELS ? source : 'manual',
+          matterId: safeMatter,
+          date: date || todayKey(),
+          estimatedSeconds: Math.max(0, Math.round(Number(estimatedSeconds) || 0)),
+          description: String(description || '').trim(),
+          billable: Boolean(billable),
+          confidence: confidence == null ? null : Number(confidence),
+          evidence: String(evidence || '').trim(),
+          externalId: externalId ? String(externalId) : null,
+          backendId: backendId ? String(backendId) : null,
+          status: 'pending',
+          createdAt: Date.now(),
+        };
+      }
+
+      function addDraft(draftInput) {
+        const draft = createDraft(draftInput);
+        setDrafts([draft, ...getDrafts()]);
+        return draft;
+      }
+
+      function updateDraft(draftId, updates) {
+        const drafts = getDrafts().map((draft) => (draft.id === draftId ? { ...draft, ...updates } : draft));
+        setDrafts(drafts);
+      }
+
+      function discardDraft(draftId) {
+        setDrafts(getDrafts().filter((draft) => draft.id !== draftId));
+      }
+
+      function approveDraft(draftId, updates = {}) {
+        const draft = getDrafts().find((item) => item.id === draftId);
+        if (!draft) return;
+        pushDraftDecision(draft, 'approved');
+        const merged = { ...draft, ...updates };
+        const entry = createEntry({
+          matterId: merged.matterId,
+          date: merged.date,
+          rawSeconds: Math.max(0, Math.round(Number(merged.estimatedSeconds) || 0)),
+          description: merged.description.trim() || `${DRAFT_SOURCE_LABELS[merged.source] || 'Draft'} entry.`,
+          type: merged.source,
+          billable: merged.billable,
+        });
+        setEntries([entry, ...getEntries()]);
+        discardDraft(draftId);
       }
 
       function calcBilledHours(rawSeconds, increment = 0.1) {
@@ -1265,6 +2346,25 @@
         const offset = day === 0 ? 6 : day - 1;
         now.setDate(now.getDate() - offset);
         return now.toISOString().slice(0, 10);
+      }
+
+      function startOfMonthKey() {
+        const now = new Date();
+        now.setDate(1);
+        return now.toISOString().slice(0, 10);
+      }
+
+      function resolveLogStartDate() {
+        switch (getSettings().logStartDefault) {
+          case 'today':
+            return todayKey();
+          case 'week':
+            return startOfWeekKey();
+          case 'month':
+            return startOfMonthKey();
+          default:
+            return '';
+        }
       }
 
       function escapeHtml(value) {
@@ -1385,7 +2485,10 @@
 
       function addManualEmailEntry(formData) {
         const settings = getSettings();
-        const suggestedHours = Number(settings.emailDefaults[formData.emailType] || 0.1);
+        const override = Number(formData.customHours);
+        const suggestedHours = Number.isFinite(override) && override > 0
+          ? override
+          : Number(settings.emailDefaults[formData.emailType] || 0.1);
         const rawSeconds = Math.round(suggestedHours * 3600);
         const description = formData.description.trim() || `${EMAIL_TIER_LABELS[formData.emailType]}.`;
         const entry = createEntry({
@@ -1400,6 +2503,697 @@
         state.currentView = 'view-log';
         showView('view-log');
         showToast('Email entry logged.', 'success');
+      }
+
+      function parseAnalysisJson(text) {
+        let raw = String(text || '').trim();
+        const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+        if (fenced) raw = fenced[1].trim();
+        const start = raw.indexOf('{');
+        const end = raw.lastIndexOf('}');
+        if (start === -1 || end === -1 || end < start) {
+          throw new Error('Claude did not return a readable result. Try again.');
+        }
+        const parsed = JSON.parse(raw.slice(start, end + 1));
+        if (!EMAIL_TIER_LABELS[parsed.tier]) {
+          throw new Error('Claude returned an unrecognized billing tier. Try again.');
+        }
+        const hours = Number(parsed.suggestedHours);
+        return {
+          tier: parsed.tier,
+          suggestedHours: Number.isFinite(hours) && hours > 0 ? hours : Number(getSettings().emailDefaults[parsed.tier] || 0.1),
+          narrative: String(parsed.narrative || '').trim(),
+          reasoning: String(parsed.reasoning || '').trim(),
+        };
+      }
+
+      async function analyzeEmailWithClaude(emailText) {
+        const settings = getSettings();
+        const apiKey = settings.anthropicApiKey.trim();
+        if (!apiKey) throw new Error('NO_API_KEY');
+
+        const tierLines = Object.entries(EMAIL_TIER_LABELS)
+          .map(([key, label]) => `- "${key}": ${label} (typical default ${settings.emailDefaults[key]} hrs)`)
+          .join('\n');
+
+        const system = `You are a legal billing assistant for a practicing attorney. Read the email and:\n1. Classify the attorney's work on it into exactly one billing tier (use the tier key).\n2. Suggest billable time in decimal hours, using the tier default as a starting point and adjusting for the email's length and complexity.\n3. Draft a concise, professional billing narrative in past tense describing the work (e.g., "Reviewed and responded to client correspondence regarding discovery deadlines."). Do not invent facts not present in the email.\n\nAvailable tiers:\n${tierLines}\n\nRespond with ONLY a JSON object, no prose, no code fences:\n{"tier": "<tierKey>", "suggestedHours": <number>, "narrative": "<string>", "reasoning": "<one short sentence>"}`;
+
+        let response;
+        try {
+          response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'content-type': 'application/json',
+              'x-api-key': apiKey,
+              'anthropic-version': '2023-06-01',
+              'anthropic-dangerous-direct-browser-access': 'true',
+            },
+            body: JSON.stringify({
+              model: AI_MODEL,
+              max_tokens: 1024,
+              system,
+              messages: [{ role: 'user', content: `Email to analyze:\n\n${emailText}` }],
+            }),
+          });
+        } catch (networkErr) {
+          throw new Error('Could not reach the Anthropic API. Check your internet connection.');
+        }
+
+        if (!response.ok) {
+          let detail = '';
+          try {
+            const errBody = await response.json();
+            detail = errBody && errBody.error ? errBody.error.message : '';
+          } catch (ignore) {}
+          if (response.status === 401) throw new Error('Anthropic rejected the API key. Check it in Settings.');
+          if (response.status === 429) throw new Error('Rate limited by Anthropic. Wait a moment and try again.');
+          throw new Error(`Anthropic API error (${response.status})${detail ? `: ${detail}` : ''}`);
+        }
+
+        const data = await response.json();
+        const text = (data.content || []).map((block) => block.text || '').join('');
+        return parseAnalysisJson(text);
+      }
+
+      async function runEmailAnalysis() {
+        const input = document.getElementById('ai-email-input');
+        const resultEl = document.getElementById('ai-analysis-result');
+        if (!input || !resultEl) return;
+        const text = input.value.trim();
+        if (!text) {
+          showToast('Paste an email to analyze first.', 'error');
+          return;
+        }
+        if (!getSettings().anthropicApiKey.trim()) {
+          showToast('Add your Anthropic API key in Settings first.', 'error');
+          openHelpModal('anthropicApiKey');
+          return;
+        }
+        state.emailAnalysis = { loading: true };
+        resultEl.innerHTML = renderAnalysisResultHtml(state.emailAnalysis);
+        try {
+          state.emailAnalysis = await analyzeEmailWithClaude(text);
+          showToast('Analysis complete.', 'success');
+        } catch (err) {
+          state.emailAnalysis = { error: err && err.message ? err.message : 'Analysis failed. Try again.' };
+        }
+        const el = document.getElementById('ai-analysis-result');
+        if (el) el.innerHTML = renderAnalysisResultHtml(state.emailAnalysis);
+      }
+
+      function sendAnalysisToReview() {
+        const analysis = state.emailAnalysis;
+        if (!analysis || analysis.error || analysis.loading) return;
+        const matterSelect = document.getElementById('email-matter');
+        const dateInput = document.getElementById('email-date');
+        addDraft({
+          source: 'email',
+          matterId: matterSelect ? matterSelect.value : null,
+          date: dateInput ? dateInput.value : todayKey(),
+          estimatedSeconds: Math.round((Number(analysis.suggestedHours) || 0) * 3600),
+          description: analysis.narrative,
+          billable: true,
+          evidence: analysis.reasoning ? `Claude: ${analysis.reasoning}` : '',
+        });
+        renderAll();
+        showToast('Sent to Review. Approve it from the Review tab.', 'success');
+      }
+
+      function applyAnalysisToForm() {
+        const analysis = state.emailAnalysis;
+        if (!analysis || analysis.error || analysis.loading) return;
+        const tierSelect = document.getElementById('email-type');
+        const description = document.getElementById('email-description');
+        const hoursInput = document.getElementById('email-hours');
+        if (tierSelect) tierSelect.value = analysis.tier;
+        if (description) description.value = analysis.narrative;
+        if (hoursInput) hoursInput.value = analysis.suggestedHours.toFixed(1);
+        showToast('Applied to the log form. Review, then click Log Email Entry.', 'success');
+        if (description) description.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      /* ----------------------------------------------------------------
+         Phase 4 — Notion activity source (client-side prototype).
+         Pulls tasks completed today from a Notion database, estimates
+         billable time (Claude, with a timestamp heuristic fallback),
+         maps each to a matter, and lands them in the Review hub via
+         addDraft({ source: 'notion', ... }). Notion's API blocks direct
+         browser calls (CORS), so live sync needs the backend (Phase 4/a);
+         "Try sample tasks" exercises the full pipeline today.
+      ---------------------------------------------------------------- */
+
+      // Shape mirrors what mapNotionPage() produces from a real API page,
+      // so the sample path and live path feed the exact same pipeline.
+      const SAMPLE_NOTION_TASKS = [
+        {
+          id: 'sample_1',
+          title: 'Draft motion to dismiss for Acme — personal jurisdiction',
+          matterHint: 'Acme',
+          createdTime: new Date(Date.now() - 95 * 60000).toISOString(),
+          lastEditedTime: new Date(Date.now() - 5 * 60000).toISOString(),
+        },
+        {
+          id: 'sample_2',
+          title: 'Call with opposing counsel re: settlement terms',
+          matterHint: 'Acme',
+          createdTime: new Date(Date.now() - 40 * 60000).toISOString(),
+          lastEditedTime: new Date(Date.now() - 18 * 60000).toISOString(),
+        },
+        {
+          id: 'sample_3',
+          title: 'Review lease amendment redlines and send comments to client',
+          matterHint: 'Brightwave',
+          createdTime: new Date(Date.now() - 70 * 60000).toISOString(),
+          lastEditedTime: new Date(Date.now() - 35 * 60000).toISOString(),
+        },
+        {
+          id: 'sample_4',
+          title: 'Research case law on non-compete enforceability',
+          matterHint: '',
+          createdTime: new Date(Date.now() - 130 * 60000).toISOString(),
+          lastEditedTime: new Date(Date.now() - 40 * 60000).toISOString(),
+        },
+      ];
+
+      async function notionApiQuery(token, databaseId) {
+        // Query the database for pages edited today, newest first.
+        const start = new Date();
+        start.setHours(0, 0, 0, 0);
+        let response;
+        try {
+          response = await fetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
+            method: 'POST',
+            headers: {
+              'content-type': 'application/json',
+              authorization: `Bearer ${token}`,
+              'Notion-Version': '2022-06-28',
+            },
+            body: JSON.stringify({
+              page_size: 25,
+              sorts: [{ timestamp: 'last_edited_time', direction: 'descending' }],
+              filter: { timestamp: 'last_edited_time', last_edited_time: { on_or_after: start.toISOString() } },
+            }),
+          });
+        } catch (networkErr) {
+          // Browser CORS block surfaces as a TypeError here.
+          throw new Error('NOTION_CORS');
+        }
+        if (!response.ok) {
+          let detail = '';
+          try {
+            const body = await response.json();
+            detail = body && body.message ? body.message : '';
+          } catch (ignore) {}
+          if (response.status === 401) throw new Error('Notion rejected the token. Check it in Settings.');
+          if (response.status === 404) throw new Error('Database not found. Confirm the Database ID and that the DB is shared with the LexClock integration.');
+          throw new Error(`Notion API error (${response.status})${detail ? `: ${detail}` : ''}`);
+        }
+        const data = await response.json();
+        return Array.isArray(data.results) ? data.results : [];
+      }
+
+      function extractNotionTitle(page) {
+        const props = (page && page.properties) || {};
+        for (const key of Object.keys(props)) {
+          const prop = props[key];
+          if (prop && prop.type === 'title' && Array.isArray(prop.title)) {
+            return prop.title.map((t) => t.plain_text || '').join('').trim();
+          }
+        }
+        return '';
+      }
+
+      function extractNotionProp(page, propName) {
+        if (!propName) return '';
+        const prop = page && page.properties && page.properties[propName];
+        if (!prop) return '';
+        if (prop.type === 'select') return (prop.select && prop.select.name) || '';
+        if (prop.type === 'multi_select') return (prop.multi_select || []).map((o) => o.name).join(', ');
+        if (prop.type === 'rich_text') return (prop.rich_text || []).map((t) => t.plain_text || '').join('').trim();
+        if (prop.type === 'title') return (prop.title || []).map((t) => t.plain_text || '').join('').trim();
+        if (prop.type === 'people') return (prop.people || []).map((p) => p.name || '').join(', ');
+        return '';
+      }
+
+      function mapNotionPage(page) {
+        const matterProp = getSettings().notionMatterProperty.trim();
+        return {
+          id: page.id,
+          title: extractNotionTitle(page),
+          matterHint: extractNotionProp(page, matterProp),
+          createdTime: page.created_time || null,
+          lastEditedTime: page.last_edited_time || null,
+        };
+      }
+
+      // Reusable matter matcher: find the best matter whose client or
+      // matter name appears in the supplied text. Mirrors parseQuickCapture.
+      function matchMatterByText(text) {
+        const lower = String(text || '').toLowerCase();
+        const matters = getMatters();
+        let best = null;
+        matters.forEach((matter) => {
+          const display = getDisplayMatter(matter.id);
+          [display.clientName, matter.name].forEach((candidate) => {
+            const needle = String(candidate || '').toLowerCase().trim();
+            if (!needle || needle === 'general' || needle === 'general matters') return;
+            if (lower.includes(needle) && (!best || needle.length > best.len)) {
+              best = { id: matter.id, len: needle.length };
+            }
+          });
+        });
+        if (best) return { matterId: best.id, matched: true };
+        return { matterId: (matters[0] && matters[0].id) || null, matched: false };
+      }
+
+      // No-AI fallback: estimate minutes from the edit span, clamped to a
+      // sane billing range; narrative is the cleaned task title.
+      function heuristicTaskEstimate(task) {
+        let minutes = 15;
+        if (task.createdTime && task.lastEditedTime) {
+          const span = (new Date(task.lastEditedTime) - new Date(task.createdTime)) / 60000;
+          if (Number.isFinite(span) && span > 0) minutes = Math.min(240, Math.max(6, Math.round(span)));
+        }
+        let narrative = String(task.title || '').trim();
+        if (narrative) narrative = narrative.charAt(0).toUpperCase() + narrative.slice(1);
+        return { minutes, narrative: narrative || 'Notion task', confidence: 0.4, reasoning: 'Estimated from task edit span.' };
+      }
+
+      async function estimateTaskWithClaude(task) {
+        const apiKey = getSettings().anthropicApiKey.trim();
+        if (!apiKey) throw new Error('NO_API_KEY');
+        const spanMin = task.createdTime && task.lastEditedTime
+          ? Math.round((new Date(task.lastEditedTime) - new Date(task.createdTime)) / 60000)
+          : null;
+        const system = `You are a legal billing assistant. Given a completed task from an attorney's task tracker, estimate the billable time and write the billing narrative.\n1. Estimate billable minutes (integer). Use the elapsed editing span as a loose signal but apply legal judgment about how long the described work realistically takes.\n2. Write a concise past-tense billing narrative describing the legal work (e.g., "Drafted motion to dismiss regarding personal jurisdiction."). Do not invent facts beyond the task title.\n3. Give a confidence between 0 and 1.\nRespond with ONLY a JSON object, no prose, no code fences:\n{"minutes": <integer>, "narrative": "<string>", "confidence": <number>, "reasoning": "<one short sentence>"}`;
+        const userContent = `Task title: ${task.title}\nElapsed editing span: ${spanMin == null ? 'unknown' : spanMin + ' minutes'}`;
+        let response;
+        try {
+          response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'content-type': 'application/json',
+              'x-api-key': apiKey,
+              'anthropic-version': '2023-06-01',
+              'anthropic-dangerous-direct-browser-access': 'true',
+            },
+            body: JSON.stringify({
+              model: AI_MODEL,
+              max_tokens: 512,
+              system,
+              messages: [{ role: 'user', content: userContent }],
+            }),
+          });
+        } catch (networkErr) {
+          throw new Error('Could not reach the Anthropic API.');
+        }
+        if (!response.ok) {
+          if (response.status === 401) throw new Error('Anthropic rejected the API key.');
+          throw new Error(`Anthropic API error (${response.status}).`);
+        }
+        const data = await response.json();
+        const text = (data.content || []).map((b) => b.text || '').join('');
+        let raw = text.trim();
+        const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+        if (fenced) raw = fenced[1].trim();
+        const s = raw.indexOf('{');
+        const e = raw.lastIndexOf('}');
+        if (s === -1 || e === -1) throw new Error('Claude returned an unreadable estimate.');
+        const parsed = JSON.parse(raw.slice(s, e + 1));
+        const minutes = Math.max(1, Math.round(Number(parsed.minutes) || 0));
+        const conf = Number(parsed.confidence);
+        return {
+          minutes,
+          narrative: String(parsed.narrative || task.title || '').trim(),
+          confidence: Number.isFinite(conf) ? Math.max(0, Math.min(1, conf)) : null,
+          reasoning: String(parsed.reasoning || '').trim(),
+        };
+      }
+
+      // The credential the backend accepts: a Supabase session JWT when the user
+      // is logged in, otherwise the manually-entered lxk_ API key.
+      function backendCredential() {
+        if (AUTH_ENABLED && authToken()) return authToken();
+        return getSettings().apiKey;
+      }
+
+      function backendConfigured() {
+        const settings = getSettings();
+        return Boolean(settings.apiBaseUrl && backendCredential());
+      }
+
+      async function backendFetch(path, { method = 'GET', body = null } = {}) {
+        const settings = getSettings();
+        const base = settings.apiBaseUrl.replace(/\/+$/, '');
+        const headers = { authorization: `Bearer ${backendCredential()}` };
+        if (body != null) headers['content-type'] = 'application/json';
+        let res;
+        try {
+          res = await fetch(`${base}${path}`, {
+            method,
+            headers,
+            body: body == null ? undefined : JSON.stringify(body),
+          });
+        } catch (err) {
+          throw new Error('Could not reach the LexClock backend. Check the Backend URL in Settings.');
+        }
+        let data = null;
+        try {
+          data = await res.json();
+        } catch (_) {
+          data = null;
+        }
+        if (!res.ok) {
+          const detail = (data && (data.error || data.message)) || `Request failed (${res.status}).`;
+          throw new Error(detail);
+        }
+        return data;
+      }
+
+      // Best-effort: tell the backend a draft was approved/discarded so server
+      // status + audit log stay accurate. Never blocks or breaks local UX.
+      function pushDraftDecision(draft, status) {
+        if (!draft || !draft.backendId || !backendConfigured()) return;
+        backendFetch('/api/drafts', { method: 'POST', body: { id: draft.backendId, status } }).catch(() => {});
+      }
+
+      async function testBackendConnection() {
+        if (!backendConfigured()) {
+          showToast('Add your Backend URL and API key first.', 'error');
+          return;
+        }
+        showToast('Testing backend…', '');
+        try {
+          const health = await backendFetch('/api/health');
+          const cfg = (health && health.config) || {};
+          await backendFetch('/api/drafts?status=pending'); // validates the API key
+          const warn = [];
+          if (!cfg.supabase) warn.push('database not configured');
+          if (!cfg.anthropic) warn.push('no AI key (heuristic estimates only)');
+          showToast(warn.length ? `Backend connected — ${warn.join(', ')}.` : 'Backend connected and API key valid.', warn.length ? '' : 'success');
+        } catch (err) {
+          showToast((err && err.message) || 'Backend test failed.', 'error');
+        }
+      }
+
+      async function syncNotionViaBackend(sample) {
+        const settings = getSettings();
+        const token = settings.notionToken.trim();
+        const dbId = settings.notionDatabaseId.trim();
+        if (!token || !dbId) {
+          throw new Error('Add your Notion token and Database ID in Settings first.');
+        }
+        await backendFetch('/api/notion/connect', {
+          method: 'POST',
+          body: {
+            token,
+            databaseId: dbId,
+            matterProperty: settings.notionMatterProperty.trim() || undefined,
+          },
+        });
+        const sync = await backendFetch('/api/notion/sync', { method: 'POST', body: {} });
+        const list = await backendFetch('/api/drafts?status=pending');
+        const remoteDrafts = (list && list.drafts) || [];
+        const existingExternal = new Set(
+          getDrafts().map((d) => d.externalId).filter(Boolean)
+        );
+        let created = 0;
+        for (const rd of remoteDrafts) {
+          const ext = rd.external_id;
+          if (ext && existingExternal.has(ext)) continue;
+          addDraft({
+            source: 'notion',
+            matterId: matchMatterByText(`${rd.evidence || ''} ${rd.description || ''}`).matterId,
+            date: rd.entry_date || todayKey(),
+            estimatedSeconds: Number(rd.estimated_seconds) || 0,
+            description: rd.description || '',
+            billable: rd.billable !== false,
+            confidence: rd.confidence == null ? null : Number(rd.confidence),
+            evidence: rd.evidence || '',
+            externalId: ext || null,
+            backendId: rd.id || null,
+          });
+          if (ext) existingExternal.add(ext);
+          created += 1;
+        }
+        state.notionSync = {
+          done: true,
+          sample: false,
+          created,
+          backend: true,
+          serverTotal: (sync && sync.total) || remoteDrafts.length,
+          serverCreated: (sync && sync.created) || 0,
+        };
+        renderReviewView();
+        renderShell();
+        showToast(`${created} Notion ${created === 1 ? 'task' : 'tasks'} added to Review.`, 'success');
+      }
+
+      async function syncNotionTasks({ sample = false } = {}) {
+        const settings = getSettings();
+        state.notionSync = { loading: true, sample };
+        renderReviewView();
+
+        if (!sample && backendConfigured()) {
+          try {
+            await syncNotionViaBackend(sample);
+          } catch (err) {
+            state.notionSync = { error: (err && err.message) || 'Notion sync failed.', sample };
+            renderReviewView();
+          }
+          return;
+        }
+
+        let tasks = [];
+        try {
+          if (sample) {
+            tasks = SAMPLE_NOTION_TASKS.slice();
+          } else {
+            const token = settings.notionToken.trim();
+            const dbId = settings.notionDatabaseId.trim();
+            if (!token || !dbId) {
+              throw new Error('Add your Notion token and Database ID in Settings first.');
+            }
+            const pages = await notionApiQuery(token, dbId);
+            tasks = pages.map(mapNotionPage).filter((t) => t.title);
+          }
+        } catch (err) {
+          const message = err && err.message === 'NOTION_CORS'
+            ? 'Notion blocks direct browser calls (CORS). A live sync needs the LexClock backend — add your Backend URL + API key in Settings, or use "Try sample tasks" to preview the pipeline now.'
+            : (err && err.message) || 'Notion sync failed.';
+          state.notionSync = { error: message, sample };
+          renderReviewView();
+          return;
+        }
+
+        if (!tasks.length) {
+          state.notionSync = { error: 'No tasks completed today were found in that database.', sample };
+          renderReviewView();
+          return;
+        }
+
+        const hasKey = Boolean(settings.anthropicApiKey.trim());
+        let created = 0;
+        let aiUsed = 0;
+        for (const task of tasks.slice(0, 12)) {
+          let est;
+          if (hasKey) {
+            try {
+              est = await estimateTaskWithClaude(task);
+              aiUsed += 1;
+            } catch (estErr) {
+              est = heuristicTaskEstimate(task);
+            }
+          } else {
+            est = heuristicTaskEstimate(task);
+          }
+          const matterText = `${task.matterHint || ''} ${task.title || ''}`;
+          const { matterId } = matchMatterByText(matterText);
+          const evidenceBits = [`Notion task: "${task.title}"`];
+          if (task.matterHint) evidenceBits.push(`Matter hint: ${task.matterHint}`);
+          if (est.reasoning) evidenceBits.push(est.reasoning);
+          addDraft({
+            source: 'notion',
+            matterId,
+            date: todayKey(),
+            estimatedSeconds: Math.round((Number(est.minutes) || 0) * 60),
+            description: est.narrative,
+            billable: true,
+            confidence: est.confidence,
+            evidence: evidenceBits.join(' · '),
+          });
+          created += 1;
+        }
+
+        state.notionSync = {
+          done: true,
+          sample,
+          created,
+          aiUsed,
+          usedAi: hasKey,
+        };
+        renderReviewView();
+        renderShell();
+        showToast(`${created} Notion ${created === 1 ? 'task' : 'tasks'} added to Review.`, 'success');
+      }
+
+      function renderNotionSyncStatusHtml() {
+        const sync = state.notionSync;
+        if (!sync) return '';
+        if (sync.loading) {
+          return `<div class="notion-status notion-status-loading">Pulling ${sync.sample ? 'sample ' : ''}Notion tasks${sync.sample ? '' : ' and estimating time'}…</div>`;
+        }
+        if (sync.error) {
+          return `<div class="notion-status notion-status-error">${escapeHtml(sync.error)}</div>`;
+        }
+        if (sync.done) {
+          if (sync.backend) {
+            const total = sync.serverTotal || 0;
+            if (sync.created === 0) {
+              return `<div class="notion-status notion-status-ok">Synced with your backend — ${total} ${total === 1 ? 'task' : 'tasks'} processed server-side, nothing new to add. Estimates ran on the server.</div>`;
+            }
+            return `<div class="notion-status notion-status-ok">Added ${sync.created} ${sync.created === 1 ? 'draft' : 'drafts'} below (of ${total} synced server-side). Estimates ran on the server. Review and approve each before it bills.</div>`;
+          }
+          const how = sync.usedAi
+            ? `Claude estimated ${sync.aiUsed} of ${sync.created}.`
+            : 'Estimated from edit spans (add an Anthropic key for AI estimates + narratives).';
+          return `<div class="notion-status notion-status-ok">Added ${sync.created} ${sync.sample ? 'sample ' : ''}${sync.created === 1 ? 'draft' : 'drafts'} below. ${escapeHtml(how)} Review and approve each before it bills.</div>`;
+        }
+        return '';
+      }
+
+      function parseLintJson(text) {
+        let raw = String(text || '').trim();
+        const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+        if (fenced) raw = fenced[1].trim();
+        const start = raw.indexOf('{');
+        const end = raw.lastIndexOf('}');
+        if (start === -1 || end === -1 || end < start) {
+          throw new Error('Claude did not return a readable result. Try again.');
+        }
+        const parsed = JSON.parse(raw.slice(start, end + 1));
+        const score = Math.max(0, Math.min(100, Math.round(Number(parsed.score))));
+        return {
+          score: Number.isFinite(score) ? score : 0,
+          issues: Array.isArray(parsed.issues) ? parsed.issues.map((i) => String(i)).filter(Boolean).slice(0, 5) : [],
+          improved: String(parsed.improved || '').trim(),
+        };
+      }
+
+      async function lintDescriptionWithClaude(description) {
+        const apiKey = getSettings().anthropicApiKey.trim();
+        if (!apiKey) throw new Error('NO_API_KEY');
+
+        const system = `You are a legal billing description coach. Law firm clients and billing partners write down or reject time-entry narratives that are vague ("attention to file"), use block billing (multiple tasks lumped together), are in the wrong tense, or sound non-billable (clerical/administrative phrasing). Given one time-entry description, evaluate how billing-ready it is and rewrite it.\n\nRules for the rewrite:\n- Past tense, professional, specific about the legal task performed.\n- One discrete task per entry (no block billing).\n- Do NOT invent facts, parties, or details not implied by the original. If the original is too sparse to know specifics, keep it general but well-phrased.\n- Keep it concise (one sentence is ideal).\n\nRespond with ONLY a JSON object, no prose, no code fences:\n{"score": <0-100 integer, how billing-ready the ORIGINAL is>, "issues": ["<short issue>", ...], "improved": "<rewritten narrative>"}`;
+
+        let response;
+        try {
+          response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'content-type': 'application/json',
+              'x-api-key': apiKey,
+              'anthropic-version': '2023-06-01',
+              'anthropic-dangerous-direct-browser-access': 'true',
+            },
+            body: JSON.stringify({
+              model: AI_MODEL,
+              max_tokens: 512,
+              system,
+              messages: [{ role: 'user', content: `Time-entry description to evaluate:\n\n${description}` }],
+            }),
+          });
+        } catch (networkErr) {
+          throw new Error('Could not reach the Anthropic API. Check your internet connection.');
+        }
+
+        if (!response.ok) {
+          let detail = '';
+          try {
+            const errBody = await response.json();
+            detail = errBody && errBody.error ? errBody.error.message : '';
+          } catch (ignore) {}
+          if (response.status === 401) throw new Error('Anthropic rejected the API key. Check it in Settings.');
+          if (response.status === 429) throw new Error('Rate limited by Anthropic. Wait a moment and try again.');
+          throw new Error(`Anthropic API error (${response.status})${detail ? `: ${detail}` : ''}`);
+        }
+
+        const data = await response.json();
+        const text = (data.content || []).map((block) => block.text || '').join('');
+        return parseLintJson(text);
+      }
+
+      function renderLintResultHtml(draftId) {
+        const lint = state.draftLint[draftId];
+        if (!lint) return '';
+        if (lint.loading) return `<div class="draft-lint-body loading">Checking the narrative&hellip;</div>`;
+        if (lint.error) return `<div class="draft-lint-body error">${escapeHtml(lint.error)}</div>`;
+        const result = lint.result;
+        const tone = result.score >= 80 ? 'good' : result.score >= 50 ? 'warn' : 'bad';
+        return `
+          <div class="draft-lint-body">
+            <div class="lint-head">
+              <span class="lint-score lint-${tone}">${result.score}/100 billing-ready</span>
+            </div>
+            ${
+              result.issues.length
+                ? `<ul class="lint-issues">${result.issues.map((i) => `<li>${escapeHtml(i)}</li>`).join('')}</ul>`
+                : `<p class="helper-text">No major issues flagged.</p>`
+            }
+            ${
+              result.improved
+                ? `
+                  <div class="lint-suggestion">
+                    <span class="meta-text">Suggested rewrite</span>
+                    <p>${escapeHtml(result.improved)}</p>
+                    <button class="btn-secondary" type="button" data-action="apply-lint" data-draft-id="${draftId}">Use this rewrite</button>
+                  </div>
+                `
+                : ''
+            }
+          </div>
+        `;
+      }
+
+      async function runDraftLint(draftId) {
+        const card = document.querySelector(`form.draft-card[data-draft-id="${draftId}"]`);
+        if (!card) return;
+        const description = card.description.value.trim();
+        if (!description) {
+          showToast('Add a description before polishing it.', 'error');
+          return;
+        }
+        if (!getSettings().anthropicApiKey.trim()) {
+          showToast('Add your Anthropic API key in Settings first.', 'error');
+          openHelpModal('anthropicApiKey');
+          return;
+        }
+        state.draftLint[draftId] = { loading: true };
+        const container = document.getElementById(`lint-${draftId}`);
+        if (container) container.innerHTML = renderLintResultHtml(draftId);
+        try {
+          const result = await lintDescriptionWithClaude(description);
+          state.draftLint[draftId] = { result };
+        } catch (err) {
+          if (err && err.message === 'NO_API_KEY') {
+            state.draftLint[draftId] = { error: 'Add your Anthropic API key in Settings first.' };
+          } else {
+            state.draftLint[draftId] = { error: err && err.message ? err.message : 'Check failed. Try again.' };
+          }
+        }
+        const el = document.getElementById(`lint-${draftId}`);
+        if (el) el.innerHTML = renderLintResultHtml(draftId);
+      }
+
+      function applyDraftLint(draftId) {
+        const lint = state.draftLint[draftId];
+        if (!lint || !lint.result || !lint.result.improved) return;
+        const card = document.querySelector(`form.draft-card[data-draft-id="${draftId}"]`);
+        if (card && card.description) {
+          card.description.value = lint.result.improved;
+          showToast('Rewrite applied. Save or approve to keep it.', 'success');
+          card.description.focus();
+        }
       }
 
       function saveEntryEdits(entryId, updates) {
@@ -1478,9 +3272,16 @@
           firmName: form.querySelector('[name="firmName"]').value.trim(),
           defaultRate: Number(form.querySelector('[name="defaultRate"]').value || existing.defaultRate),
           increment: Number(form.querySelector('[name="increment"]').value || existing.increment),
+          workdayTargetHours: Math.max(0, Number(form.querySelector('[name="workdayTargetHours"]').value) || 0),
+          logStartDefault: form.querySelector('[name="logStartDefault"]').value || existing.logStartDefault,
           anthropicApiKey: form.querySelector('[name="anthropicApiKey"]').value.trim(),
           googleClientId: form.querySelector('[name="googleClientId"]').value.trim(),
           microsoftClientId: form.querySelector('[name="microsoftClientId"]').value.trim(),
+          notionToken: form.querySelector('[name="notionToken"]').value.trim(),
+          notionDatabaseId: form.querySelector('[name="notionDatabaseId"]').value.trim(),
+          notionMatterProperty: form.querySelector('[name="notionMatterProperty"]').value.trim(),
+          apiBaseUrl: form.querySelector('[name="apiBaseUrl"]').value.trim().replace(/\/+$/, ''),
+          apiKey: form.querySelector('[name="apiKey"]').value.trim(),
           emailDefaults: {
             quickReply: Number(form.querySelector('[name="quickReply"]').value || 0.1),
             standardReply: Number(form.querySelector('[name="standardReply"]').value || 0.2),
@@ -1499,8 +3300,8 @@
         seedDataIfNeeded();
         state.exportText = '';
         state.logFilters = {
-          startDate: '',
-          endDate: '',
+          startDate: resolveLogStartDate(),
+          endDate: todayKey(),
           matterId: 'all',
           billable: 'all',
         };
@@ -1555,6 +3356,216 @@
         const start = startOfWeekKey();
         const entries = getEntries().filter((entry) => entry.date >= start && entry.billable);
         return collectTotals(entries);
+      }
+
+      function getTodayLoggedHours() {
+        const today = todayKey();
+        const increment = getSettings().increment;
+        let hours = getEntries()
+          .filter((entry) => entry.date === today)
+          .reduce((sum, entry) => sum + (Number(entry.billedHours) || 0), 0);
+        getTimers().forEach((timer) => {
+          hours += calcBilledHours(getTimerTotalSeconds(timer), increment);
+        });
+        return Number(hours.toFixed(2));
+      }
+
+      function getReconciliation() {
+        const target = Number(getSettings().workdayTargetHours) || 0;
+        const logged = getTodayLoggedHours();
+        const gap = Number(Math.max(0, target - logged).toFixed(2));
+        return { target, logged, gap };
+      }
+
+      function daysSince(dateKey) {
+        if (!dateKey) return 0;
+        const then = new Date(`${dateKey}T12:00:00`);
+        const now = new Date(`${todayKey()}T12:00:00`);
+        return Math.max(0, Math.round((now - then) / 86400000));
+      }
+
+      function getWipSummary() {
+        const entries = getEntries().filter((entry) => entry.billable && !entry.syncedTo);
+        const buckets = { recent: 0, mid: 0, old: 0 };
+        const matterMap = new Map();
+        let totalHours = 0;
+        let totalDollars = 0;
+        entries.forEach((entry) => {
+          const hours = Number(entry.billedHours) || 0;
+          const dollars = Number(entry.dollars) || 0;
+          totalHours += hours;
+          totalDollars += dollars;
+          const age = daysSince(entry.date);
+          if (age <= 7) buckets.recent += dollars;
+          else if (age <= 30) buckets.mid += dollars;
+          else buckets.old += dollars;
+          const row = matterMap.get(entry.matterId) || { matterId: entry.matterId, hours: 0, dollars: 0, count: 0, oldestDays: 0 };
+          row.hours += hours;
+          row.dollars += dollars;
+          row.count += 1;
+          row.oldestDays = Math.max(row.oldestDays, age);
+          matterMap.set(entry.matterId, row);
+        });
+        const byMatter = [...matterMap.values()].sort((a, b) => b.oldestDays - a.oldestDays || b.dollars - a.dollars);
+        return {
+          count: entries.length,
+          totalHours: Number(totalHours.toFixed(2)),
+          totalDollars: Number(totalDollars.toFixed(2)),
+          buckets,
+          byMatter,
+        };
+      }
+
+      const WIP_STALE_DAYS = 30;
+
+      function renderWipCardHtml() {
+        const wip = getWipSummary();
+        if (!wip.count) return '';
+        return `
+          <div class="card wip-card" style="margin-top:16px;">
+            <div class="card-title">
+              <h3>Unbilled WIP</h3>
+              <span class="pill">${formatHours(wip.totalHours)} &middot; ${formatDollars(wip.totalDollars)}</span>
+            </div>
+            <p class="helper-text">Approved billable time not yet marked billed. Clear it before it ages out of your billing window.</p>
+            <div class="wip-aging">
+              <span class="wip-chip">0&ndash;7 days <strong>${formatDollars(wip.buckets.recent)}</strong></span>
+              <span class="wip-chip">8&ndash;30 days <strong>${formatDollars(wip.buckets.mid)}</strong></span>
+              <span class="wip-chip ${wip.buckets.old > 0 ? 'wip-chip-old' : ''}">30+ days <strong>${formatDollars(wip.buckets.old)}</strong></span>
+            </div>
+            <table class="list-table" style="margin-top:14px;">
+              <thead>
+                <tr><th>Matter</th><th>WIP</th><th>Oldest</th><th></th></tr>
+              </thead>
+              <tbody>
+                ${wip.byMatter
+                  .map((row) => {
+                    const display = getDisplayMatter(row.matterId);
+                    const stale = row.oldestDays >= WIP_STALE_DAYS;
+                    return `
+                      <tr class="${stale ? 'wip-stale' : ''}">
+                        <td>
+                          <div class="row-stack">
+                            <strong>${escapeHtml(display.clientName)} - ${escapeHtml(display.matterName)}</strong>
+                            <small>${row.count} ${row.count === 1 ? 'entry' : 'entries'}</small>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="row-stack">
+                            <strong>${formatHours(row.hours)}</strong>
+                            <small class="money">${formatDollars(row.dollars)}</small>
+                          </div>
+                        </td>
+                        <td>${row.oldestDays === 0 ? 'today' : `${row.oldestDays}d`}${stale ? ' <span class="wip-flag">stale</span>' : ''}</td>
+                        <td><button class="btn-secondary" data-action="mark-matter-billed" data-matter-id="${row.matterId}" type="button">Mark billed</button></td>
+                      </tr>
+                    `;
+                  })
+                  .join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      function parseQuickCapture(text) {
+        const original = String(text || '').trim();
+        const result = { hours: null, matterId: null, description: original, matchedTime: false, matchedMatter: false };
+        if (!original) return result;
+        let desc = original;
+        let hours = 0;
+        const hrMatch = original.match(/(\d+(?:\.\d+)?)\s*(?:hours?|hrs?|h)(?![a-z])/i);
+        const minMatch = original.match(/(\d+(?:\.\d+)?)\s*(?:minutes?|mins?|m)(?![a-z])/i);
+        if (hrMatch) {
+          hours += parseFloat(hrMatch[1]);
+          desc = desc.replace(hrMatch[0], ' ');
+          result.matchedTime = true;
+        }
+        if (minMatch) {
+          hours += parseFloat(minMatch[1]) / 60;
+          desc = desc.replace(minMatch[0], ' ');
+          result.matchedTime = true;
+        }
+        if (!result.matchedTime) {
+          const decMatch = original.match(/(?:^|\s)(\d*\.\d+)(?=\s|$)/);
+          if (decMatch) {
+            hours = parseFloat(decMatch[1]);
+            desc = desc.replace(decMatch[1], ' ');
+            result.matchedTime = true;
+          }
+        }
+        result.hours = result.matchedTime ? Number(hours.toFixed(2)) : null;
+
+        const lower = original.toLowerCase();
+        const matters = getMatters();
+        let best = null;
+        matters.forEach((matter) => {
+          const display = getDisplayMatter(matter.id);
+          [display.clientName, matter.name].forEach((candidate) => {
+            const needle = String(candidate || '').toLowerCase().trim();
+            if (!needle || needle === 'general' || needle === 'general matters') return;
+            if (lower.includes(needle) && (!best || needle.length > best.len)) {
+              best = { id: matter.id, len: needle.length };
+            }
+          });
+        });
+        if (best) {
+          result.matterId = best.id;
+          result.matchedMatter = true;
+        } else {
+          result.matterId = (matters[0] && matters[0].id) || null;
+        }
+
+        desc = desc.replace(/\s+/g, ' ').trim().replace(/^[\s,;:.-]+/, '').replace(/[\s,;:.-]+$/, '');
+        if (desc) desc = desc.charAt(0).toUpperCase() + desc.slice(1);
+        result.description = desc || original;
+        return result;
+      }
+
+      function billedPreview(hours, matterId) {
+        const settings = getSettings();
+        const entered = Number(hours) || 0;
+        const billed = calcBilledHours(entered * 3600, settings.increment);
+        const dollars = calcDollars(billed, matterId);
+        return { entered, billed, dollars, increment: Number(settings.increment) };
+      }
+
+      function draftBillNudgeHtml(hours, matterId) {
+        const { entered, billed, dollars, increment } = billedPreview(hours, matterId);
+        const roundedUp = entered > 0 && billed > entered + 0.0001;
+        return `
+          <div class="bill-nudge">
+            <span>Bills as <strong>${formatHours(billed)}</strong> &middot; ${formatDollars(dollars)}</span>
+            ${roundedUp ? `<span class="bill-nudge-msg">Rounded up from ${entered.toFixed(2)}h to your ${formatHours(increment)} increment.</span>` : ''}
+          </div>
+        `;
+      }
+
+      function updateEmailBillNudge() {
+        const nudge = document.getElementById('email-bill-nudge');
+        if (!nudge) return;
+        const settings = getSettings();
+        const tierSelect = document.getElementById('email-type');
+        const hoursInput = document.getElementById('email-hours');
+        const matterSelect = document.getElementById('email-matter');
+        const tierKey = tierSelect ? tierSelect.value : '';
+        const tierDefault = Number(settings.emailDefaults[tierKey] || 0);
+        const raw = hoursInput ? hoursInput.value.trim() : '';
+        const enteredHours = raw ? Number(raw) : tierDefault;
+        const matterId = matterSelect ? matterSelect.value : null;
+        const billed = calcBilledHours((Number(enteredHours) || 0) * 3600, settings.increment);
+        const dollars = calcDollars(billed, matterId);
+        const under = raw !== '' && Number(raw) > 0 && Number(raw) < tierDefault;
+        nudge.innerHTML = `
+          <div class="bill-nudge ${under ? 'bill-nudge-warn' : ''}">
+            <span>Will bill <strong>${formatHours(billed)}</strong> &middot; ${formatDollars(dollars)}</span>
+            ${
+              under
+                ? `<span class="bill-nudge-msg">Below the ${escapeHtml(EMAIL_TIER_LABELS[tierKey] || 'tier')} default of ${formatHours(tierDefault)} &mdash; you may be under-billing. <button class="link-btn" type="button" data-action="bump-email-hours" data-hours="${tierDefault}">Use ${formatHours(tierDefault)}</button></span>`
+                : ''
+            }
+          </div>
+        `;
       }
 
       function buildExportText(entries, startDate, endDate) {
@@ -1693,6 +3704,76 @@
         document.getElementById('help-modal-overlay').setAttribute('aria-hidden', 'true');
       }
 
+      function renderWritingGuideHtml() {
+        const verbs = WRITING_GUIDE.verbs.map((v) => `<span class="guide-verb">${escapeHtml(v)}</span>`).join('');
+        const examples = WRITING_GUIDE.examples
+          .map(
+            (ex) => `
+              <div class="guide-example">
+                <div class="guide-ba">
+                  <span class="guide-tag guide-tag-bad">Weak</span>
+                  <span class="guide-vague">${escapeHtml(ex.vague)}</span>
+                </div>
+                <div class="guide-ba">
+                  <span class="guide-tag guide-tag-good">Billing-ready</span>
+                  <span class="guide-strong">${escapeHtml(ex.strong)}</span>
+                </div>
+                <p class="guide-why">${escapeHtml(ex.why)}</p>
+              </div>
+            `
+          )
+          .join('');
+        const risks = WRITING_GUIDE.risks
+          .map((r) => `<li><strong>${escapeHtml(r.flag)}.</strong> ${escapeHtml(r.detail)}</li>`)
+          .join('');
+        const templates = WRITING_GUIDE.templates
+          .map(
+            (t) => `
+              <div class="guide-template">
+                <div>
+                  <span class="guide-template-label">${escapeHtml(t.label)}</span>
+                  <code>${escapeHtml(t.text)}</code>
+                </div>
+                <button class="btn-secondary btn-sm" type="button" data-action="use-template" data-template="${escapeHtml(t.text)}">Use</button>
+              </div>
+            `
+          )
+          .join('');
+        return `
+          <p class="guide-intro">Title your work the way it should read on an invoice and LexClock's drafts come out billing-ready — fewer write-downs, less editing later.</p>
+          <div class="guide-section">
+            <h4>The formula</h4>
+            <p class="guide-formula"><strong>Past-tense verb</strong> + <strong>what</strong> + <strong>re: subject</strong></p>
+            <p class="guide-formula-eg">e.g. <em>Drafted motion to dismiss re: lack of personal jurisdiction</em></p>
+          </div>
+          <div class="guide-section">
+            <h4>Start with a strong verb</h4>
+            <div class="guide-verbs">${verbs}</div>
+          </div>
+          <div class="guide-section">
+            <h4>Weak &rarr; billing-ready</h4>
+            <div class="guide-examples">${examples}</div>
+          </div>
+          <div class="guide-section">
+            <h4>Write-down risks to avoid</h4>
+            <ul class="guide-risks">${risks}</ul>
+          </div>
+          <div class="guide-section">
+            <h4>Templates &mdash; tap Use to start a draft</h4>
+            <div class="guide-templates">${templates}</div>
+          </div>
+        `;
+      }
+
+      function openWritingGuide() {
+        state.modal = {
+          type: 'guide',
+          title: 'Billing-ready writing',
+          content: renderWritingGuideHtml(),
+        };
+        renderModal();
+      }
+
       function renderConnectButton(provider) {
         const settings = getSettings();
         const isGmail = provider === 'gmail';
@@ -1743,15 +3824,216 @@
         `;
       }
 
-      function initiateOAuth(provider) {
-        // MUTUAL EXCLUSIVITY GUARD (enforce in Phase 2):
-        // If provider === 'gmail' and settings.outlookConnected === true,
-        //   disconnect Outlook before proceeding.
-        // If provider === 'outlook' and settings.gmailConnected === true,
-        //   disconnect Gmail before proceeding.
-        // Show a confirmation: "This will disconnect [other provider]. Continue?"
-        // Phase 2 implementation below:
-        console.log(`OAuth flow for ${provider} — implemented in Phase 2`);
+      const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly';
+      const GMAIL_API_BASE = 'https://gmail.googleapis.com/gmail/v1';
+
+      function loadGoogleIdentityServices() {
+        return new Promise((resolve, reject) => {
+          if (window.google && google.accounts && google.accounts.oauth2) {
+            resolve();
+            return;
+          }
+          const existing = document.getElementById('gis-script');
+          if (existing) {
+            existing.addEventListener('load', () => resolve());
+            existing.addEventListener('error', () => reject(new Error('Could not load the Google sign-in library.')));
+            return;
+          }
+          const script = document.createElement('script');
+          script.id = 'gis-script';
+          script.src = 'https://accounts.google.com/gsi/client';
+          script.async = true;
+          script.defer = true;
+          script.onload = () => resolve();
+          script.onerror = () => reject(new Error('Could not load the Google sign-in library. Check your connection.'));
+          document.head.appendChild(script);
+        });
+      }
+
+      function getGmailToken() {
+        const token = localStorage.getItem('lexclock_gmail_token');
+        const expiry = Number(localStorage.getItem('lexclock_gmail_expiry') || 0);
+        if (!token || Date.now() > expiry) return null;
+        return token;
+      }
+
+      function clearGmailSession() {
+        localStorage.removeItem('lexclock_gmail_token');
+        localStorage.removeItem('lexclock_gmail_expiry');
+        localStorage.removeItem('lexclock_gmail_synced_ids');
+      }
+
+      async function initiateOAuth(provider) {
+        if (provider === 'outlook') {
+          showToast('Outlook sync activates in a future update.', 'error');
+          return;
+        }
+
+        const settings = getSettings();
+        if (!settings.googleClientId.trim()) {
+          openHelpModal('googleClientId');
+          return;
+        }
+
+        if (settings.outlookConnected) {
+          if (!confirm('This will disconnect Outlook. Continue?')) return;
+          settings.outlookConnected = false;
+          localStorage.removeItem('lexclock_outlook_token');
+          localStorage.removeItem('lexclock_outlook_expiry');
+          saveSettings(settings);
+        }
+
+        try {
+          await loadGoogleIdentityServices();
+        } catch (err) {
+          showToast(err.message, 'error');
+          return;
+        }
+
+        const tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: settings.googleClientId.trim(),
+          scope: GMAIL_SCOPE,
+          callback: async (response) => {
+            if (response.error) {
+              showToast(`Google sign-in failed: ${response.error}`, 'error');
+              return;
+            }
+            const expiresAt = Date.now() + (Number(response.expires_in || 3600) * 1000) - 60000;
+            localStorage.setItem('lexclock_gmail_token', response.access_token);
+            localStorage.setItem('lexclock_gmail_expiry', String(expiresAt));
+            await finalizeGmailConnect();
+          },
+        });
+        tokenClient.requestAccessToken({ prompt: 'consent' });
+      }
+
+      async function finalizeGmailConnect() {
+        try {
+          const profile = await gmailApiFetch('/users/me/profile');
+          const settings = getSettings();
+          settings.gmailConnected = true;
+          settings.gmailEmail = profile.emailAddress || 'Connected';
+          saveSettings(settings);
+          renderAll();
+          showToast(`Gmail connected: ${settings.gmailEmail}`, 'success');
+        } catch (err) {
+          showToast(err.message || 'Could not verify the Gmail connection.', 'error');
+        }
+      }
+
+      async function gmailApiFetch(path, params) {
+        const token = getGmailToken();
+        if (!token) throw new Error('Gmail session expired. Reconnect Gmail in Settings.');
+        const url = new URL(GMAIL_API_BASE + path);
+        if (params) {
+          Object.entries(params).forEach(([key, value]) => {
+            if (Array.isArray(value)) value.forEach((item) => url.searchParams.append(key, item));
+            else url.searchParams.set(key, value);
+          });
+        }
+        const response = await fetch(url.toString(), { headers: { Authorization: `Bearer ${token}` } });
+        if (response.status === 401) {
+          clearGmailSession();
+          const settings = getSettings();
+          settings.gmailConnected = false;
+          saveSettings(settings);
+          throw new Error('Gmail session expired. Reconnect Gmail in Settings.');
+        }
+        if (!response.ok) throw new Error(`Gmail API error (${response.status}).`);
+        return response.json();
+      }
+
+      function decodeBase64Url(data) {
+        const normalized = String(data || '').replace(/-/g, '+').replace(/_/g, '/');
+        try {
+          return decodeURIComponent(escape(atob(normalized)));
+        } catch (err) {
+          try { return atob(normalized); } catch (ignore) { return ''; }
+        }
+      }
+
+      function extractPlainTextFromPayload(payload) {
+        if (!payload) return '';
+        if (payload.mimeType === 'text/plain' && payload.body && payload.body.data) {
+          return decodeBase64Url(payload.body.data);
+        }
+        if (Array.isArray(payload.parts)) {
+          for (const part of payload.parts) {
+            const text = extractPlainTextFromPayload(part);
+            if (text) return text;
+          }
+        }
+        if (payload.body && payload.body.data) return decodeBase64Url(payload.body.data);
+        return '';
+      }
+
+      async function fetchGmailInbox() {
+        const list = await gmailApiFetch('/users/me/messages', { maxResults: 12, q: 'in:inbox' });
+        const ids = (list.messages || []).map((message) => message.id);
+        const messages = [];
+        for (const id of ids) {
+          const message = await gmailApiFetch(`/users/me/messages/${id}`, {
+            format: 'metadata',
+            metadataHeaders: ['Subject', 'From', 'Date'],
+          });
+          const headers = {};
+          ((message.payload && message.payload.headers) || []).forEach((header) => {
+            headers[header.name.toLowerCase()] = header.value;
+          });
+          messages.push({
+            id,
+            subject: headers.subject || '(no subject)',
+            from: headers.from || '',
+            snippet: message.snippet || '',
+          });
+        }
+        return messages;
+      }
+
+      async function getGmailMessageText(messageId) {
+        const message = await gmailApiFetch(`/users/me/messages/${messageId}`, { format: 'full' });
+        const headers = {};
+        ((message.payload && message.payload.headers) || []).forEach((header) => {
+          headers[header.name.toLowerCase()] = header.value;
+        });
+        const body = extractPlainTextFromPayload(message.payload) || message.snippet || '';
+        return `Subject: ${headers.subject || ''}\nFrom: ${headers.from || ''}\n\n${body}`.trim();
+      }
+
+      async function syncGmailInbox() {
+        const container = document.getElementById('gmail-inbox-list');
+        if (!container) return;
+        container.innerHTML = '<p class="helper-text">Loading inbox from Gmail…</p>';
+        try {
+          state.gmailInbox = await fetchGmailInbox();
+        } catch (err) {
+          state.gmailInbox = null;
+          container.innerHTML = `<div class="ai-result ai-error"><p>${escapeHtml(err.message || 'Could not load inbox.')}</p></div>`;
+          return;
+        }
+        container.innerHTML = renderGmailInboxList(state.gmailInbox);
+        showToast(`Loaded ${state.gmailInbox.length} email${state.gmailInbox.length === 1 ? '' : 's'}.`, 'success');
+      }
+
+      async function analyzeGmailMessage(messageId) {
+        const input = document.getElementById('ai-email-input');
+        const resultEl = document.getElementById('ai-analysis-result');
+        if (!input || !resultEl) return;
+        if (!getSettings().anthropicApiKey.trim()) {
+          showToast('Add your Anthropic API key in Settings first.', 'error');
+          openHelpModal('anthropicApiKey');
+          return;
+        }
+        resultEl.innerHTML = renderAnalysisResultHtml({ loading: true });
+        try {
+          const text = await getGmailMessageText(messageId);
+          input.value = text;
+          input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } catch (err) {
+          resultEl.innerHTML = renderAnalysisResultHtml({ error: err.message || 'Could not load the email.' });
+          return;
+        }
+        await runEmailAnalysis();
       }
 
       function disconnectProvider(provider) {
@@ -1770,8 +4052,9 @@
           localStorage.removeItem('lexclock_outlook_expiry');
         }
 
+        if (provider === 'gmail') state.gmailInbox = null;
         saveSettings(settings);
-        renderSettingsView();
+        renderAll();
         showToast(`${provider === 'gmail' ? 'Gmail' : 'Outlook'} disconnected`, 'success');
       }
 
@@ -1801,6 +4084,19 @@
               ${state.modal.content}
             </div>
           `;
+        } else if (state.modal.type === 'guide') {
+          root.innerHTML = `
+            <div class="modal-card modal-card-guide">
+              <div class="modal-guide-head">
+                <h3>${escapeHtml(state.modal.title)}</h3>
+                <button class="help-btn" data-modal-close type="button" aria-label="Close">&times;</button>
+              </div>
+              <div class="modal-guide-body">${state.modal.content}</div>
+              <div class="button-row">
+                <button class="btn-secondary" data-modal-close type="button">Close</button>
+              </div>
+            </div>
+          `;
         }
 
         root.classList.add('active');
@@ -1812,6 +4108,50 @@
         document.querySelectorAll('.nav-item').forEach((button) => {
           button.classList.toggle('active', button.dataset.view === state.currentView);
         });
+        const pendingCount = getPendingDrafts().length;
+        ['sidebar-review-badge', 'mobile-review-badge'].forEach((id) => {
+          const badge = document.getElementById(id);
+          if (!badge) return;
+          badge.textContent = pendingCount;
+          badge.hidden = pendingCount === 0;
+        });
+      }
+
+      function renderReconcileCardHtml() {
+        const { target, logged, gap } = getReconciliation();
+        if (target <= 0 || gap < 0.5) return '';
+        const pct = Math.min(100, Math.round((logged / target) * 100));
+        return `
+          <div class="card reconcile-card" style="margin-top:16px;">
+            <div class="card-title">
+              <h3>Time check &mdash; ${formatDateLabel(todayKey())}</h3>
+              <span class="pill pill-warn">${formatHours(gap)} unaccounted</span>
+            </div>
+            <p class="helper-text">You've logged <strong>${formatHours(logged)}</strong> of your <strong>${formatHours(target)}</strong> day. Capture the gap before it disappears.</p>
+            <div class="reconcile-bar"><span style="width:${pct}%;"></span></div>
+            <form id="reconcile-form" class="form-grid" style="margin-top:14px;">
+              <div class="field-row full-span">
+                <label for="reconcile-description">What did the unaccounted time go to?</label>
+                <textarea id="reconcile-description" name="description" rows="2" placeholder="e.g. Reviewed discovery responses and updated case timeline"></textarea>
+              </div>
+              <div class="field-row">
+                <label for="reconcile-matter">Matter</label>
+                <select id="reconcile-matter" name="matterId">${matterOptionsHtml(getMatters()[0] && getMatters()[0].id)}</select>
+              </div>
+              <div class="field-row">
+                <label for="reconcile-hours">Hours to capture</label>
+                <input id="reconcile-hours" name="hours" type="number" step="0.1" min="0" value="${gap.toFixed(1)}" />
+              </div>
+              <input type="hidden" name="date" value="${todayKey()}" />
+              <div class="field-row">
+                <button class="btn-gold" type="submit">Add to Review</button>
+              </div>
+              <div class="field-row">
+                <button class="btn-secondary" data-cta-view="view-review" type="button">Open Review</button>
+              </div>
+            </form>
+          </div>
+        `;
       }
 
       function renderDashboardView() {
@@ -1859,6 +4199,17 @@
               <span class="helper-text">${timerCount === 1 ? '1 timer in progress queue' : 'Timers preserved across refreshes'}</span>
             </div>
           </div>
+          <div class="card quick-capture" style="margin-top:16px;">
+            <div class="card-title">
+              <h3>Quick capture</h3>
+            </div>
+            <p class="helper-text">Jot what you did in plain language &mdash; LexClock turns it into a draft for review. e.g. <em>call w/ Acme re lease 0.3</em> or <em>drafted motion to dismiss 1.5h</em></p>
+            <form id="quick-capture-form" class="capture-row">
+              <input id="quick-capture-input" name="text" type="text" placeholder="reviewed settlement terms for Acme 45m" autocomplete="off" />
+              <button class="btn-primary" type="submit">Capture</button>
+            </form>
+          </div>
+          ${renderReconcileCardHtml()}
           <div class="split-card" style="margin-top:16px;">
             <div class="card">
               <div class="card-title">
@@ -1867,7 +4218,7 @@
               <div class="button-row">
                 <button class="btn-primary" data-cta-view="view-timers" type="button">Open Timers</button>
                 <button class="btn-secondary" data-cta-view="view-email" type="button">Log an Email</button>
-                <button class="btn-secondary" data-cta-view="view-log" type="button">Review Log</button>
+                <button class="btn-secondary" data-cta-view="view-review" type="button">Review Drafts${getPendingDrafts().length ? ` (${getPendingDrafts().length})` : ''}</button>
               </div>
             </div>
             <div class="card">
@@ -1880,6 +4231,7 @@
               <p class="helper-text">Increment: ${settings.increment.toFixed(1)} hr</p>
             </div>
           </div>
+          ${renderWipCardHtml()}
           <div class="card" style="margin-top:16px;">
             <div class="card-title">
               <h3>Recent Entries</h3>
@@ -2041,6 +4393,64 @@
         `;
       }
 
+      function renderAnalysisResultHtml(analysis) {
+        if (!analysis) return '';
+        if (analysis.loading) {
+          return `<div class="ai-result"><p class="helper-text">Analyzing email with Claude…</p></div>`;
+        }
+        if (analysis.error) {
+          return `<div class="ai-result ai-error"><p>${escapeHtml(analysis.error)}</p></div>`;
+        }
+        const label = EMAIL_TIER_LABELS[analysis.tier] || analysis.tier;
+        return `
+          <div class="ai-result">
+            <h4>Suggested Classification</h4>
+            <p><strong>Tier:</strong> ${escapeHtml(label)}</p>
+            <p><strong>Suggested time:</strong> ${analysis.suggestedHours.toFixed(1)} hrs</p>
+            <p><strong>Billing narrative:</strong></p>
+            <p class="ai-narrative">${escapeHtml(analysis.narrative)}</p>
+            ${analysis.reasoning ? `<p class="helper-text">${escapeHtml(analysis.reasoning)}</p>` : ''}
+            <div class="button-row" style="margin-top:12px;">
+              <button class="btn-gold" data-action="analysis-to-review" type="button">Send to Review</button>
+              <button class="btn-secondary" data-action="apply-analysis" type="button">Apply to Log Form</button>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderGmailInboxList(messages) {
+        if (!messages) return '';
+        if (!messages.length) {
+          return '<p class="helper-text">No emails found in your inbox.</p>';
+        }
+        return messages
+          .map((message) => `
+            <div class="inbox-item">
+              <div class="inbox-item-text">
+                <strong>${escapeHtml(message.subject)}</strong>
+                <span class="helper-text">${escapeHtml(message.from)}</span>
+                <span class="inbox-snippet">${escapeHtml(message.snippet)}</span>
+              </div>
+              <button class="btn-secondary" data-action="analyze-gmail" data-msg-id="${escapeHtml(message.id)}" type="button">Analyze</button>
+            </div>
+          `)
+          .join('');
+      }
+
+      function renderGmailSyncCard(settings) {
+        if (!settings.gmailConnected) return '';
+        return `
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-title">
+              <h3>Gmail Inbox</h3>
+              <button class="btn-secondary" data-action="sync-gmail" type="button">Sync Inbox</button>
+            </div>
+            <p class="helper-text">Connected as ${escapeHtml(settings.gmailEmail || 'your Gmail account')}. Pull recent emails, then analyze any one to draft a billing entry.</p>
+            <div id="gmail-inbox-list">${renderGmailInboxList(state.gmailInbox)}</div>
+          </div>
+        `;
+      }
+
       function renderEmailView() {
         const root = document.getElementById('view-email');
         const settings = getSettings();
@@ -2067,8 +4477,9 @@
         root.innerHTML = `
           <div class="view-header">
             <h2>Emails</h2>
-            <p class="helper-text">Phase 1 includes manual email tallying. AI email analysis hooks are reserved for Phase 2.</p>
+            <p class="helper-text">Log billable email time by tier. AI-powered email analysis coming soon.</p>
           </div>
+          ${renderGmailSyncCard(settings)}
           <div class="split-card">
             <div class="card">
               <div class="card-title">
@@ -2083,13 +4494,17 @@
                   <label for="email-matter">Matter</label>
                   <select id="email-matter" name="matterId">${matterOptions}</select>
                 </div>
-                <div class="field-row">
+                <div class="field-row full-span">
                   <label for="email-type">Email Tier</label>
                   <select id="email-type" name="emailType">
                     ${Object.entries(EMAIL_TIER_LABELS)
                       .map(([key, label]) => `<option value="${key}">${escapeHtml(label)}</option>`)
                       .join('')}
                   </select>
+                </div>
+                <div class="field-row">
+                  <label for="email-hours">Time (hrs, optional)</label>
+                  <input id="email-hours" name="customHours" type="number" min="0.1" step="0.1" placeholder="Tier default" />
                 </div>
                 <div class="field-row">
                   <label>
@@ -2101,6 +4516,7 @@
                   <label for="email-description">Billing Narrative</label>
                   <textarea id="email-description" name="description" placeholder="Review and respond to client email regarding scheduling and discovery issues."></textarea>
                 </div>
+                <div class="field-row full-span" id="email-bill-nudge"></div>
                 <div class="field-row full-span">
                   <small>Suggested time will use the editable default for the selected tier, then round up using your billing increment.</small>
                 </div>
@@ -2119,6 +4535,7 @@
             </div>
           </div>
         `;
+        updateEmailBillNudge();
       }
 
       function renderLogView() {
@@ -2251,6 +4668,149 @@
         `;
       }
 
+      function matterOptionsHtml(selectedId) {
+        return getMatters()
+          .map((matter) => {
+            const display = getDisplayMatter(matter.id);
+            return `<option value="${matter.id}" ${matter.id === selectedId ? 'selected' : ''}>${escapeHtml(display.clientName)} - ${escapeHtml(matter.name)}</option>`;
+          })
+          .join('');
+      }
+
+      function renderDraftCardHtml(draft) {
+        const hours = (Number(draft.estimatedSeconds || 0) / 3600).toFixed(2);
+        const confidencePct = draft.confidence == null ? null : Math.round(Number(draft.confidence) * 100);
+        return `
+          <form class="card draft-card" data-draft-id="${draft.id}">
+            <div class="draft-head">
+              <span class="draft-source">${escapeHtml(DRAFT_SOURCE_LABELS[draft.source] || 'Draft')}</span>
+              ${confidencePct == null ? '' : `<span class="draft-confidence">${confidencePct}% confidence</span>`}
+            </div>
+            <div class="form-grid">
+              <div class="field-row full-span">
+                <label>Description</label>
+                <textarea name="description" rows="2">${escapeHtml(draft.description)}</textarea>
+              </div>
+              <div class="field-row">
+                <label>Matter</label>
+                <select name="matterId">${matterOptionsHtml(draft.matterId)}</select>
+              </div>
+              <div class="field-row">
+                <label>Date</label>
+                <input type="date" name="date" value="${escapeHtml(draft.date)}" />
+              </div>
+              <div class="field-row">
+                <label>Estimated hours</label>
+                <input type="number" step="0.1" min="0" name="hours" value="${hours}" />
+              </div>
+              <div class="field-row">
+                <label>Billable</label>
+                <label class="label-row"><input type="checkbox" name="billable" ${draft.billable ? 'checked' : ''} /> &nbsp;Billable</label>
+              </div>
+            </div>
+            <div class="bill-nudge-slot">${draftBillNudgeHtml(hours, draft.matterId)}</div>
+            ${draft.evidence ? `<p class="draft-evidence">${escapeHtml(draft.evidence)}</p>` : ''}
+            <div class="draft-lint" id="lint-${draft.id}">${renderLintResultHtml(draft.id)}</div>
+            <div class="button-row">
+              <button class="btn-gold" type="submit">Approve to Log</button>
+              <button class="btn-secondary" type="button" data-action="save-draft" data-draft-id="${draft.id}">Save Changes</button>
+              <button class="btn-secondary" type="button" data-action="lint-draft" data-draft-id="${draft.id}">Polish description</button>
+              <button class="btn-danger" type="button" data-action="discard-draft" data-draft-id="${draft.id}">Discard</button>
+            </div>
+          </form>
+        `;
+      }
+
+      function renderReviewView() {
+        const root = document.getElementById('view-review');
+        const drafts = getPendingDrafts().slice().sort((a, b) => b.createdAt - a.createdAt);
+        const totalSeconds = drafts.reduce((sum, draft) => sum + (Number(draft.estimatedSeconds) || 0), 0);
+        const totalHours = totalSeconds / 3600;
+
+        root.innerHTML = `
+          <div class="view-header view-header-row">
+            <div>
+              <h2>Review &amp; Approve</h2>
+              <p class="helper-text">Auto-suggested time entries land here. Edit the description, matter, or estimate, then approve to send them to your billing log. Nothing bills until you approve it.</p>
+            </div>
+            <button class="btn-secondary btn-sm" type="button" data-action="open-writing-guide">Writing guide</button>
+          </div>
+          <div class="card source-card">
+            <div class="card-title">
+              <h3>Pull from a source <span class="pill pill-soft">Prototype</span></h3>
+            </div>
+            <p class="helper-text">Bring completed work in from a connected tool. Each item becomes a draft below — estimated, matter-matched, and waiting for your approval. Notion is first.</p>
+            <div class="source-row">
+              <div class="source-info">
+                <span class="source-name">Notion tasks</span>
+                <span class="source-sub">Tasks edited today → drafts</span>
+              </div>
+              <div class="inline-actions">
+                <button class="btn-secondary btn-sm" type="button" data-action="sync-notion-sample">Try sample tasks</button>
+                <button class="btn-primary btn-sm" type="button" data-action="sync-notion">Sync Notion</button>
+              </div>
+            </div>
+            ${renderNotionSyncStatusHtml()}
+            <p class="source-foot">${backendConfigured()
+              ? 'Connected to the LexClock backend. <strong>Sync Notion</strong> pulls today’s tasks server-side and adds estimated drafts here.'
+              : 'Live Notion sync needs the LexClock backend (Notion blocks direct browser calls). Add your Backend URL + API key and Notion token in <button class="link-btn" type="button" data-cta-view="view-settings">Settings</button>, or click <strong>Try sample tasks</strong> to preview the pipeline now.'}</p>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <h3>Add a draft manually</h3>
+              <button class="link-btn" type="button" data-action="open-writing-guide">How to write billing-ready descriptions</button>
+            </div>
+            <form id="add-draft-form" class="form-grid">
+              <div class="field-row full-span">
+                <label for="draft-description">Description</label>
+                <textarea id="draft-description" name="description" rows="2" placeholder="What did you work on?"></textarea>
+              </div>
+              <div class="field-row">
+                <label for="draft-matter">Matter</label>
+                <select id="draft-matter" name="matterId">${matterOptionsHtml(getMatters()[0] && getMatters()[0].id)}</select>
+              </div>
+              <div class="field-row">
+                <label for="draft-date">Date</label>
+                <input id="draft-date" name="date" type="date" value="${todayKey()}" />
+              </div>
+              <div class="field-row">
+                <label for="draft-hours">Estimated hours</label>
+                <input id="draft-hours" name="hours" type="number" step="0.1" min="0" value="0.3" />
+              </div>
+              <div class="field-row">
+                <label>Billable</label>
+                <label class="label-row"><input name="billable" type="checkbox" checked /> &nbsp;Billable</label>
+              </div>
+              <div class="field-row">
+                <button class="btn-primary" type="submit">Add to Review</button>
+              </div>
+            </form>
+          </div>
+          <div class="card" style="margin-top:16px;">
+            <div class="timer-toolbar">
+              <div>
+                <h3>Pending Drafts</h3>
+                <p class="helper-text">${drafts.length} awaiting review</p>
+              </div>
+              <div class="inline-actions">
+                <span class="pill">${formatHours(totalHours)} estimated</span>
+                ${drafts.length ? `<button class="btn-gold" data-action="approve-all-drafts" type="button">Approve All</button>` : ''}
+              </div>
+            </div>
+            ${
+              drafts.length
+                ? `<div class="draft-list">${drafts.map(renderDraftCardHtml).join('')}</div>`
+                : `
+                  <div class="empty-state">
+                    <h3>Nothing to review</h3>
+                    <p>When LexClock estimates time from your emails, Notion tasks, documents, or calls, the drafts will appear here for a quick approve or amend.</p>
+                  </div>
+                `
+            }
+          </div>
+        `;
+      }
+
       function renderSettingsView() {
         const root = document.getElementById('view-settings');
         const settings = getSettings();
@@ -2310,6 +4870,21 @@
                 <label for="increment">Billing Increment (hours)</label>
                 <input id="increment" name="increment" type="number" min="0.1" step="0.1" value="${settings.increment}" />
               </div>
+              <div class="field-row">
+                <label for="workday-target">Workday Target (hours)</label>
+                <input id="workday-target" name="workdayTargetHours" type="number" min="0" step="0.5" value="${settings.workdayTargetHours}" />
+                <small>Drives the dashboard "Time check" that flags unaccounted hours. Set to 0 to hide it.</small>
+              </div>
+              <div class="field-row">
+                <label for="log-start-default">Default Log Start Date</label>
+                <select id="log-start-default" name="logStartDefault">
+                  <option value="all" ${settings.logStartDefault === 'all' ? 'selected' : ''}>Open (all entries)</option>
+                  <option value="today" ${settings.logStartDefault === 'today' ? 'selected' : ''}>Today</option>
+                  <option value="week" ${settings.logStartDefault === 'week' ? 'selected' : ''}>Start of week</option>
+                  <option value="month" ${settings.logStartDefault === 'month' ? 'selected' : ''}>Start of month</option>
+                </select>
+                <small>Controls the Start Date the Log view opens with. End Date always defaults to today.</small>
+              </div>
               <div class="field-row settings-full-span">
                 <div class="settings-section-heading">AI Analysis</div>
               </div>
@@ -2339,6 +4914,50 @@
                     ${renderConnectButton('outlook')}
                     <small class="phase-note">Outlook sync available in a future update</small>
                   </div>
+                </div>
+              </div>
+              <div class="field-row settings-full-span">
+                <div class="settings-section-heading">Activity Sources</div>
+              </div>
+              <div class="field-row settings-full-span">
+                <div class="settings-subsection">
+                  <h4>LexClock Backend <span class="phase-note">${settings.apiBaseUrl && backendCredential() ? 'connected' : 'optional'}</span></h4>
+                  ${AUTH_ENABLED ? `<div class="field-row">
+                    <label>Signed in as</label>
+                    <div class="account-row"><span>${escapeHtml((authSession && authSession.user && authSession.user.email) || '—')}</span><button class="btn-secondary btn-sm" type="button" data-action="sign-out">Sign out</button></div>
+                  </div>` : ''}
+                  <div class="field-row">
+                    <label for="api-base-url">Backend URL</label>
+                    <input id="api-base-url" name="apiBaseUrl" type="text" placeholder="https://your-app.vercel.app" value="${escapeHtml(settings.apiBaseUrl)}" />
+                  </div>
+                  <div class="field-row">
+                    <label for="api-key">API Key</label>
+                    <input id="api-key" name="apiKey" type="password" placeholder="lxk_..." value="${escapeHtml(settings.apiKey)}" />
+                    <small>When both are set, live Notion sync runs server-side (no CORS). Leave blank to use sample mode in Review.</small>
+                  </div>
+                  <div class="field-row">
+                    <button class="btn-secondary btn-sm" type="button" data-action="test-backend">Test connection</button>
+                    <small class="phase-note">Save your settings first, then test. Checks the backend is reachable and your API key is valid.</small>
+                  </div>
+                </div>
+              </div>
+              <div class="field-row settings-full-span">
+                <div class="settings-subsection">
+                  <h4>Notion Tasks <span class="phase-note">Prototype</span></h4>
+                  <div class="field-row">
+                    <label class="label-row" for="notion-token">Notion Integration Token<button class="help-btn" data-help-key="notionToken" type="button" aria-label="Learn how to set up the Notion integration token">?</button></label>
+                    <input id="notion-token" name="notionToken" type="password" placeholder="ntn_..." value="${escapeHtml(settings.notionToken)}" />
+                  </div>
+                  <div class="field-row">
+                    <label for="notion-database-id">Tasks Database ID</label>
+                    <input id="notion-database-id" name="notionDatabaseId" type="text" placeholder="32-character ID from the database URL" value="${escapeHtml(settings.notionDatabaseId)}" />
+                  </div>
+                  <div class="field-row">
+                    <label for="notion-matter-property">Matter Property <span class="phase-note">optional</span></label>
+                    <input id="notion-matter-property" name="notionMatterProperty" type="text" placeholder="e.g. Client or Matter" value="${escapeHtml(settings.notionMatterProperty)}" />
+                    <small>Name of the Notion property that names the client/matter, used to auto-match drafts. Leave blank to match from the task title.</small>
+                  </div>
+                  <small class="phase-note">Live sync runs from the Review tab. Notion blocks direct browser calls, so a real pull goes through the LexClock backend above. Without a backend, use "Try sample tasks" in Review to preview the pipeline.</small>
                 </div>
               </div>
               <div class="field-row">
@@ -2422,6 +5041,7 @@
         renderDashboardView();
         renderTimersView();
         renderEmailView();
+        renderReviewView();
         renderLogView();
         renderSettingsView();
         renderModal();
@@ -2487,8 +5107,8 @@
 
         if (event.target.id === 'reset-log-filters') {
           state.logFilters = {
-            startDate: '',
-            endDate: '',
+            startDate: resolveLogStartDate(),
+            endDate: todayKey(),
             matterId: 'all',
             billable: 'all',
           };
@@ -2569,6 +5189,91 @@
           const select = document.getElementById('email-type');
           if (select) select.value = actionButton.dataset.tier;
           showToast('Email tier selected.', 'success');
+        } else if (action === 'analyze-email') {
+          runEmailAnalysis();
+        } else if (action === 'apply-analysis') {
+          applyAnalysisToForm();
+        } else if (action === 'analysis-to-review') {
+          sendAnalysisToReview();
+        } else if (action === 'sync-gmail') {
+          syncGmailInbox();
+        } else if (action === 'analyze-gmail') {
+          analyzeGmailMessage(actionButton.dataset.msgId);
+        } else if (action === 'save-draft') {
+          const form = actionButton.closest('form.draft-card');
+          if (form) {
+            updateDraft(actionButton.dataset.draftId, readDraftForm(form));
+            renderAll();
+            showToast('Draft updated.', 'success');
+          }
+        } else if (action === 'mark-matter-billed') {
+          const matterId = actionButton.dataset.matterId;
+          const display = getDisplayMatter(matterId);
+          openConfirmModal({
+            title: 'Mark this matter billed?',
+            message: `Clears all unbilled entries for ${display.clientName} - ${display.matterName} from WIP. They stay in your Log; this just marks them as sent to billing.`,
+            confirmLabel: 'Mark Billed',
+            confirmClass: 'btn-gold',
+            onConfirm: () => {
+              closeModal();
+              const stamp = { method: 'manual', at: todayKey() };
+              setEntries(getEntries().map((entry) => (entry.matterId === matterId && entry.billable && !entry.syncedTo ? { ...entry, syncedTo: stamp } : entry)));
+              renderAll();
+              showToast('Matter marked billed and cleared from WIP.', 'success');
+            },
+          });
+        } else if (action === 'bump-email-hours') {
+          const input = document.getElementById('email-hours');
+          if (input) input.value = actionButton.dataset.hours;
+          updateEmailBillNudge();
+          showToast('Time bumped to the tier default.', 'success');
+        } else if (action === 'sync-notion') {
+          syncNotionTasks({ sample: false });
+        } else if (action === 'sync-notion-sample') {
+          syncNotionTasks({ sample: true });
+        } else if (action === 'open-writing-guide') {
+          openWritingGuide();
+        } else if (action === 'use-template') {
+          const template = actionButton.dataset.template || '';
+          closeModal();
+          if (state.currentView !== 'view-review') showView('view-review');
+          const field = document.getElementById('draft-description');
+          if (field) {
+            field.value = template;
+            field.focus();
+            field.setSelectionRange(template.length, template.length);
+          }
+          showToast('Template added — fill the brackets, then Add to Review.', 'success');
+        } else if (action === 'lint-draft') {
+          runDraftLint(actionButton.dataset.draftId);
+        } else if (action === 'apply-lint') {
+          applyDraftLint(actionButton.dataset.draftId);
+        } else if (action === 'test-backend') {
+          testBackendConnection();
+        } else if (action === 'sign-out') {
+          signOut();
+        } else if (action === 'discard-draft') {
+          const discarded = getDrafts().find((d) => d.id === actionButton.dataset.draftId);
+          pushDraftDecision(discarded, 'discarded');
+          discardDraft(actionButton.dataset.draftId);
+          delete state.draftLint[actionButton.dataset.draftId];
+          renderAll();
+          showToast('Draft discarded.', '');
+        } else if (action === 'approve-all-drafts') {
+          const pending = getPendingDrafts();
+          if (!pending.length) return;
+          openConfirmModal({
+            title: `Approve all ${pending.length} drafts?`,
+            message: 'Each draft is sent to your billing log using its current values. You can still edit entries afterward in the Log.',
+            confirmLabel: 'Approve All',
+            confirmClass: 'btn-gold',
+            onConfirm: () => {
+              closeModal();
+              getPendingDrafts().forEach((draft) => approveDraft(draft.id));
+              renderAll();
+              showToast('All drafts approved to the log.', 'success');
+            },
+          });
         } else if (action === 'edit-entry') {
           openEditEntryModal(actionButton.dataset.entryId);
         } else if (action === 'delete-client') {
@@ -2614,6 +5319,7 @@
             date: event.target.date.value,
             matterId: event.target.matterId.value,
             emailType: event.target.emailType.value,
+            customHours: event.target.customHours.value,
             description: event.target.description.value,
             billable: event.target.billable.checked,
           });
@@ -2647,7 +5353,95 @@
             description: event.target.description.value,
             billable: event.target.billable.checked,
           });
+        } else if (event.target.id === 'quick-capture-form') {
+          event.preventDefault();
+          const raw = event.target.text.value.trim();
+          if (!raw) {
+            showToast('Type what you worked on first.', 'error');
+            return;
+          }
+          const parsed = parseQuickCapture(raw);
+          const hours = parsed.hours == null ? 0.2 : parsed.hours;
+          const evidenceBits = [];
+          evidenceBits.push(parsed.matchedTime ? `Parsed ${formatHours(hours)}` : `No time found — defaulted to ${formatHours(hours)}`);
+          evidenceBits.push(parsed.matchedMatter ? 'matched matter from text' : 'matter not detected — set to default');
+          addDraft({
+            source: 'manual',
+            description: parsed.description,
+            matterId: parsed.matterId,
+            date: todayKey(),
+            estimatedSeconds: Math.round(hours * 3600),
+            billable: true,
+            evidence: `Quick capture: "${raw}". ${evidenceBits.join('; ')}.`,
+          });
+          event.target.reset();
+          renderAll();
+          showView('view-review');
+          showToast(`Captured ${formatHours(hours)} — review and approve it.`, 'success');
+        } else if (event.target.id === 'reconcile-form') {
+          event.preventDefault();
+          const form = event.target;
+          const description = form.description.value.trim();
+          if (!description) {
+            showToast('Describe the unaccounted time first.', 'error');
+            return;
+          }
+          const hours = Number(form.hours.value) || 0;
+          if (hours <= 0) {
+            showToast('Enter how many hours to capture.', 'error');
+            return;
+          }
+          addDraft({
+            source: 'manual',
+            description,
+            matterId: form.matterId.value,
+            date: form.date.value,
+            estimatedSeconds: Math.round(hours * 3600),
+            billable: true,
+            evidence: `Time check: ${formatHours(hours)} captured against an unaccounted gap on ${formatDateLabel(form.date.value)}.`,
+          });
+          renderAll();
+          showView('view-review');
+          showToast('Missing time sent to Review.', 'success');
+        } else if (event.target.id === 'add-draft-form') {
+          event.preventDefault();
+          const fields = readDraftForm(event.target);
+          if (!fields.description.trim()) {
+            showToast('Add a description for the draft.', 'error');
+            return;
+          }
+          addDraft({ source: 'manual', ...fields });
+          renderAll();
+          showToast('Draft added to review.', 'success');
+        } else if (event.target.matches('form.draft-card')) {
+          event.preventDefault();
+          approveDraft(event.target.dataset.draftId, readDraftForm(event.target));
+          renderAll();
+          showToast('Approved to the billing log.', 'success');
         }
+      }
+
+      function handleGlobalInput(event) {
+        const target = event.target;
+        if (target.id === 'email-hours' || target.id === 'email-type' || target.id === 'email-matter') {
+          updateEmailBillNudge();
+          return;
+        }
+        const card = target.closest ? target.closest('form.draft-card') : null;
+        if (card && (target.name === 'hours' || target.name === 'matterId')) {
+          const slot = card.querySelector('.bill-nudge-slot');
+          if (slot) slot.innerHTML = draftBillNudgeHtml(card.hours.value, card.matterId.value);
+        }
+      }
+
+      function readDraftForm(form) {
+        return {
+          description: form.description.value,
+          matterId: form.matterId.value,
+          date: form.date.value,
+          estimatedSeconds: Math.round((Number(form.hours.value) || 0) * 3600),
+          billable: form.billable.checked,
+        };
       }
 
       function persistRunningTimerHeartbeat() {
@@ -2679,6 +5473,132 @@
         }, 1000);
       }
 
+      // ---- Auth module (Supabase). Dormant unless AUTH_ENABLED. ----
+      let supabaseClient = null;
+      let authSession = null;
+      let authMode = 'signin';
+
+      async function getSupabaseClient() {
+        if (supabaseClient) return supabaseClient;
+        const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+        supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        return supabaseClient;
+      }
+
+      function authToken() {
+        return (authSession && authSession.access_token) || '';
+      }
+
+      async function initAuth() {
+        if (!AUTH_ENABLED) return true; // login off -> app runs as today
+        const client = await getSupabaseClient();
+        const { data } = await client.auth.getSession();
+        authSession = data.session || null;
+        client.auth.onAuthStateChange((_event, session) => {
+          authSession = session || null;
+          applyAuthGate();
+          if (authSession) renderAll();
+        });
+        applyAuthGate();
+        return Boolean(authSession);
+      }
+
+      function applyAuthGate() {
+        const gate = document.getElementById('auth-gate');
+        const shell = document.querySelector('.app-shell');
+        if (!AUTH_ENABLED || authSession) {
+          gate.hidden = true;
+          shell.style.display = '';
+          return;
+        }
+        gate.hidden = false;
+        shell.style.display = 'none';
+        renderAuthGate();
+      }
+
+      function renderAuthGate() {
+        const isSignup = authMode === 'signup';
+        document.getElementById('auth-title').textContent = isSignup ? 'Create your account' : 'Sign in';
+        document.getElementById('auth-sub').textContent = isSignup
+          ? 'Start capturing billable time automatically.'
+          : 'Welcome back. Sign in to your LexClock account.';
+        document.getElementById('auth-submit').textContent = isSignup ? 'Create account' : 'Sign in';
+        document.getElementById('auth-switch-text').textContent = isSignup ? 'Already have an account?' : 'New to LexClock?';
+        document.getElementById('auth-switch-btn').textContent = isSignup ? 'Sign in' : 'Create an account';
+        document.getElementById('auth-password').setAttribute('autocomplete', isSignup ? 'new-password' : 'current-password');
+      }
+
+      function setAuthMessage(text, kind) {
+        const el = document.getElementById('auth-message');
+        if (!text) { el.hidden = true; el.textContent = ''; return; }
+        el.hidden = false;
+        el.textContent = text;
+        el.className = 'auth-message' + (kind ? ' auth-message-' + kind : '');
+      }
+
+      async function handleAuthSubmit(event) {
+        event.preventDefault();
+        const email = document.getElementById('auth-email').value.trim();
+        const password = document.getElementById('auth-password').value;
+        if (!email) { setAuthMessage('Enter your email.', 'error'); return; }
+        setAuthMessage('Working…', '');
+        try {
+          const client = await getSupabaseClient();
+          if (authMode === 'signup') {
+            const { error } = await client.auth.signUp({ email, password });
+            if (error) throw error;
+            setAuthMessage('Check your email to confirm your account, then sign in.', 'ok');
+            authMode = 'signin';
+            renderAuthGate();
+          } else {
+            const { error } = await client.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            // onAuthStateChange gates us in.
+          }
+        } catch (err) {
+          setAuthMessage((err && err.message) || 'Sign-in failed.', 'error');
+        }
+      }
+
+      async function handleAuthAction(action) {
+        if (action === 'toggle-mode') {
+          authMode = authMode === 'signup' ? 'signin' : 'signup';
+          setAuthMessage('', '');
+          renderAuthGate();
+          return;
+        }
+        const redirectTo = window.location.origin + window.location.pathname;
+        const email = document.getElementById('auth-email').value.trim();
+        try {
+          const client = await getSupabaseClient();
+          if (action === 'google') {
+            setAuthMessage('Redirecting to Google…', '');
+            const { error } = await client.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
+            if (error) setAuthMessage(error.message, 'error');
+          } else if (action === 'magic') {
+            if (!email) { setAuthMessage('Enter your email first.', 'error'); return; }
+            setAuthMessage('Sending…', '');
+            const { error } = await client.auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo } });
+            setAuthMessage(error ? error.message : 'Magic link sent — check your email.', error ? 'error' : 'ok');
+          } else if (action === 'forgot') {
+            if (!email) { setAuthMessage('Enter your email first.', 'error'); return; }
+            setAuthMessage('Sending…', '');
+            const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo });
+            setAuthMessage(error ? error.message : 'Password reset email sent.', error ? 'error' : 'ok');
+          }
+        } catch (err) {
+          setAuthMessage((err && err.message) || 'Something went wrong.', 'error');
+        }
+      }
+
+      async function signOut() {
+        if (!AUTH_ENABLED) return;
+        const client = await getSupabaseClient();
+        await client.auth.signOut();
+        authSession = null;
+        applyAuthGate();
+      }
+
       function initializeApp() {
         seedDataIfNeeded();
         renderAll();
@@ -2693,8 +5613,17 @@
         });
         document.addEventListener('click', handleGlobalClick);
         document.addEventListener('submit', handleGlobalSubmit);
+        document.addEventListener('input', handleGlobalInput);
+        document.addEventListener('change', handleGlobalInput);
         document.querySelector('.sidebar-nav').addEventListener('click', handleNav);
         document.querySelector('.mobile-nav').addEventListener('click', handleNav);
+
+        document.getElementById('auth-form').addEventListener('submit', handleAuthSubmit);
+        document.getElementById('auth-gate').addEventListener('click', function (event) {
+          const btn = event.target.closest('[data-auth-action]');
+          if (btn) handleAuthAction(btn.dataset.authAction);
+        });
+        initAuth().catch((err) => console.error('[auth] init failed', err));
       }
 
       document.addEventListener('DOMContentLoaded', initializeApp);

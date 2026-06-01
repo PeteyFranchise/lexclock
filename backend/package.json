@@ -1,0 +1,21 @@
+{
+  "name": "lexclock-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "LexClock backend — serverless OAuth/sync/cron for the automatic biller (Vercel + Supabase).",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod",
+    "create-user": "node --env-file=.env.local scripts/create-user.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  },
+  "devDependencies": {
+    "vercel": "^39.0.0"
+  }
+}
