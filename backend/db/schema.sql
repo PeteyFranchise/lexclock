@@ -35,7 +35,7 @@ create table if not exists users (
 create table if not exists source_connections (
   id             uuid primary key default gen_random_uuid(),
   user_id        uuid not null references users(id) on delete cascade,
-  source         text not null check (source in ('notion','workspace','calendar','phone')),
+  source         text not null check (source in ('notion','workspace','calendar','phone','gmail','outlook')),
   secret         text,                 -- integration token / access token
   refresh_token  text,                 -- OAuth refresh token (server-only)
   config         jsonb not null default '{}'::jsonb,  -- e.g. {databaseId, matterProperty}

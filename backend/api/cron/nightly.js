@@ -10,26 +10,38 @@ import { withApi, sendJson } from '../../lib/cors.js';
 import { requireCronSecret } from '../../lib/auth.js';
 import { supabase, audit } from '../../lib/supabase.js';
 import { syncNotionForConnection } from '../../lib/notionSync.js';
+import { getActiveEmailConnections, syncEmailForConnection } from '../../lib/emailSync.js';
 
 export default withApi(async (req, res) => {
   requireCronSecret(req);
 
-  const { data: connections, error } = await supabase
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  const results = [];
+
+  // 1. Notion connections.
+  const { data: notionConns, error } = await supabase
     .from('source_connections')
     .select('*')
     .eq('source', 'notion')
     .eq('status', 'active');
   if (error) throw error;
 
-  const anthropicKey = process.env.ANTHROPIC_API_KEY;
-  const results = [];
-
-  for (const connection of connections || []) {
+  for (const connection of notionConns || []) {
     try {
       const r = await syncNotionForConnection(connection, { anthropicKey });
-      results.push({ userId: connection.user_id, ok: true, ...r });
+      results.push({ userId: connection.user_id, source: 'notion', ok: true, ...r });
     } catch (err) {
-      results.push({ userId: connection.user_id, ok: false, error: err.message });
+      results.push({ userId: connection.user_id, source: 'notion', ok: false, error: err.message });
+    }
+  }
+
+  // 2. Email connections (Gmail today; Outlook in Phase 2).
+  for (const connection of await getActiveEmailConnections()) {
+    try {
+      const r = await syncEmailForConnection(connection, { anthropicKey });
+      results.push({ userId: connection.user_id, source: connection.source, ok: true, ...r });
+    } catch (err) {
+      results.push({ userId: connection.user_id, source: connection.source, ok: false, error: err.message });
     }
   }
 
