@@ -1,0 +1,60 @@
+/* ============================================================
+   LexClock — Design Tokens
+   Paste into a single-file HTML/CSS app. WCAG AA checked.
+   ============================================================ */
+
+:root {
+  /* ---- Brand: Ocean blue (primary) ---- */
+  --ocean-900: #08384C;   /* deepest — headers on light, text on tint */
+  --ocean-800: #0B4F6C;   /* PRIMARY anchor */
+  --ocean-600: #1B6FA8;   /* brand blue — links, secondary actions */
+  --ocean-400: #4E97C8;   /* hover / lighter UI accents */
+  --ocean-100: #DCEAF3;   /* tint surface, selected rows */
+  --ocean-050: #EFF5F9;   /* faint tint background */
+
+  /* ---- Accent: Orange (ACTION / APPROVAL ONLY — never errors) ---- */
+  --orange-400: #F2A341;  /* highlights, focus glow */
+  --orange-500: #E8842B;  /* PRIMARY CTA / Approve */
+  --orange-600: #CE6E18;  /* CTA hover / pressed */
+  --orange-050: #FDF1E2;  /* approve-zone tint */
+
+  /* ---- Success: Approved states ---- */
+  --green-600: #2E9E6B;
+  --green-700: #237A52;
+  --green-050: #E6F4EC;
+
+  /* ---- Caution / Errors (cool red — kept far from orange) ---- */
+  --red-600: #C0392B;
+  --red-050: #FBEAE8;
+
+  /* ---- Neutrals (oklch-harmonized, cool ocean-leaning gray) ---- */
+  --white: #FFFFFF;
+  --surface: #F7F9FB;     /* off-white app surface */
+  --surface-2: #EEF2F6;   /* secondary panels */
+  --line: #DCE3EA;        /* borders / dividers */
+  --line-strong: #C2CCD6;
+  --ink: #15232E;         /* primary text */
+  --ink-2: #34454F;       /* secondary text */
+  --muted: #5B6B76;       /* muted / captions */
+
+  /* ---- Type ---- */
+  --font-head: "Libre Franklin", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-ui: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-serif: "Source Serif 4", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* ---- Radii (rounded, not bubbly) ---- */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+  --r-pill: 999px;
+
+  /* ---- Elevation (soft, ocean-tinted) ---- */
+  --shadow-sm: 0 1px 2px rgba(11,79,108,.06), 0 1px 3px rgba(11,79,108,.08);
+  --shadow-md: 0 4px 12px rgba(11,79,108,.08), 0 2px 4px rgba(11,79,108,.06);
+  --shadow-lg: 0 18px 48px rgba(8,56,76,.16), 0 4px 12px rgba(8,56,76,.08);
+
+  /* ---- Focus ring (orange = the brand's "go") ---- */
+  --focus: 0 0 0 3px rgba(242,163,65,.45);
+}
