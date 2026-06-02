@@ -9,10 +9,13 @@ import { exchangeCode } from '../../../lib/gmail.js';
 import { supabase, audit } from '../../../lib/supabase.js';
 
 const FRONTEND_BASE = (() => {
+  // Explicit override wins (e.g. https://www.getlexclock.com/app/).
+  const explicit = (process.env.APP_BASE_URL || '').trim();
+  if (explicit) return explicit.replace(/\/?$/, '/');
   const origin = (process.env.ALLOWED_ORIGINS || '').split(',')[0]?.trim() || '';
   if (!origin) return '/';
-  // GitHub Pages serves the app under /lexclock/; harmless if hosted at root.
-  return `${origin.replace(/\/$/, '')}/lexclock/`;
+  // App is served under /app/ on the custom domain.
+  return `${origin.replace(/\/$/, '')}/app/`;
 })();
 
 export default withApi(async (req, res) => {
