@@ -826,6 +826,490 @@
 
       .draft-card {
         border-left: 3px solid var(--accent);
+        transition: box-shadow 0.18s ease, transform 0.34s cubic-bezier(0.2, 0.7, 0.2, 1),
+          opacity 0.34s cubic-bezier(0.2, 0.7, 0.2, 1), background 0.28s ease;
+      }
+
+      .draft-card.approving {
+        background: var(--green-soft);
+        border-left-color: var(--green);
+        box-shadow: 0 0 0 3px var(--green-soft);
+      }
+
+      .draft-card.leaving {
+        transform: translateX(40px);
+        opacity: 0;
+      }
+
+      /* ---- Review summary stat row ---- */
+      .review-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .rv-stat {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 16px 18px;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .rv-stat .rv-stat-label {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .rv-stat .rv-stat-value {
+        font-family: var(--font-head);
+        font-weight: 800;
+        font-size: 1.62rem;
+        letter-spacing: -0.02em;
+        margin-top: 6px;
+        color: var(--ink);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .rv-stat .rv-stat-sub {
+        font-size: 0.78rem;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+
+      .rv-stat.rv-stat-await {
+        border-color: rgba(232, 132, 43, 0.34);
+        background: var(--accent-soft);
+      }
+      .rv-stat.rv-stat-await .rv-stat-value {
+        color: var(--accent-strong);
+      }
+      .rv-stat.rv-stat-billed {
+        border-color: rgba(46, 158, 107, 0.34);
+        background: var(--green-soft);
+      }
+      .rv-stat.rv-stat-billed .rv-stat-value {
+        color: var(--green);
+      }
+
+      /* ---- Entry card (prototype display) ---- */
+      .draft-display {
+        display: block;
+      }
+      .draft-card.editing .draft-display {
+        display: none;
+      }
+      .draft-edit {
+        display: none;
+      }
+      .draft-card.editing .draft-edit {
+        display: block;
+      }
+
+      .draft-row1 {
+        display: flex;
+        align-items: flex-start;
+        gap: 18px;
+      }
+
+      .draft-time-col {
+        flex: 0 0 auto;
+        min-width: 92px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .draft-hrs {
+        font-family: var(--font-head);
+        font-weight: 800;
+        font-size: 1.9rem;
+        line-height: 1;
+        letter-spacing: -0.02em;
+        color: var(--brand-strong);
+        font-variant-numeric: tabular-nums;
+      }
+      .draft-hrs-unit {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--muted);
+        margin-left: 3px;
+      }
+      .draft-time-meta {
+        font-size: 0.78rem;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+        margin-top: 5px;
+      }
+
+      .draft-body-col {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      .draft-matter-line {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+      }
+      .draft-desc-text {
+        font-size: 0.95rem;
+        color: var(--ink);
+        margin-top: 4px;
+        line-height: 1.45;
+      }
+
+      .draft-chips {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 13px;
+      }
+      .draft-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+        font-size: 0.72rem;
+        padding: 4px 10px;
+        border-radius: 999px;
+        line-height: 1;
+        border: 1px solid transparent;
+      }
+      .draft-chip .cdot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+      }
+      .conf-high {
+        background: var(--green-soft);
+        color: var(--green);
+      }
+      .conf-high .cdot {
+        background: var(--green);
+      }
+      .conf-med {
+        background: var(--brand-soft);
+        color: var(--brand-strong);
+      }
+      .conf-med .cdot {
+        background: var(--brand);
+      }
+      .conf-low {
+        background: var(--surface-2);
+        color: var(--grey-text);
+      }
+      .conf-low .cdot {
+        background: var(--grey-mid);
+      }
+      .chip-source {
+        background: var(--brand-soft);
+        color: var(--brand-strong);
+        font-weight: 500;
+      }
+      .chip-ev {
+        background: var(--white);
+        border: 1px solid var(--border-strong);
+        color: var(--ink-2);
+        font-weight: 500;
+        cursor: pointer;
+      }
+      .chip-ev:hover {
+        border-color: var(--brand);
+        color: var(--brand-strong);
+      }
+      .chip-ev svg {
+        width: 12px;
+        height: 12px;
+        color: var(--brand);
+      }
+
+      .draft-actions {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px solid var(--border);
+      }
+      .btn-approve {
+        background: var(--accent);
+        color: #fff;
+        font-size: 0.86rem;
+        padding: 9px 16px;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        line-height: 1;
+        box-shadow: 0 1px 2px rgba(232, 132, 43, 0.26);
+        transition: background 0.14s, box-shadow 0.14s;
+      }
+      .btn-approve:hover {
+        background: var(--accent-strong);
+        box-shadow: 0 3px 10px rgba(232, 132, 43, 0.3);
+      }
+      .btn-approve svg {
+        width: 15px;
+        height: 15px;
+      }
+      .btn-skip {
+        background: transparent;
+        border: none;
+        color: var(--muted);
+        font-size: 0.86rem;
+        font-weight: 600;
+        padding: 9px 12px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+      }
+      .btn-skip:hover {
+        background: var(--surface-2);
+        color: var(--ink-2);
+      }
+      .draft-ev-link {
+        margin-left: auto;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--brand);
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 6px 4px;
+      }
+      .draft-ev-link:hover {
+        color: var(--brand-strong);
+        text-decoration: underline;
+      }
+
+      /* ---- Evidence drawer (slide-over) ---- */
+      .ev-scrim {
+        position: fixed;
+        inset: 0;
+        background: rgba(8, 56, 76, 0.34);
+        backdrop-filter: blur(2px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.24s ease;
+        z-index: 80;
+      }
+      .ev-scrim.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .ev-drawer {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 480px;
+        max-width: 92vw;
+        background: var(--white);
+        box-shadow: var(--shadow-lg);
+        transform: translateX(100%);
+        transition: transform 0.32s cubic-bezier(0.2, 0.7, 0.2, 1);
+        z-index: 81;
+        display: flex;
+        flex-direction: column;
+      }
+      .ev-scrim.open .ev-drawer {
+        transform: none;
+      }
+      .ev-drawer .ev-head {
+        padding: 22px 24px 16px;
+        border-bottom: 1px solid var(--border);
+      }
+      .ev-drawer .ev-eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--brand);
+      }
+      .ev-drawer .ev-title {
+        font-family: var(--font-head);
+        font-weight: 800;
+        font-size: 1.22rem;
+        letter-spacing: -0.02em;
+        margin-top: 6px;
+        color: var(--ink);
+      }
+      .ev-drawer .ev-close {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        background: var(--surface-2);
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        cursor: pointer;
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1;
+      }
+      .ev-drawer .ev-close:hover {
+        background: var(--border);
+        color: var(--ink);
+      }
+      .ev-drawer .ev-scroll {
+        padding: 20px 24px;
+        overflow-y: auto;
+        flex: 1 1 auto;
+      }
+      .ev-meta-row {
+        display: flex;
+        gap: 26px;
+        align-items: baseline;
+      }
+      .ev-meta-row .ev-hrs {
+        font-family: var(--font-head);
+        font-weight: 800;
+        font-size: 1.9rem;
+        color: var(--brand-strong);
+        font-variant-numeric: tabular-nums;
+      }
+      .ev-meta-row .ev-amt {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--ink);
+        font-variant-numeric: tabular-nums;
+      }
+      .ev-matter {
+        font-size: 0.74rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+        margin-top: 14px;
+      }
+      .ev-desc {
+        font-size: 0.96rem;
+        color: var(--ink);
+        margin-top: 6px;
+        line-height: 1.5;
+      }
+      .ev-meter-wrap {
+        margin-top: 20px;
+      }
+      .ev-meter-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.78rem;
+        color: var(--ink-2);
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .ev-meter {
+        height: 8px;
+        border-radius: 999px;
+        background: var(--surface-2);
+        overflow: hidden;
+      }
+      .ev-meter > span {
+        display: block;
+        height: 100%;
+        border-radius: 999px;
+        width: 0;
+        transition: width 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+      }
+      .ev-why {
+        margin-top: 22px;
+        background: var(--brand-soft);
+        border-radius: var(--radius-sm);
+        padding: 14px 16px;
+      }
+      .ev-why .h {
+        font-family: var(--font-mono);
+        font-size: 0.64rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--brand);
+        font-weight: 500;
+      }
+      .ev-why p {
+        font-size: 0.86rem;
+        color: var(--ink-2);
+        margin-top: 8px;
+        line-height: 1.5;
+      }
+      .ev-source-card {
+        margin-top: 18px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 14px 16px;
+      }
+      .ev-source-card .src-label {
+        font-family: var(--font-mono);
+        font-size: 0.64rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .ev-source-card p {
+        font-size: 0.86rem;
+        color: var(--ink-2);
+        margin-top: 8px;
+        line-height: 1.5;
+      }
+      .ev-source-card mark {
+        background: var(--accent-soft);
+        color: var(--ink);
+        padding: 0 3px;
+        border-radius: 3px;
+      }
+      .ev-drawer .ev-footer {
+        padding: 16px 24px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      /* ---- Confetti ---- */
+      .confetti-piece {
+        position: fixed;
+        width: 8px;
+        height: 8px;
+        border-radius: 1px;
+        pointer-events: none;
+        z-index: 200;
+        will-change: transform, opacity;
+      }
+      @keyframes confetti-fall {
+        to {
+          transform: translate(var(--cx), var(--cy)) rotate(var(--cr));
+          opacity: 0;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .draft-card,
+        .ev-drawer,
+        .ev-scrim,
+        .ev-meter > span {
+          transition: none !important;
+        }
+        .confetti-piece {
+          display: none !important;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .review-stats {
+          grid-template-columns: 1fr;
+        }
+        .draft-row1 {
+          flex-direction: column;
+          gap: 8px;
+        }
       }
 
       .draft-head {
@@ -1067,6 +1551,44 @@
 
       .toast.error {
         background: #9f2f2f;
+      }
+
+      .toast {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        justify-content: space-between;
+      }
+
+      .toast-action {
+        background: rgba(255, 255, 255, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.8rem;
+        padding: 5px 12px;
+        border-radius: 999px;
+        cursor: pointer;
+        flex: 0 0 auto;
+      }
+      .toast-action:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .btn-edit {
+        background: var(--white);
+        border: 1px solid var(--border-strong);
+        color: var(--brand-strong);
+        font-size: 0.86rem;
+        padding: 9px 15px;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.14s, border-color 0.14s;
+      }
+      .btn-edit:hover {
+        background: var(--brand-soft);
+        border-color: var(--brand);
       }
 
       @keyframes toast-in {
@@ -2328,6 +2850,10 @@
 
       function formatHours(hours) {
         return `${Number(hours || 0).toFixed(1)} hrs`;
+      }
+
+      function formatHoursNumber(hours) {
+        return Number(hours || 0).toFixed(1);
       }
 
       function formatDollars(amount) {
@@ -3643,15 +4169,152 @@
           .sort((a, b) => b.createdAt - a.createdAt);
       }
 
-      function showToast(message, tone = '') {
+      function showToast(message, tone = '', options = null) {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
         toast.className = `toast ${tone}`.trim();
-        toast.textContent = message;
+        const text = document.createElement('span');
+        text.textContent = message;
+        toast.appendChild(text);
+        let lifespan = 3000;
+        if (options && options.actionLabel) {
+          lifespan = 6000;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'toast-action';
+          btn.textContent = options.actionLabel;
+          btn.addEventListener('click', () => {
+            toast.remove();
+            if (typeof options.onAction === 'function') options.onAction();
+          });
+          toast.appendChild(btn);
+        }
         container.appendChild(toast);
         window.setTimeout(() => {
           toast.remove();
-        }, 3000);
+        }, lifespan);
+      }
+
+      function evMeterColor(tier) {
+        if (!tier) return 'var(--grey-mid)';
+        if (tier.cls === 'conf-high') return 'var(--green)';
+        if (tier.cls === 'conf-med') return 'var(--brand)';
+        return 'var(--grey-mid)';
+      }
+
+      function openEvidenceDrawer(draftId) {
+        const draft = getDrafts().find((d) => d.id === draftId);
+        if (!draft) return;
+        const display = getDisplayMatter(draft.matterId);
+        const tier = confidenceTier(draft.confidence);
+        const billedHours = calcBilledHours(Math.round(Number(draft.estimatedSeconds) || 0), getSettings().increment);
+        const dollars = draftDollars(draft);
+        const sourceLabel = DRAFT_SOURCE_LABELS[draft.source] || 'Draft';
+        let scrim = document.getElementById('ev-scrim');
+        if (!scrim) {
+          scrim = document.createElement('div');
+          scrim.id = 'ev-scrim';
+          scrim.className = 'ev-scrim';
+          document.body.appendChild(scrim);
+        }
+        scrim.innerHTML = `
+          <aside class="ev-drawer" role="dialog" aria-modal="true" aria-label="Why LexClock suggested this">
+            <button class="ev-close" type="button" data-action="close-evidence" aria-label="Close">&times;</button>
+            <div class="ev-head">
+              <div class="ev-eyebrow">Evidence</div>
+              <div class="ev-title">Why LexClock suggested this</div>
+            </div>
+            <div class="ev-scroll">
+              <div class="ev-meta-row">
+                <span class="ev-hrs">${formatHoursNumber(billedHours)} hrs</span>
+                <span class="ev-amt">${draft.billable ? formatDollars(dollars) : 'Non-billable'}</span>
+              </div>
+              <div class="ev-matter">${escapeHtml(display.clientName)} · ${escapeHtml(display.matterName)}</div>
+              <div class="ev-desc">${escapeHtml(draft.description)}</div>
+              ${
+                tier
+                  ? `<div class="ev-meter-wrap">
+                       <div class="ev-meter-label"><span>${tier.label}</span><span>${tier.pct}%</span></div>
+                       <div class="ev-meter"><span style="background:${evMeterColor(tier)};"></span></div>
+                     </div>`
+                  : ''
+              }
+              <div class="ev-why">
+                <div class="h">Reasoning</div>
+                <p>${draft.evidence ? escapeHtml(draft.evidence) : `LexClock estimated this entry from your ${escapeHtml(sourceLabel.toLowerCase())} activity and matched it to ${escapeHtml(display.clientName)}.`}</p>
+              </div>
+              <div class="ev-source-card">
+                <div class="src-label">Source · ${escapeHtml(sourceLabel)}</div>
+                <p>Open the original ${escapeHtml(sourceLabel.toLowerCase())} item to verify the time and matter before you approve. LexClock keeps your source read-only.</p>
+              </div>
+            </div>
+            <div class="ev-footer">
+              <button class="btn-approve" type="button" data-action="approve-from-evidence" data-draft-id="${draft.id}">${CHECK_ICON}Approve &amp; bill</button>
+              <button class="btn-secondary" type="button" data-action="close-evidence">Close</button>
+            </div>
+          </aside>
+        `;
+        requestAnimationFrame(() => {
+          scrim.classList.add('open');
+          const bar = scrim.querySelector('.ev-meter > span');
+          if (bar && tier) {
+            requestAnimationFrame(() => {
+              bar.style.width = `${tier.pct}%`;
+            });
+          }
+        });
+      }
+
+      function closeEvidenceDrawer() {
+        const scrim = document.getElementById('ev-scrim');
+        if (scrim) scrim.classList.remove('open');
+      }
+
+      function fireConfetti(originEl) {
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const rect = originEl.getBoundingClientRect();
+        const cx = rect.left + Math.min(rect.width, 140);
+        const cy = rect.top + rect.height / 2;
+        const colors = ['#E8842B', '#F2A341', '#2E9E6B', '#1B6FA8'];
+        for (let i = 0; i < 18; i += 1) {
+          const piece = document.createElement('div');
+          piece.className = 'confetti-piece';
+          piece.style.left = `${cx}px`;
+          piece.style.top = `${cy}px`;
+          piece.style.background = colors[i % colors.length];
+          const angle = (Math.PI * 2 * i) / 18 + Math.random() * 0.6;
+          const dist = 60 + Math.random() * 90;
+          piece.style.setProperty('--cx', `${Math.cos(angle) * dist}px`);
+          piece.style.setProperty('--cy', `${Math.sin(angle) * dist + 40}px`);
+          piece.style.setProperty('--cr', `${Math.random() * 540 - 270}deg`);
+          piece.style.animation = `confetti-fall ${600 + Math.random() * 300}ms cubic-bezier(0.2,0.7,0.2,1) forwards`;
+          document.body.appendChild(piece);
+          window.setTimeout(() => piece.remove(), 1000);
+        }
+      }
+
+      function approveDraftWithAnimation(form) {
+        const draftId = form.dataset.draftId;
+        const fields = readDraftForm(form);
+        const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const dollars = draftDollars({ ...getDrafts().find((d) => d.id === draftId), ...fields });
+        const finish = () => {
+          approveDraft(draftId, fields);
+          delete state.draftLint[draftId];
+          renderAll();
+          showToast(`Approved & billed to Clio — ${formatDollars(dollars)}`, 'success');
+        };
+        if (reduce) {
+          finish();
+          return;
+        }
+        const approveBtn = form.querySelector('.btn-approve');
+        if (approveBtn) fireConfetti(approveBtn);
+        form.classList.add('approving');
+        window.setTimeout(() => {
+          form.classList.add('leaving');
+        }, 280);
+        window.setTimeout(finish, 620);
       }
 
       function openConfirmModal({ title, message, confirmLabel, confirmClass = 'btn-primary', onConfirm }) {
@@ -4698,45 +5361,89 @@
           .join('');
       }
 
+      function confidenceTier(confidence) {
+        if (confidence == null) return null;
+        const pct = Math.round(Number(confidence) * 100);
+        if (pct >= 85) return { cls: 'conf-high', label: 'High confidence', pct };
+        if (pct >= 60) return { cls: 'conf-med', label: 'Medium', pct };
+        return { cls: 'conf-low', label: 'Needs a look', pct };
+      }
+
+      function draftDollars(draft) {
+        if (!draft.billable) return 0;
+        const billedHours = calcBilledHours(Math.round(Number(draft.estimatedSeconds) || 0), getSettings().increment);
+        return calcDollars(billedHours, draft.matterId);
+      }
+
+      const EV_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H5.2L4 18z"/></svg>`;
+      const CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`;
+
       function renderDraftCardHtml(draft) {
         const hours = (Number(draft.estimatedSeconds || 0) / 3600).toFixed(2);
-        const confidencePct = draft.confidence == null ? null : Math.round(Number(draft.confidence) * 100);
+        const display = getDisplayMatter(draft.matterId);
+        const tier = confidenceTier(draft.confidence);
+        const dollars = draftDollars(draft);
+        const billedHours = calcBilledHours(Math.round(Number(draft.estimatedSeconds) || 0), getSettings().increment);
+        const sourceLabel = DRAFT_SOURCE_LABELS[draft.source] || 'Draft';
+        const evChipLabel = draft.evidence ? 'View evidence' : 'How this was drafted';
         return `
           <form class="card draft-card" data-draft-id="${draft.id}">
-            <div class="draft-head">
-              <span class="draft-source">${escapeHtml(DRAFT_SOURCE_LABELS[draft.source] || 'Draft')}</span>
-              ${confidencePct == null ? '' : `<span class="draft-confidence">${confidencePct}% confidence</span>`}
-            </div>
-            <div class="form-grid">
-              <div class="field-row full-span">
-                <label>Description</label>
-                <textarea name="description" rows="2">${escapeHtml(draft.description)}</textarea>
+            <div class="draft-display">
+              <div class="draft-row1">
+                <div class="draft-time-col">
+                  <div><span class="draft-hrs">${formatHoursNumber(billedHours)}</span><span class="draft-hrs-unit">hrs</span></div>
+                  <div class="draft-time-meta">${draft.billable ? `${formatDollars(dollars)}` : 'Non-billable'}</div>
+                </div>
+                <div class="draft-body-col">
+                  <div class="draft-matter-line">${escapeHtml(display.clientName)} · ${escapeHtml(display.matterName)}</div>
+                  <div class="draft-desc-text">${escapeHtml(draft.description)}</div>
+                  <div class="draft-chips">
+                    ${tier ? `<span class="draft-chip ${tier.cls}"><span class="cdot"></span>${tier.label} · ${tier.pct}%</span>` : ''}
+                    <span class="draft-chip chip-source">${escapeHtml(sourceLabel)}</span>
+                    <span class="draft-chip chip-ev" data-action="show-evidence" data-draft-id="${draft.id}">${EV_ICON}${escapeHtml(evChipLabel)}</span>
+                  </div>
+                </div>
               </div>
-              <div class="field-row">
-                <label>Matter</label>
-                <select name="matterId">${matterOptionsHtml(draft.matterId)}</select>
-              </div>
-              <div class="field-row">
-                <label>Date</label>
-                <input type="date" name="date" value="${escapeHtml(draft.date)}" />
-              </div>
-              <div class="field-row">
-                <label>Estimated hours</label>
-                <input type="number" step="0.1" min="0" name="hours" value="${hours}" />
-              </div>
-              <div class="field-row">
-                <label>Billable</label>
-                <label class="label-row"><input type="checkbox" name="billable" ${draft.billable ? 'checked' : ''} /> &nbsp;Billable</label>
+              <div class="draft-actions">
+                <button class="btn-approve" type="submit">${CHECK_ICON}Approve &amp; bill</button>
+                <button class="btn-edit" type="button" data-action="edit-draft" data-draft-id="${draft.id}">Edit</button>
+                <button class="btn-skip" type="button" data-action="discard-draft" data-draft-id="${draft.id}">Skip</button>
+                <button class="draft-ev-link" type="button" data-action="show-evidence" data-draft-id="${draft.id}">Show evidence</button>
               </div>
             </div>
-            <div class="bill-nudge-slot">${draftBillNudgeHtml(hours, draft.matterId)}</div>
-            ${draft.evidence ? `<p class="draft-evidence">${escapeHtml(draft.evidence)}</p>` : ''}
-            <div class="draft-lint" id="lint-${draft.id}">${renderLintResultHtml(draft.id)}</div>
-            <div class="button-row">
-              <button class="btn-gold" type="submit">Approve to Log</button>
-              <button class="btn-secondary" type="button" data-action="save-draft" data-draft-id="${draft.id}">Save Changes</button>
-              <button class="btn-secondary" type="button" data-action="lint-draft" data-draft-id="${draft.id}">Polish description</button>
-              <button class="btn-danger" type="button" data-action="discard-draft" data-draft-id="${draft.id}">Discard</button>
+
+            <div class="draft-edit">
+              <div class="form-grid">
+                <div class="field-row full-span">
+                  <label>Description</label>
+                  <textarea name="description" rows="2">${escapeHtml(draft.description)}</textarea>
+                </div>
+                <div class="field-row">
+                  <label>Matter</label>
+                  <select name="matterId">${matterOptionsHtml(draft.matterId)}</select>
+                </div>
+                <div class="field-row">
+                  <label>Date</label>
+                  <input type="date" name="date" value="${escapeHtml(draft.date)}" />
+                </div>
+                <div class="field-row">
+                  <label>Estimated hours</label>
+                  <input type="number" step="0.1" min="0" name="hours" value="${hours}" />
+                </div>
+                <div class="field-row">
+                  <label>Billable</label>
+                  <label class="label-row"><input type="checkbox" name="billable" ${draft.billable ? 'checked' : ''} /> &nbsp;Billable</label>
+                </div>
+              </div>
+              <div class="bill-nudge-slot">${draftBillNudgeHtml(hours, draft.matterId)}</div>
+              <div class="draft-lint" id="lint-${draft.id}">${renderLintResultHtml(draft.id)}</div>
+              <div class="button-row">
+                <button class="btn-gold" type="submit">Save &amp; approve</button>
+                <button class="btn-secondary" type="button" data-action="save-draft" data-draft-id="${draft.id}">Save changes</button>
+                <button class="btn-secondary" type="button" data-action="lint-draft" data-draft-id="${draft.id}">Polish description</button>
+                <button class="btn-secondary" type="button" data-action="edit-draft-done" data-draft-id="${draft.id}">Done</button>
+                <button class="btn-danger" type="button" data-action="discard-draft" data-draft-id="${draft.id}">Discard</button>
+              </div>
             </div>
           </form>
         `;
@@ -4747,14 +5454,34 @@
         const drafts = getPendingDrafts().slice().sort((a, b) => b.createdAt - a.createdAt);
         const totalSeconds = drafts.reduce((sum, draft) => sum + (Number(draft.estimatedSeconds) || 0), 0);
         const totalHours = totalSeconds / 3600;
+        const pendingDollars = drafts.reduce((sum, draft) => sum + draftDollars(draft), 0);
+        const todayEntries = getEntries().filter((entry) => entry.date === todayKey() && entry.billable);
+        const billedToday = todayEntries.reduce((sum, entry) => sum + Number(entry.dollars || 0), 0);
 
         root.innerHTML = `
           <div class="view-header view-header-row">
             <div>
               <h2>Review &amp; Approve</h2>
-              <p class="helper-text">Auto-suggested time entries land here. Edit the description, matter, or estimate, then approve to send them to your billing log. Nothing bills until you approve it.</p>
+              <p class="helper-text">Auto-suggested time entries land here. Review the evidence, edit if needed, then approve to bill. Nothing bills until you approve it.</p>
             </div>
             <button class="btn-secondary btn-sm" type="button" data-action="open-writing-guide">Writing guide</button>
+          </div>
+          <div class="review-stats">
+            <div class="rv-stat">
+              <div class="rv-stat-label">Captured today</div>
+              <div class="rv-stat-value">${drafts.length}</div>
+              <div class="rv-stat-sub">${drafts.length === 1 ? 'draft' : 'drafts'} drafted for you</div>
+            </div>
+            <div class="rv-stat rv-stat-await">
+              <div class="rv-stat-label">Awaiting approval</div>
+              <div class="rv-stat-value">${formatDollars(pendingDollars)}</div>
+              <div class="rv-stat-sub">${formatHours(totalHours)} across ${drafts.length} ${drafts.length === 1 ? 'draft' : 'drafts'}</div>
+            </div>
+            <div class="rv-stat rv-stat-billed">
+              <div class="rv-stat-label">Approved &amp; billed today</div>
+              <div class="rv-stat-value">${formatDollars(billedToday)}</div>
+              <div class="rv-stat-sub">${todayEntries.length} ${todayEntries.length === 1 ? 'entry' : 'entries'} synced</div>
+            </div>
           </div>
           <div class="card source-card">
             <div class="card-title">
@@ -4815,7 +5542,7 @@
               </div>
               <div class="inline-actions">
                 <span class="pill">${formatHours(totalHours)} estimated</span>
-                ${drafts.length ? `<button class="btn-gold" data-action="approve-all-drafts" type="button">Approve All</button>` : ''}
+                ${drafts.length ? `<button class="btn-gold" data-action="approve-all-drafts" type="button">Approve all (${formatDollars(pendingDollars)})</button>` : ''}
               </div>
             </div>
             ${
@@ -5082,6 +5809,10 @@
       }
 
       function handleGlobalClick(event) {
+        if (event.target.id === 'ev-scrim') {
+          closeEvidenceDrawer();
+          return;
+        }
         const actionButton = event.target.closest('[data-action]');
         const ctaButton = event.target.closest('[data-cta-view]');
 
@@ -5273,13 +6004,42 @@
           testBackendConnection();
         } else if (action === 'sign-out') {
           signOut();
+        } else if (action === 'edit-draft') {
+          const card = actionButton.closest('form.draft-card');
+          if (card) card.classList.add('editing');
+        } else if (action === 'edit-draft-done') {
+          const card = actionButton.closest('form.draft-card');
+          if (card) card.classList.remove('editing');
+        } else if (action === 'show-evidence') {
+          openEvidenceDrawer(actionButton.dataset.draftId);
+        } else if (action === 'close-evidence') {
+          closeEvidenceDrawer();
+        } else if (action === 'approve-from-evidence') {
+          closeEvidenceDrawer();
+          const card = document.querySelector(`form.draft-card[data-draft-id="${actionButton.dataset.draftId}"]`);
+          if (card) {
+            approveDraftWithAnimation(card);
+          } else {
+            approveDraft(actionButton.dataset.draftId);
+            renderAll();
+            showToast('Approved & billed to Clio.', 'success');
+          }
         } else if (action === 'discard-draft') {
-          const discarded = getDrafts().find((d) => d.id === actionButton.dataset.draftId);
+          const draftId = actionButton.dataset.draftId;
+          const discarded = getDrafts().find((d) => d.id === draftId);
+          if (!discarded) return;
           pushDraftDecision(discarded, 'discarded');
-          discardDraft(actionButton.dataset.draftId);
-          delete state.draftLint[actionButton.dataset.draftId];
+          discardDraft(draftId);
+          delete state.draftLint[draftId];
           renderAll();
-          showToast('Draft discarded.', '');
+          showToast('Draft skipped.', '', {
+            actionLabel: 'Undo',
+            onAction: () => {
+              setDrafts([discarded, ...getDrafts()]);
+              renderAll();
+              showToast('Draft restored.', 'success');
+            },
+          });
         } else if (action === 'approve-all-drafts') {
           const pending = getPendingDrafts();
           if (!pending.length) return;
@@ -5436,9 +6196,7 @@
           showToast('Draft added to review.', 'success');
         } else if (event.target.matches('form.draft-card')) {
           event.preventDefault();
-          approveDraft(event.target.dataset.draftId, readDraftForm(event.target));
-          renderAll();
-          showToast('Approved to the billing log.', 'success');
+          approveDraftWithAnimation(event.target);
         }
       }
 
@@ -5630,7 +6388,10 @@
         });
         document.getElementById('help-modal-close').addEventListener('click', closeHelpModal);
         document.addEventListener('keydown', function (event) {
-          if (event.key === 'Escape') closeHelpModal();
+          if (event.key === 'Escape') {
+            closeHelpModal();
+            closeEvidenceDrawer();
+          }
         });
         document.addEventListener('click', handleGlobalClick);
         document.addEventListener('submit', handleGlobalSubmit);
