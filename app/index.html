@@ -3412,6 +3412,14 @@
           data = null;
         }
         if (!res.ok) {
+          // An expired session token returns 401. If we were authenticating with
+          // a Supabase session (not a static API key), try to recover silently;
+          // if the session is truly gone, revalidateSession surfaces the sign-in
+          // screen so the user is never stranded on a stale page.
+          if (res.status === 401 && AUTH_ENABLED && authToken()) {
+            const stillIn = await revalidateSession();
+            if (!stillIn) throw new Error('Your session expired. Please sign in again.');
+          }
           const detail = (data && (data.error || data.message)) || `Request failed (${res.status}).`;
           throw new Error(detail);
         }
@@ -5735,8 +5743,10 @@
                 <div class="settings-subsection">
                   <h4>LexClock Backend <span class="phase-note">${settings.apiBaseUrl && backendCredential() ? 'connected' : 'optional'}</span></h4>
                   ${AUTH_ENABLED ? `<div class="field-row">
-                    <label>Signed in as</label>
-                    <div class="account-row"><span>${escapeHtml((authSession && authSession.user && authSession.user.email) || '—')}</span><button class="btn-secondary btn-sm" type="button" data-action="sign-out">Sign out</button></div>
+                    <label>Account</label>
+                    <div class="account-row"><span>${authSession ? escapeHtml((authSession.user && authSession.user.email) || 'Signed in') : 'Not signed in'}</span>${authSession
+                      ? '<button class="btn-secondary btn-sm" type="button" data-action="sign-out">Sign out</button>'
+                      : '<button class="btn-primary btn-sm" type="button" data-action="sign-in">Sign in</button>'}</div>
                   </div>` : ''}
                   <div class="field-row">
                     <label for="api-base-url">Backend URL</label>
@@ -6068,6 +6078,8 @@
           testBackendConnection();
         } else if (action === 'sign-out') {
           signOut();
+        } else if (action === 'sign-in') {
+          showSignIn();
         } else if (action === 'edit-draft') {
           const card = actionButton.closest('form.draft-card');
           if (card) card.classList.add('editing');
@@ -6342,6 +6354,13 @@
           applyAuthGate();
           if (authSession) { renderAll(); syncGmailConnection(); }
         });
+        // When the user returns to a backgrounded tab, Supabase may have paused
+        // its token-refresh timer. Re-sync the session on focus so an expired
+        // token renews (or the sign-in screen appears) without a manual reload.
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') revalidateSession();
+        });
+        window.addEventListener('focus', () => { revalidateSession(); });
         applyAuthGate();
         if (authSession) syncGmailConnection();
         return Boolean(authSession);
@@ -6441,6 +6460,32 @@
         await client.auth.signOut();
         authSession = null;
         applyAuthGate();
+      }
+
+      // Bring up the sign-in screen on demand (the Settings "Sign in" button).
+      function showSignIn() {
+        if (!AUTH_ENABLED) { showToast('Sign-in is not configured.', 'error'); return; }
+        authSession = null;
+        applyAuthGate();
+      }
+
+      // Re-sync our in-memory session with Supabase's stored one. getSession()
+      // transparently refreshes an expired access token when a valid refresh
+      // token exists, so this both renews live sessions and detects dead ones.
+      // Returns true if we end up signed in. Used on tab focus and after a 401
+      // so an expired session recovers (or surfaces the sign-in screen) without
+      // the user having to reload the page.
+      async function revalidateSession() {
+        if (!AUTH_ENABLED) return false;
+        try {
+          const client = await getSupabaseClient();
+          const { data } = await client.auth.getSession();
+          authSession = data.session || null;
+        } catch (_) {
+          authSession = null;
+        }
+        applyAuthGate();
+        return Boolean(authSession);
       }
 
       function initializeApp() {
