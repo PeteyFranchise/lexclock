@@ -4584,7 +4584,7 @@
           return;
         }
         state.gmailSync = { loading: true };
-        renderEmailView();
+        renderAll();
         try {
           const sync = await backendFetch('/api/email/sync', { method: 'POST', body: {} });
           const list = await backendFetch('/api/drafts?status=pending');
@@ -4616,8 +4616,7 @@
             serverCreated: (sync && sync.created) || 0,
             serverTotal: (sync && sync.total) || 0,
           };
-          renderEmailView();
-          renderShell();
+          renderAll();
           showToast(
             created
               ? `${created} email ${created === 1 ? 'entry' : 'entries'} added to Review.`
@@ -4626,7 +4625,7 @@
           );
         } catch (err) {
           state.gmailSync = { error: (err && err.message) || 'Gmail sync failed.' };
-          renderEmailView();
+          renderAll();
           showToast((err && err.message) || 'Gmail sync failed.', 'error');
         }
       }
@@ -5408,7 +5407,19 @@
             <div class="card-title">
               <h3>Pull from a source <span class="pill pill-soft">Prototype</span></h3>
             </div>
-            <p class="helper-text">Bring completed work in from a connected tool. Each item becomes a draft below — estimated, matter-matched, and waiting for your approval. Notion is first.</p>
+            <p class="helper-text">Bring completed work in from a connected tool. Each item becomes a draft below — estimated, matter-matched, and waiting for your approval.</p>
+            <div class="source-row">
+              <div class="source-info">
+                <span class="source-name">Gmail email</span>
+                <span class="source-sub">Recent sent mail → drafts</span>
+              </div>
+              <div class="inline-actions">
+                ${getSettings().gmailConnected
+                  ? '<button class="btn-primary btn-sm" type="button" data-action="sync-gmail">Sync Gmail</button>'
+                  : '<button class="btn-secondary btn-sm" type="button" data-cta-view="view-settings">Connect Gmail</button>'}
+              </div>
+            </div>
+            ${renderGmailSyncStatusHtml()}
             <div class="source-row">
               <div class="source-info">
                 <span class="source-name">Notion tasks</span>
@@ -5421,8 +5432,8 @@
             </div>
             ${renderNotionSyncStatusHtml()}
             <p class="source-foot">${backendConfigured()
-              ? 'Connected to the LexClock backend. <strong>Sync Notion</strong> pulls today’s tasks server-side and adds estimated drafts here.'
-              : 'Live Notion sync needs the LexClock backend (Notion blocks direct browser calls). Add your Backend URL + API key and Notion token in <button class="link-btn" type="button" data-cta-view="view-settings">Settings</button>, or click <strong>Try sample tasks</strong> to preview the pipeline now.'}</p>
+              ? 'Connected to the LexClock backend. <strong>Sync Gmail</strong> and <strong>Sync Notion</strong> pull your latest work server-side and add estimated drafts here. They also run automatically every night.'
+              : 'Live sync needs the LexClock backend. Add your Backend URL + API key in <button class="link-btn" type="button" data-cta-view="view-settings">Settings</button>, or click <strong>Try sample tasks</strong> to preview the pipeline now.'}</p>
           </div>
           <div class="card">
             <div class="card-title">
