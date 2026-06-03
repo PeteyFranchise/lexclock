@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Privacy Policy — LexClock</title>
-<meta name="description" content="How LexClock accesses, uses, stores, shares, and protects your data — including Google and Microsoft email data used to draft billing time entries." />
+<meta name="description" content="How LexClock accesses, uses, stores, shares, and protects your data — including Google email and calendar data and Microsoft email data used to draft billing time entries." />
 <meta name="robots" content="index, follow" />
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -105,7 +105,7 @@ footer a{color:var(--muted);}
     <h1>Privacy Policy</h1>
     <div class="meta">
       <span><strong>Effective:</strong> June 2, 2026</span>
-      <span><strong>Last updated:</strong> June 2, 2026</span>
+      <span><strong>Last updated:</strong> June 3, 2026</span>
     </div>
   </div>
 </div>
@@ -116,8 +116,8 @@ footer a{color:var(--muted);}
     <div class="tldr">
       <h2>The short version</h2>
       <ul>
-        <li><strong>Read-only.</strong> When you connect Gmail or Microsoft Outlook, LexClock can only <em>read</em> your messages. It can never send, delete, or change your email.</li>
-        <li><strong>We don't keep your email.</strong> We read a message to draft one time entry, then discard the message content. We do not store message bodies or attachments.</li>
+        <li><strong>Read-only.</strong> When you connect Gmail, Google Calendar, or Microsoft Outlook, LexClock can only <em>read</em> your messages and calendar events. It can never send, delete, or change your email or your calendar.</li>
+        <li><strong>We don't keep your email or event details.</strong> We read a message or meeting to draft one time entry, then discard the content. We do not store message bodies, attachments, or event notes.</li>
         <li><strong>Nothing is sold, and nothing trains AI.</strong> We never sell your data, never serve ads, and never let your content be used to train any AI/ML model — ours or a third party's.</li>
         <li><strong>You decide what bills.</strong> Every draft waits for your explicit approval before anything is sent to Clio.</li>
         <li><strong>You can leave instantly.</strong> Disconnect a source or delete your account at any time, and your stored data is erased.</li>
@@ -143,7 +143,7 @@ footer a{color:var(--muted);}
 
       <h3>Information from connected services (only if you connect them)</h3>
       <ul>
-        <li><strong>Google account data</strong> — see Section 4.</li>
+        <li><strong>Google account data</strong> — Gmail and/or Google Calendar, see Section 4.</li>
         <li><strong>Microsoft account data</strong> — see Section 5.</li>
         <li><strong>Clio (or other billing system) data</strong> — when you connect a billing system, we exchange the matter/client and time-entry data needed to sync approved entries.</li>
       </ul>
@@ -170,14 +170,16 @@ footer a{color:var(--muted);}
       <p>LexClock's use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">Google API Services User Data Policy</a>, including the <strong>Limited Use</strong> requirements.</p>
 
       <h3>What we access</h3>
+      <p>LexClock connects to Gmail and Google Calendar separately — you choose which, if either, to connect. Each grants only the read-only scope below:</p>
       <div class="scope">
-        <p style="margin:0 0 6px;"><strong>Scope requested:</strong> <code>https://www.googleapis.com/auth/gmail.readonly</code> (read-only Gmail access)</p>
+        <p style="margin:0 0 6px;"><strong>Gmail scope:</strong> <code>https://www.googleapis.com/auth/gmail.readonly</code> (read-only Gmail access)</p>
+        <p style="margin:0 0 6px;"><strong>Calendar scope:</strong> <code>https://www.googleapis.com/auth/calendar.readonly</code> (read-only Google Calendar access)</p>
         <p class="note" style="margin:0;">If you sign in with Google, we also receive your basic profile (name, email address, profile picture) via the standard <code>openid</code>, <code>email</code>, and <code>profile</code> scopes.</p>
       </div>
-      <p>We request this scope so LexClock can read recent messages (such as messages you've sent) as evidence of billable work and draft a corresponding time entry. The access is <strong>read-only</strong>: LexClock cannot compose, send, modify, label, or delete any message.</p>
+      <p>We request the <strong>Gmail</strong> scope so LexClock can read recent messages (such as messages you've sent) as evidence of billable work and draft a corresponding time entry. We request the <strong>Calendar</strong> scope so LexClock can read your recently finished events (meetings, calls, hearings) and draft a time entry from the scheduled duration. Both are <strong>read-only</strong>: LexClock cannot compose, send, modify, label, or delete any message, and cannot create, edit, or delete any calendar event.</p>
 
       <h3>How we use it</h3>
-      <p>We read the content of a qualifying message solely to estimate the billable time and write a draft entry. The message content is processed transiently in memory and is <strong>not retained</strong>.</p>
+      <p>We read the content of a qualifying message, or the details of a finished calendar event, solely to estimate the billable time and write a draft entry. That content is processed transiently in memory and is <strong>not retained</strong>. For calendar events we look only at events that have already ended (a finished meeting is evidence of billable time); we skip all-day entries, cancelled events, and any meeting you declined.</p>
 
       <h3>What we store vs. what we discard</h3>
       <table class="dt">
@@ -185,12 +187,14 @@ footer a{color:var(--muted);}
         <tr>
           <td>
             • The draft we generate (your duration estimate and description)<br/>
-            • A short <em>evidence note</em> that may include the recipient and the subject line of the message, plus the message's date and Gmail message ID (used to avoid duplicates)<br/>
+            • For email: a short <em>evidence note</em> that may include the recipient and the subject line of the message, plus the message's date and Gmail message ID (used to avoid duplicates)<br/>
+            • For calendar: a short <em>evidence note</em> that may include the event title, up to a few attendee names, the meeting duration, and the calendar event ID (used to avoid duplicates)<br/>
             • An encrypted Google <em>refresh token</em> so we can sync on your behalf until you disconnect
           </td>
           <td>
             • The body of any email message<br/>
-            • Attachments<br/>
+            • Email attachments<br/>
+            • Event descriptions/notes, location, or the full attendee list<br/>
             • Your Google password<br/>
             • Google access tokens (used in memory only, never written to our database)
           </td>
@@ -203,7 +207,7 @@ footer a{color:var(--muted);}
       </div>
 
       <h3>Revoking access</h3>
-      <p>You can disconnect Gmail from within LexClock at any time, and you can review or revoke LexClock's access directly at <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">myaccount.google.com/permissions</a>. When you disconnect, we delete the stored refresh token and purge associated drafts as described in Section 9.</p>
+      <p>You can disconnect Gmail or Google Calendar from within LexClock at any time, and you can review or revoke LexClock's access directly at <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">myaccount.google.com/permissions</a>. When you disconnect a source, we delete the stored refresh token and purge associated drafts as described in Section 9.</p>
     </section>
 
     <section class="s">
@@ -217,7 +221,7 @@ footer a{color:var(--muted);}
 
     <section class="s">
       <h2>6. AI processing</h2>
-      <p>To turn a message into a useful draft, LexClock sends the relevant message content to our AI provider, <strong>Anthropic (the Claude API)</strong>, which returns a suggested duration and description. This transfer is necessary to provide the core, user-facing feature of LexClock.</p>
+      <p>To turn a message or a calendar event into a useful draft, LexClock sends the relevant message content or event details to our AI provider, <strong>Anthropic (the Claude API)</strong>, which returns a suggested duration and description. This transfer is necessary to provide the core, user-facing feature of LexClock.</p>
       <ul>
         <li>Content sent for processing is used <strong>only</strong> to generate your draft and return it to you.</li>
         <li>Our AI provider does <strong>not</strong> use this content to train or improve its models, and the content is not retained beyond what is needed to return a result.</li>
@@ -232,8 +236,8 @@ footer a{color:var(--muted);}
         <tr><th>Subprocessor</th><th>Purpose</th><th>Data</th></tr>
         <tr><td>Vercel</td><td>Application hosting &amp; serverless backend</td><td>Requests, logs, data in transit</td></tr>
         <tr><td>Supabase</td><td>Authentication &amp; encrypted database</td><td>Account data, drafts, encrypted tokens</td></tr>
-        <tr><td>Anthropic</td><td>AI drafting (Claude API)</td><td>Transient message content for estimation</td></tr>
-        <tr><td>Google / Microsoft</td><td>Email access you authorize</td><td>OAuth tokens, read-only mail access</td></tr>
+        <tr><td>Anthropic</td><td>AI drafting (Claude API)</td><td>Transient message content or event details for estimation</td></tr>
+        <tr><td>Google / Microsoft</td><td>Email &amp; calendar access you authorize</td><td>OAuth tokens, read-only mail and calendar access</td></tr>
         <tr><td>Clio (or your billing system)</td><td>Syncing approved time entries</td><td>Approved entries you choose to send</td></tr>
       </table>
       <p>We may also disclose information if required by law, to enforce our terms, to protect the rights, safety, and security of users or the public, or in connection with a merger, acquisition, or sale of assets (in which case we will notify you and this policy will continue to apply).</p>
@@ -242,7 +246,7 @@ footer a{color:var(--muted);}
     <section class="s">
       <h2>8. What we never do</h2>
       <ul>
-        <li>We never <strong>send, modify, or delete</strong> your email — access is read-only.</li>
+        <li>We never <strong>send, modify, or delete</strong> your email, and never <strong>create, edit, or delete</strong> your calendar events — access is read-only.</li>
         <li>We never <strong>sell or rent</strong> your personal information or client data.</li>
         <li>We never use your data for <strong>advertising</strong> or cross-site tracking.</li>
         <li>We never use your data to <strong>train AI/ML models</strong>, and we don't permit our subprocessors to.</li>
@@ -254,7 +258,7 @@ footer a{color:var(--muted);}
     <section class="s">
       <h2>9. Data retention &amp; deletion</h2>
       <ul>
-        <li><strong>Message content:</strong> not retained — discarded immediately after a draft is generated.</li>
+        <li><strong>Message and event content:</strong> not retained — discarded immediately after a draft is generated.</li>
         <li><strong>Drafts &amp; evidence notes:</strong> retained until you approve, skip, or delete them, or until you delete your account.</li>
         <li><strong>Connection tokens:</strong> encrypted refresh tokens are kept only while a source is connected, and deleted when you disconnect.</li>
         <li><strong>Account data:</strong> retained while your account is active.</li>
