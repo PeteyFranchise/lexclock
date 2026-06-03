@@ -4546,45 +4546,6 @@
         `;
       }
 
-      const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly';
-      const GMAIL_API_BASE = 'https://gmail.googleapis.com/gmail/v1';
-
-      function loadGoogleIdentityServices() {
-        return new Promise((resolve, reject) => {
-          if (window.google && google.accounts && google.accounts.oauth2) {
-            resolve();
-            return;
-          }
-          const existing = document.getElementById('gis-script');
-          if (existing) {
-            existing.addEventListener('load', () => resolve());
-            existing.addEventListener('error', () => reject(new Error('Could not load the Google sign-in library.')));
-            return;
-          }
-          const script = document.createElement('script');
-          script.id = 'gis-script';
-          script.src = 'https://accounts.google.com/gsi/client';
-          script.async = true;
-          script.defer = true;
-          script.onload = () => resolve();
-          script.onerror = () => reject(new Error('Could not load the Google sign-in library. Check your connection.'));
-          document.head.appendChild(script);
-        });
-      }
-
-      function getGmailToken() {
-        const token = localStorage.getItem('lexclock_gmail_token');
-        const expiry = Number(localStorage.getItem('lexclock_gmail_expiry') || 0);
-        if (!token || Date.now() > expiry) return null;
-        return token;
-      }
-
-      function clearGmailSession() {
-        localStorage.removeItem('lexclock_gmail_token');
-        localStorage.removeItem('lexclock_gmail_expiry');
-        localStorage.removeItem('lexclock_gmail_synced_ids');
-      }
-
       async function initiateOAuth(provider) {
         if (provider === 'outlook') {
           showToast('Outlook sync activates in a future update.', 'error');
@@ -4611,133 +4572,63 @@
         }
       }
 
-      async function finalizeGmailConnect() {
+      // Server-side Gmail sync. The backend (using the stored refresh token)
+      // pulls recently sent mail, estimates billable time with the shared
+      // Anthropic key, and writes idempotent pending drafts to Postgres — the
+      // message bodies never touch the browser. We then pull those drafts into
+      // the Review hub. Mirrors syncNotionViaBackend so both sources share the
+      // same approve-before-bill pipeline.
+      async function syncGmailViaBackend() {
+        if (!backendConfigured()) {
+          showToast('Sign in to LexClock before syncing Gmail.', 'error');
+          return;
+        }
+        state.gmailSync = { loading: true };
+        renderEmailView();
         try {
-          const profile = await gmailApiFetch('/users/me/profile');
-          const settings = getSettings();
-          settings.gmailConnected = true;
-          settings.gmailEmail = profile.emailAddress || 'Connected';
-          saveSettings(settings);
-          renderAll();
-          showToast(`Gmail connected: ${settings.gmailEmail}`, 'success');
-        } catch (err) {
-          showToast(err.message || 'Could not verify the Gmail connection.', 'error');
-        }
-      }
-
-      async function gmailApiFetch(path, params) {
-        const token = getGmailToken();
-        if (!token) throw new Error('Gmail session expired. Reconnect Gmail in Settings.');
-        const url = new URL(GMAIL_API_BASE + path);
-        if (params) {
-          Object.entries(params).forEach(([key, value]) => {
-            if (Array.isArray(value)) value.forEach((item) => url.searchParams.append(key, item));
-            else url.searchParams.set(key, value);
-          });
-        }
-        const response = await fetch(url.toString(), { headers: { Authorization: `Bearer ${token}` } });
-        if (response.status === 401) {
-          clearGmailSession();
-          const settings = getSettings();
-          settings.gmailConnected = false;
-          saveSettings(settings);
-          throw new Error('Gmail session expired. Reconnect Gmail in Settings.');
-        }
-        if (!response.ok) throw new Error(`Gmail API error (${response.status}).`);
-        return response.json();
-      }
-
-      function decodeBase64Url(data) {
-        const normalized = String(data || '').replace(/-/g, '+').replace(/_/g, '/');
-        try {
-          return decodeURIComponent(escape(atob(normalized)));
-        } catch (err) {
-          try { return atob(normalized); } catch (ignore) { return ''; }
-        }
-      }
-
-      function extractPlainTextFromPayload(payload) {
-        if (!payload) return '';
-        if (payload.mimeType === 'text/plain' && payload.body && payload.body.data) {
-          return decodeBase64Url(payload.body.data);
-        }
-        if (Array.isArray(payload.parts)) {
-          for (const part of payload.parts) {
-            const text = extractPlainTextFromPayload(part);
-            if (text) return text;
+          const sync = await backendFetch('/api/email/sync', { method: 'POST', body: {} });
+          const list = await backendFetch('/api/drafts?status=pending');
+          const remoteDrafts = (list && list.drafts) || [];
+          const existingExternal = new Set(getDrafts().map((d) => d.externalId).filter(Boolean));
+          let created = 0;
+          for (const rd of remoteDrafts) {
+            if (rd.source !== 'gmail') continue; // only surface email drafts here
+            const ext = rd.external_id;
+            if (ext && existingExternal.has(ext)) continue;
+            addDraft({
+              source: 'gmail',
+              matterId: matchMatterByText(`${rd.evidence || ''} ${rd.description || ''}`).matterId,
+              date: rd.entry_date || todayKey(),
+              estimatedSeconds: Number(rd.estimated_seconds) || 0,
+              description: rd.description || '',
+              billable: rd.billable !== false,
+              confidence: rd.confidence == null ? null : Number(rd.confidence),
+              evidence: rd.evidence || '',
+              externalId: ext || null,
+              backendId: rd.id || null,
+            });
+            if (ext) existingExternal.add(ext);
+            created += 1;
           }
-        }
-        if (payload.body && payload.body.data) return decodeBase64Url(payload.body.data);
-        return '';
-      }
-
-      async function fetchGmailInbox() {
-        const list = await gmailApiFetch('/users/me/messages', { maxResults: 12, q: 'in:inbox' });
-        const ids = (list.messages || []).map((message) => message.id);
-        const messages = [];
-        for (const id of ids) {
-          const message = await gmailApiFetch(`/users/me/messages/${id}`, {
-            format: 'metadata',
-            metadataHeaders: ['Subject', 'From', 'Date'],
-          });
-          const headers = {};
-          ((message.payload && message.payload.headers) || []).forEach((header) => {
-            headers[header.name.toLowerCase()] = header.value;
-          });
-          messages.push({
-            id,
-            subject: headers.subject || '(no subject)',
-            from: headers.from || '',
-            snippet: message.snippet || '',
-          });
-        }
-        return messages;
-      }
-
-      async function getGmailMessageText(messageId) {
-        const message = await gmailApiFetch(`/users/me/messages/${messageId}`, { format: 'full' });
-        const headers = {};
-        ((message.payload && message.payload.headers) || []).forEach((header) => {
-          headers[header.name.toLowerCase()] = header.value;
-        });
-        const body = extractPlainTextFromPayload(message.payload) || message.snippet || '';
-        return `Subject: ${headers.subject || ''}\nFrom: ${headers.from || ''}\n\n${body}`.trim();
-      }
-
-      async function syncGmailInbox() {
-        const container = document.getElementById('gmail-inbox-list');
-        if (!container) return;
-        container.innerHTML = '<p class="helper-text">Loading inbox from Gmail…</p>';
-        try {
-          state.gmailInbox = await fetchGmailInbox();
+          state.gmailSync = {
+            done: true,
+            created,
+            serverCreated: (sync && sync.created) || 0,
+            serverTotal: (sync && sync.total) || 0,
+          };
+          renderEmailView();
+          renderShell();
+          showToast(
+            created
+              ? `${created} email ${created === 1 ? 'entry' : 'entries'} added to Review.`
+              : 'Gmail is up to date — no new emails to bill.',
+            'success'
+          );
         } catch (err) {
-          state.gmailInbox = null;
-          container.innerHTML = `<div class="ai-result ai-error"><p>${escapeHtml(err.message || 'Could not load inbox.')}</p></div>`;
-          return;
+          state.gmailSync = { error: (err && err.message) || 'Gmail sync failed.' };
+          renderEmailView();
+          showToast((err && err.message) || 'Gmail sync failed.', 'error');
         }
-        container.innerHTML = renderGmailInboxList(state.gmailInbox);
-        showToast(`Loaded ${state.gmailInbox.length} email${state.gmailInbox.length === 1 ? '' : 's'}.`, 'success');
-      }
-
-      async function analyzeGmailMessage(messageId) {
-        const input = document.getElementById('ai-email-input');
-        const resultEl = document.getElementById('ai-analysis-result');
-        if (!input || !resultEl) return;
-        if (!getSettings().anthropicApiKey.trim()) {
-          showToast('Add your Anthropic API key in Settings first.', 'error');
-          openHelpModal('anthropicApiKey');
-          return;
-        }
-        resultEl.innerHTML = renderAnalysisResultHtml({ loading: true });
-        try {
-          const text = await getGmailMessageText(messageId);
-          input.value = text;
-          input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } catch (err) {
-          resultEl.innerHTML = renderAnalysisResultHtml({ error: err.message || 'Could not load the email.' });
-          return;
-        }
-        await runEmailAnalysis();
       }
 
       async function disconnectProvider(provider) {
@@ -4756,7 +4647,7 @@
           localStorage.removeItem('lexclock_gmail_token');
           localStorage.removeItem('lexclock_gmail_expiry');
           localStorage.removeItem('lexclock_gmail_synced_ids');
-          state.gmailInbox = null;
+          state.gmailSync = null;
         } else {
           settings.outlookConnected = false;
           localStorage.removeItem('lexclock_outlook_token');
@@ -5128,23 +5019,27 @@
         `;
       }
 
-      function renderGmailInboxList(messages) {
-        if (!messages) return '';
-        if (!messages.length) {
-          return '<p class="helper-text">No emails found in your inbox.</p>';
+      function renderGmailSyncStatusHtml() {
+        const sync = state.gmailSync;
+        if (!sync) return '';
+        if (sync.loading) {
+          return '<p class="helper-text">Reviewing your recent sent email…</p>';
         }
-        return messages
-          .map((message) => `
-            <div class="inbox-item">
-              <div class="inbox-item-text">
-                <strong>${escapeHtml(message.subject)}</strong>
-                <span class="helper-text">${escapeHtml(message.from)}</span>
-                <span class="inbox-snippet">${escapeHtml(message.snippet)}</span>
-              </div>
-              <button class="btn-secondary" data-action="analyze-gmail" data-msg-id="${escapeHtml(message.id)}" type="button">Analyze</button>
+        if (sync.error) {
+          return `<div class="ai-result ai-error"><p>${escapeHtml(sync.error)}</p></div>`;
+        }
+        if (sync.done) {
+          const msg = sync.created
+            ? `${sync.created} new email ${sync.created === 1 ? 'entry' : 'entries'} drafted — review and approve them before anything bills.`
+            : 'No new emails to bill — you’re all caught up.';
+          return `
+            <div class="ai-result">
+              <p>${escapeHtml(msg)}</p>
+              ${sync.created ? '<button class="btn-secondary" data-cta-view="view-review" type="button" style="margin-top:8px;">Open Review</button>' : ''}
             </div>
-          `)
-          .join('');
+          `;
+        }
+        return '';
       }
 
       function renderGmailSyncCard(settings) {
@@ -5152,11 +5047,11 @@
         return `
           <div class="card" style="margin-bottom:16px;">
             <div class="card-title">
-              <h3>Gmail Inbox</h3>
-              <button class="btn-secondary" data-action="sync-gmail" type="button">Sync Inbox</button>
+              <h3>Gmail Sync</h3>
+              <button class="btn-secondary" data-action="sync-gmail" type="button">Sync Now</button>
             </div>
-            <p class="helper-text">Connected as ${escapeHtml(settings.gmailEmail || 'your Gmail account')}. Pull recent emails, then analyze any one to draft a billing entry.</p>
-            <div id="gmail-inbox-list">${renderGmailInboxList(state.gmailInbox)}</div>
+            <p class="helper-text">Connected as ${escapeHtml(settings.gmailEmail || 'your Gmail account')}. LexClock reviews your recently sent email and drafts billable time entries. Nothing bills until you approve it in Review.</p>
+            <div id="gmail-sync-status">${renderGmailSyncStatusHtml()}</div>
           </div>
         `;
       }
@@ -5973,9 +5868,7 @@
         } else if (action === 'analysis-to-review') {
           sendAnalysisToReview();
         } else if (action === 'sync-gmail') {
-          syncGmailInbox();
-        } else if (action === 'analyze-gmail') {
-          analyzeGmailMessage(actionButton.dataset.msgId);
+          syncGmailViaBackend();
         } else if (action === 'save-draft') {
           const form = actionButton.closest('form.draft-card');
           if (form) {
