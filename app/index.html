@@ -2380,6 +2380,12 @@
             </span>
             Log
           </button>
+          <button class="nav-item" data-view="view-clients" type="button">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </span>
+            Clients
+          </button>
           <button class="nav-item" data-view="view-settings" type="button">
             <span class="nav-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M12 8.5A3.5 3.5 0 1 0 12 15.5A3.5 3.5 0 1 0 12 8.5z"></path><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.58 1.7 1.7 0 0 0-1.8.37l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.67 8.9a1.7 1.7 0 0 0-.37-1.8l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.55 1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.55 1.03H21a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15z"></path></svg>
@@ -2401,6 +2407,7 @@
           <section class="view" id="view-email"></section>
           <section class="view" id="view-review"></section>
           <section class="view" id="view-log"></section>
+          <section class="view" id="view-clients"></section>
           <section class="view" id="view-settings"></section>
         </div>
       </main>
@@ -2437,6 +2444,12 @@
           <svg viewBox="0 0 24 24"><path d="M7 4h10l3 3v13H7z"></path><path d="M9 10h6M9 14h6M9 18h4"></path></svg>
         </span>
         Log
+      </button>
+      <button class="nav-item" data-view="view-clients" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        </span>
+        Clients
       </button>
       <button class="nav-item" data-view="view-settings" type="button">
         <span class="nav-icon" aria-hidden="true">
@@ -5756,34 +5769,43 @@
         `;
       }
 
-      function renderSettingsView() {
-        const root = document.getElementById('view-settings');
+      function renderClientsView() {
+        const root = document.getElementById('view-clients');
         const settings = getSettings();
         const clients = getClients();
         const matters = getMatters();
-        const clientRows = clients
-          .map(
-            (client) => `
-              <div class="manager-row">
-                <div>
-                  <strong>${escapeHtml(client.name)}</strong>
-                  <p class="helper-text">${client.id}</p>
-                </div>
-                <button class="btn-danger" data-action="delete-client" data-client-id="${client.id}" type="button">Delete</button>
-              </div>
-            `
-          )
-          .join('');
-        const matterRows = matters
-          .map((matter) => {
-            const client = getClientById(matter.clientId);
+
+        const clientCards = clients
+          .map((client) => {
+            const clientMatters = matters.filter((m) => m.clientId === client.id);
+            const matterRows = clientMatters.length
+              ? clientMatters
+                  .map(
+                    (matter) => `
+                      <div class="manager-row">
+                        <div>
+                          <strong>${escapeHtml(matter.name)}</strong>
+                          <p class="helper-text">${matter.rateOverride == null ? `Default ${formatDollars(settings.defaultRate)}/hr` : `${formatDollars(matter.rateOverride)}/hr override`}</p>
+                        </div>
+                        ${matter.id === DEFAULT_MATTER.id ? '' : `<button class="btn-danger btn-sm" data-action="delete-matter" data-matter-id="${matter.id}" type="button">Delete</button>`}
+                      </div>
+                    `
+                  )
+                  .join('')
+              : '<p class="helper-text" style="padding:8px 0;">No matters yet. Add the first one below.</p>';
             return `
-              <div class="manager-row">
-                <div>
-                  <strong>${escapeHtml(matter.name)}</strong>
-                  <p class="helper-text">${escapeHtml(client ? client.name : 'Unknown Client')} | ${matter.rateOverride == null ? `Default ${formatDollars(settings.defaultRate)}/hr` : `${formatDollars(matter.rateOverride)}/hr override`}</p>
+              <div class="card" style="margin-top:16px;">
+                <div class="card-title" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                  <h3>${escapeHtml(client.name)}</h3>
+                  ${client.id === DEFAULT_CLIENT.id ? '' : `<button class="btn-danger btn-sm" data-action="delete-client" data-client-id="${client.id}" type="button">Delete client</button>`}
                 </div>
-                <button class="btn-danger" data-action="delete-matter" data-matter-id="${matter.id}" type="button">Delete</button>
+                <div class="manager-list">${matterRows}</div>
+                <form class="add-matter-form button-row" style="margin-top:12px; flex-wrap:wrap; gap:8px;">
+                  <input type="hidden" name="clientId" value="${client.id}" />
+                  <input name="matterName" type="text" placeholder="New matter name" style="flex:1; min-width:200px; min-height:44px; border-radius:6px; border:1px solid #ccd4e2; padding:10px 12px;" />
+                  <input name="rateOverride" type="number" min="0" step="0.01" placeholder="Rate override (optional)" style="width:210px; min-height:44px; border-radius:6px; border:1px solid #ccd4e2; padding:10px 12px;" />
+                  <button class="btn-primary" type="submit">Add Matter</button>
+                </form>
               </div>
             `;
           })
@@ -5791,8 +5813,30 @@
 
         root.innerHTML = `
           <div class="view-header">
+            <h2>Clients &amp; Matters</h2>
+            <p class="helper-text">Every billable draft, timer, and log entry attaches to a matter. Add your clients, then the matters (engagements) under each. A matter can carry its own hourly rate that overrides your firm default.</p>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <h3>Add a Client</h3>
+            </div>
+            <form id="add-client-form" class="button-row" style="flex-wrap:wrap; gap:8px;">
+              <input name="clientName" type="text" placeholder="New client name" style="flex:1; min-width:220px; min-height:44px; border-radius:6px; border:1px solid #ccd4e2; padding:10px 12px;" />
+              <button class="btn-primary" type="submit">Add Client</button>
+            </form>
+          </div>
+          ${clientCards}
+        `;
+      }
+
+      function renderSettingsView() {
+        const root = document.getElementById('view-settings');
+        const settings = getSettings();
+
+        root.innerHTML = `
+          <div class="view-header">
             <h2>Settings</h2>
-            <p class="helper-text">Configure firm details, billing defaults, email tier values, clients, matters, and stored API placeholders.</p>
+            <p class="helper-text">Configure firm details, billing defaults, email tier values, and connected activity sources. Manage clients and matters from the Clients tab.</p>
           </div>
           <div class="card">
             <div class="card-title">
@@ -5945,44 +5989,6 @@
               </div>
             </form>
           </div>
-          <div class="split-card" style="margin-top:16px;">
-            <div class="card">
-              <div class="card-title">
-                <h3>Clients</h3>
-              </div>
-              <form id="add-client-form" class="button-row" style="margin-bottom:16px;">
-                <input name="clientName" type="text" placeholder="New client name" style="flex:1; min-width:220px; min-height:44px; border-radius:6px; border:1px solid #ccd4e2; padding:10px 12px;" />
-                <button class="btn-primary" type="submit">Add Client</button>
-              </form>
-              <div class="manager-list">${clientRows}</div>
-            </div>
-            <div class="card">
-              <div class="card-title">
-                <h3>Matters</h3>
-              </div>
-              <form id="add-matter-form" class="form-grid" style="margin-bottom:16px;">
-                <div class="field-row">
-                  <label for="matter-client-id">Client</label>
-                  <select id="matter-client-id" name="clientId">
-                    ${clients.map((client) => `<option value="${client.id}">${escapeHtml(client.name)}</option>`).join('')}
-                  </select>
-                </div>
-                <div class="field-row">
-                  <label for="matter-name">Matter Name</label>
-                  <input id="matter-name" name="matterName" type="text" placeholder="Matter name" />
-                </div>
-                <div class="field-row">
-                  <label for="matter-rate-override">Rate Override</label>
-                  <input id="matter-rate-override" name="rateOverride" type="number" min="0" step="0.01" placeholder="Optional" />
-                </div>
-                <div class="field-row">
-                  <label>&nbsp;</label>
-                  <button class="btn-primary" type="submit">Add Matter</button>
-                </div>
-              </form>
-              <div class="manager-list">${matterRows}</div>
-            </div>
-          </div>
           <div class="card" style="margin-top:16px;">
             <div class="card-title">
               <h3>Danger Zone</h3>
@@ -6002,6 +6008,7 @@
         renderEmailView();
         renderReviewView();
         renderLogView();
+        renderClientsView();
         renderSettingsView();
         renderModal();
       }
@@ -6337,7 +6344,7 @@
           event.preventDefault();
           addClient(event.target.clientName.value);
           event.target.reset();
-        } else if (event.target.id === 'add-matter-form') {
+        } else if (event.target.classList.contains('add-matter-form')) {
           event.preventDefault();
           addMatter(event.target.clientId.value, event.target.matterName.value, event.target.rateOverride.value);
           event.target.reset();
