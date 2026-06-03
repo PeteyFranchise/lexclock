@@ -32,7 +32,8 @@ export default withApi(async (req, res) => {
   let uid;
   try {
     uid = verifyState(state).uid;
-  } catch (_) {
+  } catch (e) {
+    console.error('oauth callback: bad state', e);
     return redirect('gmail=error');
   }
 
@@ -56,11 +57,15 @@ export default withApi(async (req, res) => {
       },
       { onConflict: 'user_id,source' }
     );
-    if (upsertErr) return redirect('gmail=error');
+    if (upsertErr) {
+      console.error('oauth callback: upsert failed', upsertErr);
+      return redirect('gmail=error');
+    }
 
     await audit('gmail.connect', { userId: uid, source: 'gmail' });
     return redirect('gmail=connected');
-  } catch (_) {
+  } catch (e) {
+    console.error('oauth callback: exchange failed', e);
     return redirect('gmail=error');
   }
 });
