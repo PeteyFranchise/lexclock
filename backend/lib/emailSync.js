@@ -13,9 +13,12 @@ import { estimateEmailTask } from './estimate.js';
 export async function syncEmailForConnection(connection, { anthropicKey } = {}) {
   const userId = connection.user_id;
 
+  // Outlook is handled by its own pipeline (lib/outlookSync.js), since one
+  // Microsoft connection drives both mail and calendar. This Gmail path should
+  // never receive an outlook connection.
   if (connection.source === 'outlook') {
-    const err = new Error('Outlook email sync ships in Phase 2.');
-    err.status = 501;
+    const err = new Error('Outlook connections are synced by the Outlook pipeline, not the Gmail path.');
+    err.status = 500;
     throw err;
   }
   if (!connection.refresh_token) {
@@ -108,12 +111,13 @@ export async function getEmailConnection(userId, source = 'gmail') {
   return data || null;
 }
 
-// All active email connections across users (for the cron fleet run).
+// All active Gmail connections across users (for the cron fleet run). Outlook
+// has its own fleet query in lib/outlookSync.js.
 export async function getActiveEmailConnections() {
   const { data, error } = await supabase
     .from('source_connections')
     .select('*')
-    .in('source', ['gmail', 'outlook'])
+    .eq('source', 'gmail')
     .eq('status', 'active');
   if (error) throw error;
   return data || [];

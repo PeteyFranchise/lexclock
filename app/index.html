@@ -2440,6 +2440,9 @@
         workspace: 'Google Workspace',
         phone: 'Phone call',
         research: 'Research session',
+        gmail: 'Gmail',
+        calendar: 'Google Calendar',
+        outlook: 'Outlook',
       };
 
       const IS_HOSTED = window.location.protocol === 'https:';
@@ -2536,27 +2539,21 @@
           caution:
             'LexClock requests read-only access. It cannot send, delete, or modify any emails. Setup takes approximately 10–15 minutes the first time. Gmail sync requires LexClock to be served over HTTPS (e.g. GitHub Pages) — the Connect button stays disabled when running locally.',
         },
-        microsoftClientId: {
-          title: 'Microsoft Client ID (Outlook Sync)',
+        outlookConnect: {
+          title: 'Connect Outlook',
           body: `
-            <p>This ID connects LexClock to your Outlook inbox so emails can be fetched and analyzed automatically.</p>
-            <p>It is a UUID formatted as:<br /><code>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</code></p>
-            <p>How to get it:</p>
+            <p>One secure Microsoft sign-in connects <strong>both</strong> your Outlook mail and calendar — no Azure or developer setup required.</p>
+            <p>To connect:</p>
             <ol>
-              <li>Go to portal.azure.com</li>
-              <li>Search for "App registrations" and click it</li>
-              <li>Click "New registration"</li>
-              <li>Name: "LexClock"</li>
-              <li>Account type: "Personal Microsoft accounts only"</li>
-              <li>Redirect URI: Select "Single-page application (SPA)" and enter:<br /><code>https://getlexclock.com/app/</code></li>
-              <li>Click Register</li>
-              <li>Copy the "Application (client) ID" from the Overview page</li>
-              <li>Go to "API permissions" → "Add a permission" → "Microsoft Graph" → "Delegated" → search for and add "Mail.Read"</li>
-              <li>Click "Grant admin consent" if prompted</li>
+              <li>Make sure you are signed in to LexClock (Settings → Account).</li>
+              <li>Click "Connect Outlook" and sign in with your Microsoft account.</li>
+              <li>Approve the read-only access request.</li>
+              <li>You will be returned to LexClock with Outlook connected.</li>
             </ol>
+            <p>LexClock reviews your recently sent mail and recently finished meetings, then drafts billable time entries for you to approve.</p>
           `,
           caution:
-            'LexClock requests read-only access. It cannot send, delete, or modify any emails. Setup takes approximately 10–15 minutes the first time. Gmail and Outlook cannot be connected simultaneously — connecting one will disconnect the other. Outlook sync activates in a future update.',
+            'LexClock requests read-only access. It cannot send, delete, or modify your email or calendar. The Connect button needs LexClock to be served over HTTPS (e.g. getlexclock.com) and requires you to be signed in first.',
         },
         notionToken: {
           title: 'Notion Integration Token (Tasks Sync)',
@@ -3432,9 +3429,9 @@
       // Idempotent: safe to call on every load / auth-state change.
       async function syncGmailConnection() {
         const params = new URLSearchParams(window.location.search);
-        const labels = { gmail: 'Gmail', calendar: 'Google Calendar' };
+        const labels = { gmail: 'Gmail', calendar: 'Google Calendar', outlook: 'Outlook' };
         let dirty = false;
-        for (const provider of ['gmail', 'calendar']) {
+        for (const provider of ['gmail', 'calendar', 'outlook']) {
           const flag = params.get(provider);
           if (!flag) continue;
           params.delete(provider);
@@ -3442,7 +3439,9 @@
           const label = labels[provider];
           if (flag === 'connected') showToast(`${label} connected.`, 'success');
           else if (flag === 'denied') showToast(`${label} connection cancelled.`, 'error');
-          else if (flag === 'norefresh') showToast('Google didn’t return a refresh token. Remove LexClock at myaccount.google.com/permissions, then reconnect.', 'error');
+          else if (flag === 'norefresh') showToast(provider === 'outlook'
+            ? 'Microsoft didn’t return a refresh token. Remove LexClock at microsoft.com/consent, then reconnect.'
+            : 'Google didn’t return a refresh token. Remove LexClock at myaccount.google.com/permissions, then reconnect.', 'error');
           else if (flag === 'error') showToast(`${label} connection failed. Please try again.`, 'error');
         }
         if (dirty) {
@@ -3468,6 +3467,15 @@
           if (settings.calendarConnected !== connected) {
             settings.calendarConnected = connected;
             if (!connected) settings.calendarEmail = '';
+            changed = true;
+          }
+        } catch (_) { /* backend unreachable: keep local state as-is */ }
+        try {
+          const status = await backendFetch('/api/outlook/status');
+          const connected = !!(status && status.connected);
+          if (settings.outlookConnected !== connected) {
+            settings.outlookConnected = connected;
+            if (!connected) settings.outlookEmail = '';
             changed = true;
           }
         } catch (_) { /* backend unreachable: keep local state as-is */ }
@@ -3880,7 +3888,7 @@
           logStartDefault: form.querySelector('[name="logStartDefault"]').value || existing.logStartDefault,
           anthropicApiKey: form.querySelector('[name="anthropicApiKey"]').value.trim(),
           googleClientId: (form.querySelector('[name="googleClientId"]')?.value || existing.googleClientId || '').trim(),
-          microsoftClientId: form.querySelector('[name="microsoftClientId"]').value.trim(),
+          microsoftClientId: (form.querySelector('[name="microsoftClientId"]')?.value || existing.microsoftClientId || '').trim(),
           notionToken: form.querySelector('[name="notionToken"]').value.trim(),
           notionDatabaseId: form.querySelector('[name="notionDatabaseId"]').value.trim(),
           notionMatterProperty: form.querySelector('[name="notionMatterProperty"]').value.trim(),
@@ -4517,14 +4525,13 @@
 
       function renderConnectButton(provider) {
         const settings = getSettings();
-        // Gmail and Calendar both use LexClock's server-side Google OAuth (no
-        // per-user Client ID). Outlook still uses a client-side Microsoft id.
-        const isGoogle = provider === 'gmail' || provider === 'calendar';
+        // All three providers now use LexClock's server-side OAuth (no per-user
+        // Client ID): Gmail/Calendar via Google, Outlook via Microsoft.
+        const isServerOAuth = provider === 'gmail' || provider === 'calendar' || provider === 'outlook';
         const labels = { gmail: 'Gmail', calendar: 'Google Calendar', outlook: 'Outlook' };
         const label = labels[provider] || provider;
-        const clientId = isGoogle ? '' : settings.microsoftClientId;
         const isConnected = !!settings[`${provider}Connected`];
-        const helpKey = isGoogle ? 'googleClientId' : 'microsoftClientId';
+        const helpKey = provider === 'outlook' ? 'outlookConnect' : 'googleClientId';
         const buttonId = `btn-connect-${provider}`;
         const statusId = `status-connect-${provider}`;
         let buttonClass = 'btn-connect';
@@ -4545,7 +4552,7 @@
           buttonClass += ' is-disabled';
           statusText = 'Available once hosted (HTTPS)';
           action = 'help';
-        } else if (isGoogle) {
+        } else if (isServerOAuth) {
           // Server-side OAuth: no per-user Client ID needed — just be signed in.
           if (!backendConfigured()) {
             buttonClass += ' is-disabled';
@@ -4554,10 +4561,6 @@
           } else {
             statusText = 'One-click connect — no setup required';
           }
-        } else if (!clientId.trim()) {
-          buttonClass += ' is-disabled';
-          statusText = 'Enter your Microsoft Client ID above first';
-          action = 'help';
         }
 
         return `
@@ -4576,26 +4579,24 @@
       }
 
       async function initiateOAuth(provider) {
-        if (provider === 'outlook') {
-          showToast('Outlook sync activates in a future update.', 'error');
-          return;
-        }
-
-        // Gmail and Google Calendar both use LexClock's server-side OAuth. We
-        // ask the backend for a Google consent URL (signed with our user id AND
-        // the source), then hand the browser off to Google. The authorization
-        // code is exchanged for a refresh token server-side in
-        // /api/oauth/google/callback — the token never touches the browser, and
-        // background sync keeps capturing billable time after the tab closes.
-        const labels = { gmail: 'Gmail', calendar: 'Google Calendar' };
-        const label = labels[provider] || 'Google';
+        // All three providers use LexClock's server-side OAuth. We ask the
+        // backend for a provider consent URL (signed with our user id AND the
+        // source), then hand the browser off. The authorization code is
+        // exchanged for a refresh token server-side — the token never touches the
+        // browser, and background sync keeps capturing billable time after the
+        // tab closes. Outlook is one Microsoft connection granting mail+calendar.
+        const labels = { gmail: 'Gmail', calendar: 'Google Calendar', outlook: 'Outlook' };
+        const label = labels[provider] || provider;
         if (!backendConfigured()) {
           showToast(`Sign in to LexClock before connecting ${label}.`, 'error');
           return;
         }
+        const isOutlook = provider === 'outlook';
+        const startPath = isOutlook ? '/api/oauth/microsoft/start' : '/api/oauth/google/start';
+        const startBody = isOutlook ? {} : { source: provider };
         try {
-          showToast('Opening Google…', '');
-          const { url } = await backendFetch('/api/oauth/google/start', { method: 'POST', body: { source: provider } });
+          showToast(isOutlook ? 'Opening Microsoft…' : 'Opening Google…', '');
+          const { url } = await backendFetch(startPath, { method: 'POST', body: startBody });
           if (!url) throw new Error('The server did not return an authorization URL.');
           window.location.href = url;
         } catch (err) {
@@ -4717,6 +4718,64 @@
         }
       }
 
+      // Server-side Outlook sync. One Microsoft connection drives BOTH recently
+      // sent mail and recently finished calendar events. The backend pulls them,
+      // estimates billable time with the shared Anthropic key, and writes
+      // idempotent pending drafts (source 'outlook') — content never touches the
+      // browser. We then pull those drafts into Review. Mirrors the Gmail/Calendar
+      // sync, but surfaces both halves under the single Outlook source.
+      async function syncOutlookViaBackend() {
+        if (!backendConfigured()) {
+          showToast('Sign in to LexClock before syncing Outlook.', 'error');
+          return;
+        }
+        state.outlookSync = { loading: true };
+        renderAll();
+        try {
+          const sync = await backendFetch('/api/outlook/sync', { method: 'POST', body: {} });
+          const list = await backendFetch('/api/drafts?status=pending');
+          const remoteDrafts = (list && list.drafts) || [];
+          const existingExternal = new Set(getDrafts().map((d) => d.externalId).filter(Boolean));
+          let created = 0;
+          for (const rd of remoteDrafts) {
+            if (rd.source !== 'outlook') continue; // only surface Outlook drafts here
+            const ext = rd.external_id;
+            if (ext && existingExternal.has(ext)) continue;
+            addDraft({
+              source: 'outlook',
+              matterId: matchMatterByText(`${rd.evidence || ''} ${rd.description || ''}`).matterId,
+              date: rd.entry_date || todayKey(),
+              estimatedSeconds: Number(rd.estimated_seconds) || 0,
+              description: rd.description || '',
+              billable: rd.billable !== false,
+              confidence: rd.confidence == null ? null : Number(rd.confidence),
+              evidence: rd.evidence || '',
+              externalId: ext || null,
+              backendId: rd.id || null,
+            });
+            if (ext) existingExternal.add(ext);
+            created += 1;
+          }
+          state.outlookSync = {
+            done: true,
+            created,
+            serverCreated: (sync && sync.created) || 0,
+            serverTotal: (sync && sync.total) || 0,
+          };
+          renderAll();
+          showToast(
+            created
+              ? `${created} Outlook ${created === 1 ? 'entry' : 'entries'} added to Review.`
+              : 'Outlook is up to date — no new mail or meetings to bill.',
+            'success'
+          );
+        } catch (err) {
+          state.outlookSync = { error: (err && err.message) || 'Outlook sync failed.' };
+          renderAll();
+          showToast((err && err.message) || 'Outlook sync failed.', 'error');
+        }
+      }
+
       async function disconnectProvider(provider) {
         const labels = { gmail: 'Gmail', calendar: 'Google Calendar', outlook: 'Outlook' };
         const label = labels[provider] || provider;
@@ -4744,9 +4803,15 @@
           settings.calendarEmail = '';
           state.calendarSync = null;
         } else {
+          // Outlook: revoke + purge the server-side Microsoft refresh token.
+          try {
+            await backendFetch('/api/outlook/status', { method: 'DELETE' });
+          } catch (_) { /* fall through to local cleanup */ }
           settings.outlookConnected = false;
+          settings.outlookEmail = '';
           localStorage.removeItem('lexclock_outlook_token');
           localStorage.removeItem('lexclock_outlook_expiry');
+          state.outlookSync = null;
         }
 
         saveSettings(settings);
@@ -5160,6 +5225,29 @@
         return '';
       }
 
+      function renderOutlookSyncStatusHtml() {
+        const sync = state.outlookSync;
+        if (!sync) return '';
+        if (sync.loading) {
+          return '<p class="helper-text">Reviewing your recent Outlook mail and meetings…</p>';
+        }
+        if (sync.error) {
+          return `<div class="ai-result ai-error"><p>${escapeHtml(sync.error)}</p></div>`;
+        }
+        if (sync.done) {
+          const msg = sync.created
+            ? `${sync.created} new Outlook ${sync.created === 1 ? 'entry' : 'entries'} drafted — review and approve them before anything bills.`
+            : 'No new Outlook mail or meetings to bill — you’re all caught up.';
+          return `
+            <div class="ai-result">
+              <p>${escapeHtml(msg)}</p>
+              ${sync.created ? '<button class="btn-secondary" data-cta-view="view-review" type="button" style="margin-top:8px;">Open Review</button>' : ''}
+            </div>
+          `;
+        }
+        return '';
+      }
+
       function renderGmailSyncCard(settings) {
         if (!settings.gmailConnected) return '';
         return `
@@ -5553,6 +5641,18 @@
             ${renderCalendarSyncStatusHtml()}
             <div class="source-row">
               <div class="source-info">
+                <span class="source-name">Outlook</span>
+                <span class="source-sub">Recent mail &amp; meetings → drafts</span>
+              </div>
+              <div class="inline-actions">
+                ${getSettings().outlookConnected
+                  ? '<button class="btn-primary btn-sm" type="button" data-action="sync-outlook">Sync Outlook</button>'
+                  : '<button class="btn-secondary btn-sm" type="button" data-cta-view="view-settings">Connect Outlook</button>'}
+              </div>
+            </div>
+            ${renderOutlookSyncStatusHtml()}
+            <div class="source-row">
+              <div class="source-info">
                 <span class="source-name">Notion tasks</span>
                 <span class="source-sub">Tasks edited today → drafts</span>
               </div>
@@ -5729,10 +5829,9 @@
                 <div class="settings-subsection">
                   <h4>Outlook Sync</h4>
                   <div class="field-row">
-                    <label class="label-row" for="microsoft-client-id">Microsoft Client ID<button class="help-btn" data-help-key="microsoftClientId" type="button" aria-label="Learn how to find the Microsoft Client ID">?</button></label>
-                    <input id="microsoft-client-id" name="microsoftClientId" type="password" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" value="${escapeHtml(settings.microsoftClientId)}" />
+                    <p class="helper-text">One-click, secure connection — no Azure setup required. A single Microsoft sign-in connects <strong>both</strong> your Outlook mail and calendar. LexClock requests <strong>read-only</strong> access; it can never send, delete, or modify your email or events. Authorization is handled on the LexClock server, so background sync keeps capturing billable time after you close the tab.</p>
                     ${renderConnectButton('outlook')}
-                    <small class="phase-note">Outlook sync available in a future update</small>
+                    <div id="outlook-sync-status">${renderOutlookSyncStatusHtml()}</div>
                   </div>
                 </div>
               </div>
@@ -6025,6 +6124,8 @@
           syncGmailViaBackend();
         } else if (action === 'sync-calendar') {
           syncCalendarViaBackend();
+        } else if (action === 'sync-outlook') {
+          syncOutlookViaBackend();
         } else if (action === 'save-draft') {
           const form = actionButton.closest('form.draft-card');
           if (form) {

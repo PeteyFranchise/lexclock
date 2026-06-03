@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Privacy Policy — LexClock</title>
-<meta name="description" content="How LexClock accesses, uses, stores, shares, and protects your data — including Google email and calendar data and Microsoft email data used to draft billing time entries." />
+<meta name="description" content="How LexClock accesses, uses, stores, shares, and protects your data — including Google email and calendar data and Microsoft email and calendar data used to draft billing time entries." />
 <meta name="robots" content="index, follow" />
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -214,9 +214,10 @@ footer a{color:var(--muted);}
       <h2>5. Microsoft user data</h2>
       <p>If you connect a Microsoft account, LexClock uses Microsoft Graph in accordance with the <a href="https://learn.microsoft.com/legal/microsoft-apis/terms-of-use" target="_blank" rel="noopener">Microsoft APIs Terms of Use</a>.</p>
       <div class="scope">
-        <p style="margin:0;"><strong>Scope requested:</strong> <code>Mail.Read</code> (read-only access to your Outlook mail) and <code>offline_access</code> / <code>User.Read</code> for sign-in and token refresh.</p>
+        <p style="margin:0 0 6px;"><strong>Scopes requested:</strong> <code>Mail.Read</code> (read-only access to your Outlook mail) and <code>Calendars.Read</code> (read-only access to your Outlook calendar). A single Microsoft sign-in grants both.</p>
+        <p style="margin:0;"><code>offline_access</code> / <code>User.Read</code> are also requested for sign-in and token refresh.</p>
       </div>
-      <p>We treat Microsoft mail data exactly as we treat Google data (Section 4): access is read-only; message content is processed transiently to draft a time entry and then discarded; we store only the derived draft, a minimal evidence note and metadata, and an encrypted refresh token. We never send, modify, or delete your mail; we never sell the data; and we never use it to train AI/ML models. You can revoke LexClock's access at any time at <a href="https://myaccount.microsoft.com/" target="_blank" rel="noopener">myaccount.microsoft.com</a> or by disconnecting inside LexClock.</p>
+      <p>We treat Microsoft mail and calendar data exactly as we treat Google data (Section 4): access is read-only; message and event content is processed transiently to draft a time entry and then discarded; we store only the derived draft, a minimal evidence note and metadata, and an encrypted refresh token. We never send, modify, or delete your mail; we never create, change, or delete calendar events; we never sell the data; and we never use it to train AI/ML models. You can revoke LexClock's access at any time at <a href="https://myaccount.microsoft.com/" target="_blank" rel="noopener">myaccount.microsoft.com</a> or by disconnecting inside LexClock.</p>
     </section>
 
     <section class="s">

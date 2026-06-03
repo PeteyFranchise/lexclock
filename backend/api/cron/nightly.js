@@ -12,6 +12,7 @@ import { supabase, audit } from '../../lib/supabase.js';
 import { syncNotionForConnection } from '../../lib/notionSync.js';
 import { getActiveEmailConnections, syncEmailForConnection } from '../../lib/emailSync.js';
 import { getActiveCalendarConnections, syncCalendarForConnection } from '../../lib/calendarSync.js';
+import { getActiveOutlookConnections, syncOutlookForConnection } from '../../lib/outlookSync.js';
 
 export default withApi(async (req, res) => {
   requireCronSecret(req);
@@ -53,6 +54,16 @@ export default withApi(async (req, res) => {
       results.push({ userId: connection.user_id, source: 'calendar', ok: true, ...r });
     } catch (err) {
       results.push({ userId: connection.user_id, source: 'calendar', ok: false, error: err.message });
+    }
+  }
+
+  // 4. Outlook connections (one Microsoft connection drives mail + calendar).
+  for (const connection of await getActiveOutlookConnections()) {
+    try {
+      const r = await syncOutlookForConnection(connection, { anthropicKey });
+      results.push({ userId: connection.user_id, source: 'outlook', ok: true, ...r });
+    } catch (err) {
+      results.push({ userId: connection.user_id, source: 'outlook', ok: false, error: err.message });
     }
   }
 
