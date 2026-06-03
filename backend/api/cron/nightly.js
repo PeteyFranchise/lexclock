@@ -11,6 +11,7 @@ import { requireCronSecret } from '../../lib/auth.js';
 import { supabase, audit } from '../../lib/supabase.js';
 import { syncNotionForConnection } from '../../lib/notionSync.js';
 import { getActiveEmailConnections, syncEmailForConnection } from '../../lib/emailSync.js';
+import { getActiveCalendarConnections, syncCalendarForConnection } from '../../lib/calendarSync.js';
 
 export default withApi(async (req, res) => {
   requireCronSecret(req);
@@ -42,6 +43,16 @@ export default withApi(async (req, res) => {
       results.push({ userId: connection.user_id, source: connection.source, ok: true, ...r });
     } catch (err) {
       results.push({ userId: connection.user_id, source: connection.source, ok: false, error: err.message });
+    }
+  }
+
+  // 3. Google Calendar connections.
+  for (const connection of await getActiveCalendarConnections()) {
+    try {
+      const r = await syncCalendarForConnection(connection, { anthropicKey });
+      results.push({ userId: connection.user_id, source: 'calendar', ok: true, ...r });
+    } catch (err) {
+      results.push({ userId: connection.user_id, source: 'calendar', ok: false, error: err.message });
     }
   }
 

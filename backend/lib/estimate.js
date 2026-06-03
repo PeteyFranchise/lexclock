@@ -128,3 +128,59 @@ export async function estimateEmailTask(message, apiKey) {
     return emailHeuristic(message);
   }
 }
+
+// ---------------------------------------------------------------------------
+// Calendar event estimator. Unlike email/tasks, a calendar event has a KNOWN
+// duration (end - start), which is the strongest billable-time signal we get.
+// The heuristic bills the full duration; Claude may trim it (e.g. a 60-min
+// block where only part was substantive) and always writes the narrative.
+// ---------------------------------------------------------------------------
+function eventTitle(event) {
+  const who = (event.attendees || []).slice(0, 3).join(', ');
+  return event.summary
+    ? (who ? `${event.summary} with ${who}` : event.summary)
+    : (who ? `Meeting with ${who}` : 'Meeting');
+}
+
+export function calendarHeuristic(event) {
+  const minutes = Math.max(1, Math.round(Number(event.durationMin) || 0));
+  const base = event.summary ? event.summary.trim() : 'Conference';
+  const who = (event.attendees || []).slice(0, 3).join(', ');
+  const narrative = who
+    ? `Attended ${base.toLowerCase().startsWith('meeting') ? base.toLowerCase() : base} with ${who}.`
+    : `Attended ${base}.`;
+  return { minutes, narrative, confidence: 0.5, reasoning: 'Billed the scheduled meeting duration.' };
+}
+
+export async function estimateCalendarEvent(event, apiKey) {
+  const system = `You are a legal billing assistant. Given a calendar event an attorney attended, estimate the billable time and write the billing narrative.
+1. The scheduled duration is given. Default to billing the full scheduled duration in minutes (integer). Only reduce it if the title clearly implies part was non-billable (e.g., a block that includes a break). Never increase beyond the scheduled duration.
+2. Write a concise past-tense billing narrative describing the legal work (e.g., "Attended deposition of opposing witness." or "Telephone conference with client regarding settlement strategy."). Do not invent facts beyond the event details.
+3. Give a confidence between 0 and 1.
+Respond with ONLY a JSON object, no prose, no code fences:
+{"minutes": <integer>, "narrative": "<string>", "confidence": <number>, "reasoning": "<one short sentence>"}`;
+
+  const lines = [
+    `Title: ${event.summary || '(no title)'}`,
+    `Scheduled duration: ${event.durationMin} minutes`,
+  ];
+  if (event.attendees && event.attendees.length) lines.push(`Attendees: ${event.attendees.join(', ')}`);
+  if (event.location) lines.push(`Location: ${event.location}`);
+  if (event.description) lines.push(`Notes: ${String(event.description).slice(0, 2000)}`);
+
+  const result = await callClaudeEstimate(system, lines.join('\n'), apiKey, eventTitle(event));
+  // Safety clamp: never bill more than the scheduled duration.
+  const cap = Math.max(1, Math.round(Number(event.durationMin) || 0));
+  return { ...result, minutes: Math.min(result.minutes, cap) };
+}
+
+// Estimate a calendar event with Claude, falling back to the heuristic (full
+// scheduled duration) on any failure so one bad event never breaks a sync.
+export async function estimateCalendarTask(event, apiKey) {
+  if (!apiKey) return calendarHeuristic(event);
+  try {
+    return await estimateCalendarEvent(event, apiKey);
+  } catch (_) {
+    return calendarHeuristic(event);
+  }
+}

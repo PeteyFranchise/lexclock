@@ -1,7 +1,8 @@
 // GET /api/oauth/google/callback — Google redirects the browser here after the
-// user consents. We verify the signed state, exchange the code for tokens, store
-// the refresh token in source_connections (source 'gmail'), then redirect back
-// to the app with a status flag. No Bearer token is present on this hop — the
+// user consents. We verify the signed state (which carries the user id AND the
+// source: gmail | calendar), exchange the code for tokens, store the refresh
+// token in source_connections under that source, then redirect back to the app
+// with a per-source status flag. No Bearer token is present on this hop — the
 // signed state is what authenticates the user.
 import { withApi } from '../../../lib/cors.js';
 import { verifyState } from '../../../lib/oauthState.js';
@@ -25,30 +26,38 @@ export default withApi(async (req, res) => {
     res.end();
   };
 
+  // Recover the source from the signed state below; default to gmail so a
+  // pre-source-aware state (or a hand-built URL) still behaves like before.
   const { code, state, error } = req.query || {};
-  if (error) return redirect('gmail=denied');
-  if (!code || !state) return redirect('gmail=error');
 
   let uid;
-  try {
-    uid = verifyState(state).uid;
-  } catch (e) {
-    console.error('oauth callback: bad state', e);
-    return redirect('gmail=error');
+  let source = 'gmail';
+  if (state) {
+    try {
+      const claims = verifyState(state);
+      uid = claims.uid;
+      if (claims.source === 'calendar' || claims.source === 'gmail') source = claims.source;
+    } catch (e) {
+      console.error('oauth callback: bad state', e);
+      return redirect('gmail=error');
+    }
   }
+
+  if (error) return redirect(`${source}=denied`);
+  if (!code || !uid) return redirect(`${source}=error`);
 
   try {
     const tokens = await exchangeCode(code, process.env.GOOGLE_OAUTH_REDIRECT_URI);
     if (!tokens.refresh_token) {
       // Google only returns a refresh token on first consent; prompt=consent in
       // /start forces it, but guard anyway.
-      return redirect('gmail=norefresh');
+      return redirect(`${source}=norefresh`);
     }
 
     const { error: upsertErr } = await supabase.from('source_connections').upsert(
       {
         user_id: uid,
-        source: 'gmail',
+        source,
         refresh_token: tokens.refresh_token,
         secret: null,
         config: {},
@@ -59,13 +68,13 @@ export default withApi(async (req, res) => {
     );
     if (upsertErr) {
       console.error('oauth callback: upsert failed', upsertErr);
-      return redirect('gmail=error');
+      return redirect(`${source}=error`);
     }
 
-    await audit('gmail.connect', { userId: uid, source: 'gmail' });
-    return redirect('gmail=connected');
+    await audit(`${source}.connect`, { userId: uid, source });
+    return redirect(`${source}=connected`);
   } catch (e) {
     console.error('oauth callback: exchange failed', e);
-    return redirect('gmail=error');
+    return redirect(`${source}=error`);
   }
 });

@@ -2469,6 +2469,7 @@
         apiBaseUrl: 'https://lexclock-backend.vercel.app',
         apiKey: '',
         gmailConnected: false,
+        calendarConnected: false,
         outlookConnected: false,
         onboardingDismissed: false,
         emailDefaults: {
@@ -3417,35 +3418,52 @@
         return data;
       }
 
-      // After the server-side Gmail OAuth callback redirects back to /app/ with a
-      // ?gmail=... flag, surface the result and then reconcile the local
-      // connected state with the backend (the source of truth). Idempotent:
-      // safe to call on every load / auth-state change.
+      // After a server-side Google OAuth callback redirects back to /app/ with a
+      // ?gmail=... or ?calendar=... flag, surface the result and then reconcile
+      // the local connected state with the backend (the source of truth).
+      // Idempotent: safe to call on every load / auth-state change.
       async function syncGmailConnection() {
         const params = new URLSearchParams(window.location.search);
-        const flag = params.get('gmail');
-        if (flag) {
-          params.delete('gmail');
+        const labels = { gmail: 'Gmail', calendar: 'Google Calendar' };
+        let dirty = false;
+        for (const provider of ['gmail', 'calendar']) {
+          const flag = params.get(provider);
+          if (!flag) continue;
+          params.delete(provider);
+          dirty = true;
+          const label = labels[provider];
+          if (flag === 'connected') showToast(`${label} connected.`, 'success');
+          else if (flag === 'denied') showToast(`${label} connection cancelled.`, 'error');
+          else if (flag === 'norefresh') showToast('Google didn’t return a refresh token. Remove LexClock at myaccount.google.com/permissions, then reconnect.', 'error');
+          else if (flag === 'error') showToast(`${label} connection failed. Please try again.`, 'error');
+        }
+        if (dirty) {
           const qs = params.toString();
           const clean = window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash;
           window.history.replaceState({}, '', clean);
-          if (flag === 'connected') showToast('Gmail connected.', 'success');
-          else if (flag === 'denied') showToast('Gmail connection cancelled.', 'error');
-          else if (flag === 'norefresh') showToast('Google didn’t return a refresh token. Remove LexClock at myaccount.google.com/permissions, then reconnect.', 'error');
-          else if (flag === 'error') showToast('Gmail connection failed. Please try again.', 'error');
         }
         if (!backendConfigured()) return;
+        const settings = getSettings();
+        let changed = false;
         try {
           const status = await backendFetch('/api/email/status');
-          const settings = getSettings();
           const connected = !!(status && status.connected);
           if (settings.gmailConnected !== connected) {
             settings.gmailConnected = connected;
             if (!connected) settings.gmailEmail = '';
-            saveSettings(settings);
-            renderAll();
+            changed = true;
           }
         } catch (_) { /* backend unreachable: keep local state as-is */ }
+        try {
+          const status = await backendFetch('/api/calendar/status');
+          const connected = !!(status && status.connected);
+          if (settings.calendarConnected !== connected) {
+            settings.calendarConnected = connected;
+            if (!connected) settings.calendarEmail = '';
+            changed = true;
+          }
+        } catch (_) { /* backend unreachable: keep local state as-is */ }
+        if (changed) { saveSettings(settings); renderAll(); }
       }
 
       // Best-effort: tell the backend a draft was approved/discarded so server
@@ -4491,11 +4509,14 @@
 
       function renderConnectButton(provider) {
         const settings = getSettings();
-        const isGmail = provider === 'gmail';
-        const clientId = isGmail ? settings.googleClientId : settings.microsoftClientId;
-        const isConnected = isGmail ? settings.gmailConnected : settings.outlookConnected;
-        const helpKey = isGmail ? 'googleClientId' : 'microsoftClientId';
-        const label = isGmail ? 'Gmail' : 'Outlook';
+        // Gmail and Calendar both use LexClock's server-side Google OAuth (no
+        // per-user Client ID). Outlook still uses a client-side Microsoft id.
+        const isGoogle = provider === 'gmail' || provider === 'calendar';
+        const labels = { gmail: 'Gmail', calendar: 'Google Calendar', outlook: 'Outlook' };
+        const label = labels[provider] || provider;
+        const clientId = isGoogle ? '' : settings.microsoftClientId;
+        const isConnected = !!settings[`${provider}Connected`];
+        const helpKey = isGoogle ? 'googleClientId' : 'microsoftClientId';
         const buttonId = `btn-connect-${provider}`;
         const statusId = `status-connect-${provider}`;
         let buttonClass = 'btn-connect';
@@ -4516,11 +4537,11 @@
           buttonClass += ' is-disabled';
           statusText = 'Available once hosted (HTTPS)';
           action = 'help';
-        } else if (isGmail) {
+        } else if (isGoogle) {
           // Server-side OAuth: no per-user Client ID needed — just be signed in.
           if (!backendConfigured()) {
             buttonClass += ' is-disabled';
-            statusText = 'Sign in to connect Gmail';
+            statusText = `Sign in to connect ${label}`;
             action = 'help';
           } else {
             statusText = 'One-click connect — no setup required';
@@ -4552,23 +4573,25 @@
           return;
         }
 
-        // Gmail uses LexClock's server-side OAuth. We ask the backend for a
-        // Google consent URL (signed with our user id), then hand the browser
-        // off to Google. The authorization code is exchanged for a refresh
-        // token server-side in /api/oauth/google/callback — the token never
-        // touches the browser, and background sync keeps capturing billable
-        // time after the tab closes.
+        // Gmail and Google Calendar both use LexClock's server-side OAuth. We
+        // ask the backend for a Google consent URL (signed with our user id AND
+        // the source), then hand the browser off to Google. The authorization
+        // code is exchanged for a refresh token server-side in
+        // /api/oauth/google/callback — the token never touches the browser, and
+        // background sync keeps capturing billable time after the tab closes.
+        const labels = { gmail: 'Gmail', calendar: 'Google Calendar' };
+        const label = labels[provider] || 'Google';
         if (!backendConfigured()) {
-          showToast('Sign in to LexClock before connecting Gmail.', 'error');
+          showToast(`Sign in to LexClock before connecting ${label}.`, 'error');
           return;
         }
         try {
           showToast('Opening Google…', '');
-          const { url } = await backendFetch('/api/oauth/google/start', { method: 'POST' });
+          const { url } = await backendFetch('/api/oauth/google/start', { method: 'POST', body: { source: provider } });
           if (!url) throw new Error('The server did not return an authorization URL.');
           window.location.href = url;
         } catch (err) {
-          showToast(err.message || 'Could not start the Gmail connection.', 'error');
+          showToast(err.message || `Could not start the ${label} connection.`, 'error');
         }
       }
 
@@ -4630,8 +4653,66 @@
         }
       }
 
+      // Server-side Google Calendar sync. The backend pulls recently finished
+      // calendar events, bills the scheduled duration (refined by the shared
+      // Anthropic key), and writes idempotent pending drafts — event details
+      // never touch the browser. Mirrors syncGmailViaBackend.
+      async function syncCalendarViaBackend() {
+        if (!backendConfigured()) {
+          showToast('Sign in to LexClock before syncing Calendar.', 'error');
+          return;
+        }
+        state.calendarSync = { loading: true };
+        renderAll();
+        try {
+          const sync = await backendFetch('/api/calendar/sync', { method: 'POST', body: {} });
+          const list = await backendFetch('/api/drafts?status=pending');
+          const remoteDrafts = (list && list.drafts) || [];
+          const existingExternal = new Set(getDrafts().map((d) => d.externalId).filter(Boolean));
+          let created = 0;
+          for (const rd of remoteDrafts) {
+            if (rd.source !== 'calendar') continue; // only surface calendar drafts here
+            const ext = rd.external_id;
+            if (ext && existingExternal.has(ext)) continue;
+            addDraft({
+              source: 'calendar',
+              matterId: matchMatterByText(`${rd.evidence || ''} ${rd.description || ''}`).matterId,
+              date: rd.entry_date || todayKey(),
+              estimatedSeconds: Number(rd.estimated_seconds) || 0,
+              description: rd.description || '',
+              billable: rd.billable !== false,
+              confidence: rd.confidence == null ? null : Number(rd.confidence),
+              evidence: rd.evidence || '',
+              externalId: ext || null,
+              backendId: rd.id || null,
+            });
+            if (ext) existingExternal.add(ext);
+            created += 1;
+          }
+          state.calendarSync = {
+            done: true,
+            created,
+            serverCreated: (sync && sync.created) || 0,
+            serverTotal: (sync && sync.total) || 0,
+          };
+          renderAll();
+          showToast(
+            created
+              ? `${created} calendar ${created === 1 ? 'entry' : 'entries'} added to Review.`
+              : 'Calendar is up to date — no new meetings to bill.',
+            'success'
+          );
+        } catch (err) {
+          state.calendarSync = { error: (err && err.message) || 'Calendar sync failed.' };
+          renderAll();
+          showToast((err && err.message) || 'Calendar sync failed.', 'error');
+        }
+      }
+
       async function disconnectProvider(provider) {
-        const confirmed = confirm(`Disconnect ${provider === 'gmail' ? 'Gmail' : 'Outlook'}? Your logged billing entries will not be affected.`);
+        const labels = { gmail: 'Gmail', calendar: 'Google Calendar', outlook: 'Outlook' };
+        const label = labels[provider] || provider;
+        const confirmed = confirm(`Disconnect ${label}? Your logged billing entries will not be affected.`);
         if (!confirmed) return;
 
         const settings = getSettings();
@@ -4647,6 +4728,13 @@
           localStorage.removeItem('lexclock_gmail_expiry');
           localStorage.removeItem('lexclock_gmail_synced_ids');
           state.gmailSync = null;
+        } else if (provider === 'calendar') {
+          try {
+            await backendFetch('/api/calendar/status', { method: 'DELETE' });
+          } catch (_) { /* fall through to local cleanup */ }
+          settings.calendarConnected = false;
+          settings.calendarEmail = '';
+          state.calendarSync = null;
         } else {
           settings.outlookConnected = false;
           localStorage.removeItem('lexclock_outlook_token');
@@ -4655,7 +4743,7 @@
 
         saveSettings(settings);
         renderAll();
-        showToast(`${provider === 'gmail' ? 'Gmail' : 'Outlook'} disconnected`, 'success');
+        showToast(`${label} disconnected`, 'success');
       }
 
       function renderModal() {
@@ -5031,6 +5119,29 @@
           const msg = sync.created
             ? `${sync.created} new email ${sync.created === 1 ? 'entry' : 'entries'} drafted — review and approve them before anything bills.`
             : 'No new emails to bill — you’re all caught up.';
+          return `
+            <div class="ai-result">
+              <p>${escapeHtml(msg)}</p>
+              ${sync.created ? '<button class="btn-secondary" data-cta-view="view-review" type="button" style="margin-top:8px;">Open Review</button>' : ''}
+            </div>
+          `;
+        }
+        return '';
+      }
+
+      function renderCalendarSyncStatusHtml() {
+        const sync = state.calendarSync;
+        if (!sync) return '';
+        if (sync.loading) {
+          return '<p class="helper-text">Reviewing your recent calendar events…</p>';
+        }
+        if (sync.error) {
+          return `<div class="ai-result ai-error"><p>${escapeHtml(sync.error)}</p></div>`;
+        }
+        if (sync.done) {
+          const msg = sync.created
+            ? `${sync.created} new calendar ${sync.created === 1 ? 'entry' : 'entries'} drafted — review and approve them before anything bills.`
+            : 'No new meetings to bill — you’re all caught up.';
           return `
             <div class="ai-result">
               <p>${escapeHtml(msg)}</p>
@@ -5422,6 +5533,18 @@
             ${renderGmailSyncStatusHtml()}
             <div class="source-row">
               <div class="source-info">
+                <span class="source-name">Google Calendar</span>
+                <span class="source-sub">Recent meetings → drafts</span>
+              </div>
+              <div class="inline-actions">
+                ${getSettings().calendarConnected
+                  ? '<button class="btn-primary btn-sm" type="button" data-action="sync-calendar">Sync Calendar</button>'
+                  : '<button class="btn-secondary btn-sm" type="button" data-cta-view="view-settings">Connect Calendar</button>'}
+              </div>
+            </div>
+            ${renderCalendarSyncStatusHtml()}
+            <div class="source-row">
+              <div class="source-info">
                 <span class="source-name">Notion tasks</span>
                 <span class="source-sub">Tasks edited today → drafts</span>
               </div>
@@ -5432,7 +5555,7 @@
             </div>
             ${renderNotionSyncStatusHtml()}
             <p class="source-foot">${backendConfigured()
-              ? 'Connected to the LexClock backend. <strong>Sync Gmail</strong> and <strong>Sync Notion</strong> pull your latest work server-side and add estimated drafts here. They also run automatically every night.'
+              ? 'Connected to the LexClock backend. <strong>Sync Gmail</strong>, <strong>Sync Calendar</strong>, and <strong>Sync Notion</strong> pull your latest work server-side and add estimated drafts here. They also run automatically every night.'
               : 'Live sync needs the LexClock backend. Add your Backend URL + API key in <button class="link-btn" type="button" data-cta-view="view-settings">Settings</button>, or click <strong>Try sample tasks</strong> to preview the pipeline now.'}</p>
           </div>
           <div class="card">
@@ -5573,7 +5696,7 @@
                 <input id="anthropic-api-key" name="anthropicApiKey" type="password" value="${escapeHtml(settings.anthropicApiKey)}" />
               </div>
               <div class="field-row settings-full-span">
-                <div class="settings-section-heading">Email Sync</div>
+                <div class="settings-section-heading">Email &amp; Calendar Sync</div>
               </div>
               <div class="field-row settings-full-span">
                 <div class="settings-subsection">
@@ -5581,6 +5704,16 @@
                   <div class="field-row">
                     <p class="helper-text">One-click, secure connection — no Google Cloud setup required. LexClock requests <strong>read-only</strong> access; it can never send, delete, or modify your email. Authorization is handled on the LexClock server, so background sync keeps capturing billable time after you close the tab.</p>
                     ${renderConnectButton('gmail')}
+                  </div>
+                </div>
+              </div>
+              <div class="field-row settings-full-span">
+                <div class="settings-subsection">
+                  <h4>Google Calendar Sync</h4>
+                  <div class="field-row">
+                    <p class="helper-text">Connect your calendar to turn meetings, calls, and hearings into billable drafts automatically. LexClock requests <strong>read-only</strong> access; it can never create, edit, or delete events. The scheduled duration becomes the suggested time — nothing bills until you approve it in Review.</p>
+                    ${renderConnectButton('calendar')}
+                    <div id="calendar-sync-status">${renderCalendarSyncStatusHtml()}</div>
                   </div>
                 </div>
               </div>
@@ -5880,6 +6013,8 @@
           sendAnalysisToReview();
         } else if (action === 'sync-gmail') {
           syncGmailViaBackend();
+        } else if (action === 'sync-calendar') {
+          syncCalendarViaBackend();
         } else if (action === 'save-draft') {
           const form = actionButton.closest('form.draft-card');
           if (form) {
