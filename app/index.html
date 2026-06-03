@@ -3417,6 +3417,37 @@
         return data;
       }
 
+      // After the server-side Gmail OAuth callback redirects back to /app/ with a
+      // ?gmail=... flag, surface the result and then reconcile the local
+      // connected state with the backend (the source of truth). Idempotent:
+      // safe to call on every load / auth-state change.
+      async function syncGmailConnection() {
+        const params = new URLSearchParams(window.location.search);
+        const flag = params.get('gmail');
+        if (flag) {
+          params.delete('gmail');
+          const qs = params.toString();
+          const clean = window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash;
+          window.history.replaceState({}, '', clean);
+          if (flag === 'connected') showToast('Gmail connected.', 'success');
+          else if (flag === 'denied') showToast('Gmail connection cancelled.', 'error');
+          else if (flag === 'norefresh') showToast('Google didn’t return a refresh token. Remove LexClock at myaccount.google.com/permissions, then reconnect.', 'error');
+          else if (flag === 'error') showToast('Gmail connection failed. Please try again.', 'error');
+        }
+        if (!backendConfigured()) return;
+        try {
+          const status = await backendFetch('/api/email/status');
+          const settings = getSettings();
+          const connected = !!(status && status.connected);
+          if (settings.gmailConnected !== connected) {
+            settings.gmailConnected = connected;
+            if (!connected) settings.gmailEmail = '';
+            saveSettings(settings);
+            renderAll();
+          }
+        } catch (_) { /* backend unreachable: keep local state as-is */ }
+      }
+
       // Best-effort: tell the backend a draft was approved/discarded so server
       // status + audit log stay accurate. Never blocks or breaks local UX.
       function pushDraftDecision(draft, status) {
@@ -3822,7 +3853,7 @@
           workdayTargetHours: Math.max(0, Number(form.querySelector('[name="workdayTargetHours"]').value) || 0),
           logStartDefault: form.querySelector('[name="logStartDefault"]').value || existing.logStartDefault,
           anthropicApiKey: form.querySelector('[name="anthropicApiKey"]').value.trim(),
-          googleClientId: form.querySelector('[name="googleClientId"]').value.trim(),
+          googleClientId: (form.querySelector('[name="googleClientId"]')?.value || existing.googleClientId || '').trim(),
           microsoftClientId: form.querySelector('[name="microsoftClientId"]').value.trim(),
           notionToken: form.querySelector('[name="notionToken"]').value.trim(),
           notionDatabaseId: form.querySelector('[name="notionDatabaseId"]').value.trim(),
@@ -4467,8 +4498,6 @@
         const label = isGmail ? 'Gmail' : 'Outlook';
         const buttonId = `btn-connect-${provider}`;
         const statusId = `status-connect-${provider}`;
-        const canConnect = IS_HOSTED && clientId.trim().length > 0;
-
         let buttonClass = 'btn-connect';
         let buttonText = `Connect ${label}`;
         let statusText = '';
@@ -4485,11 +4514,20 @@
           action = 'connected';
         } else if (!IS_HOSTED) {
           buttonClass += ' is-disabled';
-          statusText = 'Available once hosted on GitHub Pages';
+          statusText = 'Available once hosted (HTTPS)';
           action = 'help';
+        } else if (isGmail) {
+          // Server-side OAuth: no per-user Client ID needed — just be signed in.
+          if (!backendConfigured()) {
+            buttonClass += ' is-disabled';
+            statusText = 'Sign in to connect Gmail';
+            action = 'help';
+          } else {
+            statusText = 'One-click connect — no setup required';
+          }
         } else if (!clientId.trim()) {
           buttonClass += ' is-disabled';
-          statusText = `Enter your ${label === 'Gmail' ? 'Google Client ID' : 'Microsoft Client ID'} above first`;
+          statusText = 'Enter your Microsoft Client ID above first';
           action = 'help';
         }
 
@@ -4553,42 +4591,24 @@
           return;
         }
 
-        const settings = getSettings();
-        if (!settings.googleClientId.trim()) {
-          openHelpModal('googleClientId');
+        // Gmail uses LexClock's server-side OAuth. We ask the backend for a
+        // Google consent URL (signed with our user id), then hand the browser
+        // off to Google. The authorization code is exchanged for a refresh
+        // token server-side in /api/oauth/google/callback — the token never
+        // touches the browser, and background sync keeps capturing billable
+        // time after the tab closes.
+        if (!backendConfigured()) {
+          showToast('Sign in to LexClock before connecting Gmail.', 'error');
           return;
         }
-
-        if (settings.outlookConnected) {
-          if (!confirm('This will disconnect Outlook. Continue?')) return;
-          settings.outlookConnected = false;
-          localStorage.removeItem('lexclock_outlook_token');
-          localStorage.removeItem('lexclock_outlook_expiry');
-          saveSettings(settings);
-        }
-
         try {
-          await loadGoogleIdentityServices();
+          showToast('Opening Google…', '');
+          const { url } = await backendFetch('/api/oauth/google/start', { method: 'POST' });
+          if (!url) throw new Error('The server did not return an authorization URL.');
+          window.location.href = url;
         } catch (err) {
-          showToast(err.message, 'error');
-          return;
+          showToast(err.message || 'Could not start the Gmail connection.', 'error');
         }
-
-        const tokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: settings.googleClientId.trim(),
-          scope: GMAIL_SCOPE,
-          callback: async (response) => {
-            if (response.error) {
-              showToast(`Google sign-in failed: ${response.error}`, 'error');
-              return;
-            }
-            const expiresAt = Date.now() + (Number(response.expires_in || 3600) * 1000) - 60000;
-            localStorage.setItem('lexclock_gmail_token', response.access_token);
-            localStorage.setItem('lexclock_gmail_expiry', String(expiresAt));
-            await finalizeGmailConnect();
-          },
-        });
-        tokenClient.requestAccessToken({ prompt: 'consent' });
       }
 
       async function finalizeGmailConnect() {
@@ -4720,23 +4740,29 @@
         await runEmailAnalysis();
       }
 
-      function disconnectProvider(provider) {
+      async function disconnectProvider(provider) {
         const confirmed = confirm(`Disconnect ${provider === 'gmail' ? 'Gmail' : 'Outlook'}? Your logged billing entries will not be affected.`);
         if (!confirmed) return;
 
         const settings = getSettings();
         if (provider === 'gmail') {
+          // Revoke + purge the server-side refresh token. Best-effort: clear
+          // locally even if the backend call fails so the UI stays consistent.
+          try {
+            await backendFetch('/api/email/status', { method: 'DELETE' });
+          } catch (_) { /* fall through to local cleanup */ }
           settings.gmailConnected = false;
+          settings.gmailEmail = '';
           localStorage.removeItem('lexclock_gmail_token');
           localStorage.removeItem('lexclock_gmail_expiry');
           localStorage.removeItem('lexclock_gmail_synced_ids');
+          state.gmailInbox = null;
         } else {
           settings.outlookConnected = false;
           localStorage.removeItem('lexclock_outlook_token');
           localStorage.removeItem('lexclock_outlook_expiry');
         }
 
-        if (provider === 'gmail') state.gmailInbox = null;
         saveSettings(settings);
         renderAll();
         showToast(`${provider === 'gmail' ? 'Gmail' : 'Outlook'} disconnected`, 'success');
@@ -5647,8 +5673,7 @@
                 <div class="settings-subsection">
                   <h4>Gmail Sync</h4>
                   <div class="field-row">
-                    <label class="label-row" for="google-client-id">Google Client ID<button class="help-btn" data-help-key="googleClientId" type="button" aria-label="Learn how to find the Google Client ID">?</button></label>
-                    <input id="google-client-id" name="googleClientId" type="text" value="${escapeHtml(settings.googleClientId)}" />
+                    <p class="helper-text">One-click, secure connection — no Google Cloud setup required. LexClock requests <strong>read-only</strong> access; it can never send, delete, or modify your email. Authorization is handled on the LexClock server, so background sync keeps capturing billable time after you close the tab.</p>
                     ${renderConnectButton('gmail')}
                   </div>
                 </div>
@@ -6276,9 +6301,10 @@
         client.auth.onAuthStateChange((_event, session) => {
           authSession = session || null;
           applyAuthGate();
-          if (authSession) renderAll();
+          if (authSession) { renderAll(); syncGmailConnection(); }
         });
         applyAuthGate();
+        if (authSession) syncGmailConnection();
         return Boolean(authSession);
       }
 
