@@ -1854,6 +1854,40 @@
         font-size: 0.98rem;
       }
 
+      .advanced-settings {
+        margin-top: 8px;
+        border-top: 1px solid var(--border);
+        padding-top: 8px;
+      }
+
+      .advanced-settings > summary {
+        cursor: pointer;
+        list-style: none;
+        font-size: 0.85rem;
+        color: var(--muted, #6b7280);
+        padding: 4px 0;
+        user-select: none;
+      }
+
+      .advanced-settings > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .advanced-settings > summary::before {
+        content: '\25B8'; /* right-pointing triangle */
+        display: inline-block;
+        margin-right: 6px;
+        transition: transform 0.15s ease;
+      }
+
+      .advanced-settings[open] > summary::before {
+        transform: rotate(90deg);
+      }
+
+      .advanced-settings > .field-row:first-of-type {
+        margin-top: 8px;
+      }
+
       .label-row {
         display: inline-flex;
         align-items: center;
@@ -5847,19 +5881,23 @@
                       ? '<button class="btn-secondary btn-sm" type="button" data-action="sign-out">Sign out</button>'
                       : '<button class="btn-primary btn-sm" type="button" data-action="sign-in">Sign in</button>'}</div>
                   </div>` : ''}
-                  <div class="field-row">
-                    <label for="api-base-url">Backend URL</label>
-                    <input id="api-base-url" name="apiBaseUrl" type="text" placeholder="https://your-app.vercel.app" value="${escapeHtml(settings.apiBaseUrl)}" />
-                  </div>
-                  <div class="field-row">
-                    <label for="api-key">API Key</label>
-                    <input id="api-key" name="apiKey" type="password" placeholder="lxk_..." value="${escapeHtml(settings.apiKey)}" />
-                    <small>When both are set, live Notion sync runs server-side (no CORS). Leave blank to use sample mode in Review.</small>
-                  </div>
-                  <div class="field-row">
-                    <button class="btn-secondary btn-sm" type="button" data-action="test-backend">Test connection</button>
-                    <small class="phase-note">Save your settings first, then test. Checks the backend is reachable and your API key is valid.</small>
-                  </div>
+                  <details class="advanced-settings">
+                    <summary>Advanced / developer settings</summary>
+                    <div class="field-row">
+                      <label for="api-base-url">Backend URL</label>
+                      <input id="api-base-url" name="apiBaseUrl" type="text" placeholder="https://your-app.vercel.app" value="${escapeHtml(settings.apiBaseUrl)}" />
+                      <small>Defaults to the LexClock server. Only change this if you are self-hosting the backend.</small>
+                    </div>
+                    <div class="field-row">
+                      <label for="api-key">API Key</label>
+                      <input id="api-key" name="apiKey" type="password" placeholder="lxk_..." value="${escapeHtml(settings.apiKey)}" />
+                      <small>Optional legacy key. With an account signed in above, you do not need this.</small>
+                    </div>
+                    <div class="field-row">
+                      <button class="btn-secondary btn-sm" type="button" data-action="test-backend">Test connection</button>
+                      <small class="phase-note">Save your settings first, then test. Checks the backend is reachable and your credentials are valid.</small>
+                    </div>
+                  </details>
                 </div>
               </div>
               <div class="field-row settings-full-span">
