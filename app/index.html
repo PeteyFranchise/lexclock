@@ -2575,7 +2575,7 @@
             </ol>
           `,
           caution:
-            'This is a client-side prototype. Notion’s API blocks direct browser calls (CORS), so a live sync needs the LexClock backend (Phase 4). Use "Try sample tasks" to see the Notion → draft pipeline now. When the backend ships, this same token moves server-side and never lives in the browser. Read-only: LexClock cannot edit or delete anything in Notion.',
+            'Read-only: LexClock cannot edit or delete anything in Notion. Your token is sent to the LexClock backend, which runs the sync server-side — it never lives in the browser. Use "Try sample tasks" to preview the Notion → draft pipeline without connecting.',
         },
       };
 
@@ -3180,13 +3180,13 @@
       }
 
       /* ----------------------------------------------------------------
-         Phase 4 — Notion activity source (client-side prototype).
-         Pulls tasks completed today from a Notion database, estimates
-         billable time (Claude, with a timestamp heuristic fallback),
-         maps each to a matter, and lands them in the Review hub via
-         addDraft({ source: 'notion', ... }). Notion's API blocks direct
-         browser calls (CORS), so live sync needs the backend (Phase 4/a);
-         "Try sample tasks" exercises the full pipeline today.
+         Notion activity source. Pulls tasks completed today from a Notion
+         database, estimates billable time (Claude, with a timestamp
+         heuristic fallback), maps each to a matter, and lands them in the
+         Review hub via addDraft({ source: 'notion', ... }). Live sync runs
+         server-side through the LexClock backend (Notion's API blocks
+         direct browser calls / CORS); "Try sample tasks" exercises the
+         full pipeline locally without connecting.
       ---------------------------------------------------------------- */
 
       // Shape mirrors what mapNotionPage() produces from a real API page,
@@ -5405,7 +5405,7 @@
           </div>
           <div class="card source-card">
             <div class="card-title">
-              <h3>Pull from a source <span class="pill pill-soft">Prototype</span></h3>
+              <h3>Pull from a source</h3>
             </div>
             <p class="helper-text">Bring completed work in from a connected tool. Each item becomes a draft below — estimated, matter-matched, and waiting for your approval.</p>
             <div class="source-row">
@@ -5622,7 +5622,7 @@
               </div>
               <div class="field-row settings-full-span">
                 <div class="settings-subsection">
-                  <h4>Notion Tasks <span class="phase-note">Prototype</span></h4>
+                  <h4>Notion Tasks</h4>
                   <div class="field-row">
                     <label class="label-row" for="notion-token">Notion Integration Token<button class="help-btn" data-help-key="notionToken" type="button" aria-label="Learn how to set up the Notion integration token">?</button></label>
                     <input id="notion-token" name="notionToken" type="password" placeholder="ntn_..." value="${escapeHtml(settings.notionToken)}" />
