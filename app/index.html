@@ -2309,6 +2309,28 @@
         font-weight: 800;
         font-size: 0.78rem;
       }
+      .btn-microsoft {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 10px;
+        padding: 11px 14px;
+        border: 1px solid #d6e1ea;
+        border-radius: var(--radius);
+        background: #fff;
+        font-weight: 600;
+        color: #2b3a47;
+        cursor: pointer;
+      }
+      .btn-microsoft:hover {
+        background: #f6fafd;
+      }
+      .btn-microsoft svg {
+        width: 18px;
+        height: 18px;
+      }
       .auth-switch {
         margin: 18px 0 4px;
         font-size: 0.88rem;
@@ -2362,6 +2384,7 @@
         <button class="btn-secondary auth-alt" type="button" data-auth-action="magic">Email me a magic link instead</button>
         <div class="auth-divider"><span>or</span></div>
         <button class="btn-google" type="button" data-auth-action="google"><span class="g-mark">G</span> Continue with Google</button>
+        <button class="btn-microsoft" type="button" data-auth-action="microsoft"><svg viewBox="0 0 23 23" aria-hidden="true"><rect x="1" y="1" width="10" height="10" fill="#F25022"/><rect x="12" y="1" width="10" height="10" fill="#7FBA00"/><rect x="1" y="12" width="10" height="10" fill="#00A4EF"/><rect x="12" y="12" width="10" height="10" fill="#FFB900"/></svg> Continue with Microsoft</button>
         <p class="auth-switch"><span id="auth-switch-text">New to LexClock?</span> <button type="button" class="link-btn" data-auth-action="toggle-mode" id="auth-switch-btn">Create an account</button></p>
         <button type="button" class="link-btn auth-forgot" data-auth-action="forgot">Forgot password?</button>
       </div>
@@ -6615,6 +6638,10 @@
           if (action === 'google') {
             setAuthMessage('Redirecting to Google…', '');
             const { error } = await client.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
+            if (error) setAuthMessage(error.message, 'error');
+          } else if (action === 'microsoft') {
+            setAuthMessage('Redirecting to Microsoft…', '');
+            const { error } = await client.auth.signInWithOAuth({ provider: 'azure', options: { redirectTo, scopes: 'openid email profile' } });
             if (error) setAuthMessage(error.message, 'error');
           } else if (action === 'magic') {
             if (!email) { setAuthMessage('Enter your email first.', 'error'); return; }
