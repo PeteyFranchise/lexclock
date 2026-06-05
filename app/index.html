@@ -5946,21 +5946,25 @@
               </div>
               <div class="field-row settings-full-span">
                 <div class="settings-subsection">
-                  <h4>Notion Tasks</h4>
-                  <div class="field-row">
-                    <label class="label-row" for="notion-token">Notion Integration Token<button class="help-btn" data-help-key="notionToken" type="button" aria-label="Learn how to set up the Notion integration token">?</button></label>
-                    <input id="notion-token" name="notionToken" type="password" placeholder="ntn_..." value="${escapeHtml(settings.notionToken)}" />
-                  </div>
-                  <div class="field-row">
-                    <label for="notion-database-id">Tasks Database ID</label>
-                    <input id="notion-database-id" name="notionDatabaseId" type="text" placeholder="32-character ID from the database URL" value="${escapeHtml(settings.notionDatabaseId)}" />
-                  </div>
-                  <div class="field-row">
-                    <label for="notion-matter-property">Matter Property <span class="phase-note">optional</span></label>
-                    <input id="notion-matter-property" name="notionMatterProperty" type="text" placeholder="e.g. Client or Matter" value="${escapeHtml(settings.notionMatterProperty)}" />
-                    <small>Name of the Notion property that names the client/matter, used to auto-match drafts. Leave blank to match from the task title.</small>
-                  </div>
-                  <small class="phase-note">Live sync runs from the Review tab. Notion blocks direct browser calls, so a real pull goes through the LexClock backend above. Without a backend, use "Try sample tasks" in Review to preview the pipeline.</small>
+                  <h4>Notion Tasks <span class="phase-note">${settings.notionToken ? 'connected' : 'optional'}</span></h4>
+                  <p class="helper-text">Pulls tasks you completed today from a Notion database and turns them into billing drafts. Read-only — LexClock can never edit or delete anything in Notion.</p>
+                  <details class="advanced-settings">
+                    <summary>Advanced / developer settings</summary>
+                    <div class="field-row">
+                      <label class="label-row" for="notion-token">Notion Integration Token<button class="help-btn" data-help-key="notionToken" type="button" aria-label="Learn how to set up the Notion integration token">?</button></label>
+                      <input id="notion-token" name="notionToken" type="password" placeholder="ntn_..." value="${escapeHtml(settings.notionToken)}" />
+                    </div>
+                    <div class="field-row">
+                      <label for="notion-database-id">Tasks Database ID</label>
+                      <input id="notion-database-id" name="notionDatabaseId" type="text" placeholder="32-character ID from the database URL" value="${escapeHtml(settings.notionDatabaseId)}" />
+                    </div>
+                    <div class="field-row">
+                      <label for="notion-matter-property">Matter Property <span class="phase-note">optional</span></label>
+                      <input id="notion-matter-property" name="notionMatterProperty" type="text" placeholder="e.g. Client or Matter" value="${escapeHtml(settings.notionMatterProperty)}" />
+                      <small>Name of the Notion property that names the client/matter, used to auto-match drafts. Leave blank to match from the task title.</small>
+                    </div>
+                    <small class="phase-note">Live sync runs from the Review tab. Notion blocks direct browser calls, so a real pull goes through the LexClock backend above. Without a backend, use "Try sample tasks" in Review to preview the pipeline.</small>
+                  </details>
                 </div>
               </div>
               <div class="field-row">
