@@ -25,6 +25,7 @@
         --brand-strong: #0b4f6c; /* ocean-800 — primary anchor */
         --brand-soft: #eff5f9;   /* ocean-050 — faint tint */
         --brand-ring: rgba(27, 111, 168, 0.34);
+        --focus: 0 0 0 3px rgba(242, 163, 65, 0.45); /* orange approval-glow focus ring */
         --accent: #e8842b;       /* orange-500 — CTA / approve */
         --accent-strong: #ce6e18;/* orange-600 — hover / pressed */
         --accent-soft: #fdf1e2;  /* orange-050 — approve-zone tint */
@@ -95,6 +96,10 @@
 
       a {
         color: inherit;
+      }
+
+      ::selection {
+        background: var(--accent-soft);
       }
 
       button,
@@ -434,6 +439,14 @@
       .btn-gold:active,
       .btn-danger:active {
         transform: translateY(1px);
+      }
+
+      .btn-primary:focus-visible,
+      .btn-secondary:focus-visible,
+      .btn-gold:focus-visible,
+      .btn-danger:focus-visible {
+        outline: none;
+        box-shadow: var(--focus);
       }
 
       .btn-primary {
@@ -788,7 +801,7 @@
       .field-row textarea:focus {
         outline: none;
         border-color: var(--brand);
-        box-shadow: 0 0 0 3px var(--brand-ring);
+        box-shadow: var(--focus);
       }
 
       .field-row textarea {
@@ -837,6 +850,11 @@
         border-left: 3px solid var(--accent);
         transition: box-shadow 0.18s ease, transform 0.34s cubic-bezier(0.2, 0.7, 0.2, 1),
           opacity 0.34s cubic-bezier(0.2, 0.7, 0.2, 1), background 0.28s ease;
+      }
+
+      .draft-card:hover {
+        box-shadow: var(--shadow-md);
+        border-color: var(--border-strong);
       }
 
       .draft-card.approving {
@@ -2237,7 +2255,7 @@
       .auth-form input:focus {
         outline: none;
         border-color: var(--brand);
-        box-shadow: 0 0 0 3px var(--brand-ring);
+        box-shadow: var(--focus);
       }
       .auth-submit {
         margin-top: 4px;
