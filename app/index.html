@@ -84,6 +84,11 @@
         font: inherit;
       }
 
+      input[type='checkbox'],
+      input[type='radio'] {
+        accent-color: var(--brand);
+      }
+
       button {
         cursor: pointer;
       }
@@ -348,11 +353,14 @@
 
       .stat-value {
         font-size: 1.9rem;
-        font-weight: 700;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
       }
 
       .money {
         color: var(--green);
+        font-variant-numeric: tabular-nums;
       }
 
       .meta-text,
